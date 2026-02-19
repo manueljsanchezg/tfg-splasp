@@ -68,6 +68,10 @@ class AnalysisResult:
     blocks: Dict[BlockKey, BlockStats]
     unknown_events: List[UnknownEvent] = field(default_factory=list)
 
+    total_scripts: int = 0
+    duplicate_scripts: int = 0
+    duplication_ratio: float = 0.0
+
     def to_json_dict(self) -> dict:
         return {
             "project_level": self.project_level,
@@ -83,6 +87,9 @@ class AnalysisResult:
                 for k, v in sorted(self.blocks.items(), key=lambda kv: kv[0].as_str().lower())
             },
             "unknown_events": [e.__dict__ for e in self.unknown_events],
+            "total_scripts": self.total_scripts,
+            "duplicate_scripts": self.duplicate_scripts,
+            "duplication_ratio": self.duplication_ratio
         }
 
 @dataclass
@@ -519,6 +526,11 @@ class ProjectAnalyzer:
         # Precomputed data
         self.configured_vars = _collect_configured_vars(root)
 
+        # Duplication data
+        self.total_scripts: int = 0
+        self.duplicate_scripts: int = 0
+        self.seen_hashes: Set[str] = set()
+
     def analyze(self) -> AnalysisResult:
         """Run the analysis and return results."""
         for scene in _iter_scenes(self.root):
@@ -571,6 +583,8 @@ class ProjectAnalyzer:
 
             # Owner's scripts
             for script in _iter_owner_scripts(owner_elem):
+                script_id = self._hash_script_structure(script)
+                self._calculate_duplicate_scripts(script_id)
                 state = _ScriptState()
                 self._analyze_script(owner_name, script, state)
 
@@ -588,6 +602,8 @@ class ProjectAnalyzer:
         # Analyze only the direct script child (not nested scripts)
         script = bd.find("script")
         if script is not None:
+            script_id = self._hash_script_structure(script)
+            self._calculate_duplicate_scripts(script_id)
             state = _ScriptState()
             self._analyze_script(owner, script, state)
 
@@ -719,6 +735,29 @@ class ProjectAnalyzer:
         state.ast_vars |= branch_ast_vars
         state.mutated_ast_vars |= branch_mutated_ast_vars
 
+    def _hash_script_structure(self, script: ET.Element) -> str:
+        """ 
+        Generates a hash of the logical structure of a script. 
+        """
+        signature = []
+
+        for elem in script.iter():
+            if elem.tag in ("block", "custom-block"):
+                selector = elem.get('s')
+                if selector:
+                    signature.append(selector)
+        
+        return hash("|".join(signature))
+    
+    def _calculate_duplicate_scripts(self, script_id: str) -> None:
+        self.total_scripts += 1
+
+        if script_id in self.seen_hashes:
+            self.duplicate_scripts += 1
+        else:
+            self.seen_hashes.add(script_id)
+
+
     def _build_result(self) -> AnalysisResult:
         """Build the final analysis result."""
         # Compute project-level indicator
@@ -731,10 +770,17 @@ class ProjectAnalyzer:
         for ev in self.unknown_events:
             max_level = max(max_level, ev.inferred_level)
 
+        duplication_ratio = 0.0
+        if self.total_scripts > 0:
+            duplication_ratio = (self.duplicate_scripts / self.total_scripts) * 100
+
         return AnalysisResult(
             project_level=max_level,
             blocks=self.blocks,
             unknown_events=self.unknown_events,
+            total_scripts=self.total_scripts,
+            duplicate_scripts=self.duplicate_scripts,
+            duplication_ratio=duplication_ratio
         )
 
 # ---------------------------------------------------------------------------
