@@ -13,28 +13,5 @@ async def analyze_snap_project(file: UploadFile):
     root = ET.fromstring(content)
 
     result = analyze_project(root)
-    
-    print(result)
 
-    blocks = []
-
-    for key, value in result.blocks.items():
-        block_parsed = {
-            "owner": key.owner,
-            "name": key.name,
-            "level": value.level,
-            "structural_changes": value.structural_changes,
-            "definition_changes": value.definition_changes,
-            "definition_level": value.definition_level,
-            "feature_guarded_definition_changes": value.feature_guarded_definition_changes,
-            "ast_pipeline_definition_changes": value.ast_pipeline_definition_changes,
-        }
-        blocks.append(block_parsed)
-
-    result_dict = {
-        "project_level": result.project_level,
-        "blocks": blocks,
-        "unknown_events": result.unknown_events
-    }
-
-    return {"filename": file.filename, "result": result_dict}
+    return {"filename": file.filename, "result": result.to_json_dict()}
