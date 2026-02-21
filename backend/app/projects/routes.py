@@ -14,4 +14,4 @@ async def analyze_snap_project(file: UploadFile):
 
     result = analyze_project(root)
 
-    return {"filename": file.filename, "result": result.to_json_dict()}
+    return result.to_json_dict()
