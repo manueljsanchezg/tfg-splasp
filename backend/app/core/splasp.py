@@ -30,6 +30,7 @@ import xml.etree.ElementTree as ET
 # Data model
 # ---------------------------------------------------------------------------
 
+
 @dataclass(frozen=True)
 class BlockKey:
     """Identifies a block by owner (sprite/stage) and logical name."""
@@ -39,6 +40,7 @@ class BlockKey:
 
     def as_str(self) -> str:
         return f"{self.owner}::{self.name}"
+
 
 @dataclass
 class BlockStats:
@@ -51,6 +53,7 @@ class BlockStats:
     feature_guarded_definition_changes: int = 0
     ast_pipeline_definition_changes: int = 0
 
+
 @dataclass
 class UnknownEvent:
     """A doSetBlockAttribute event whose target could not be resolved."""
@@ -61,6 +64,7 @@ class UnknownEvent:
     inferred_level: int
     feature_guarded: bool
     note: str
+
 
 @dataclass
 class AnalysisResult:
@@ -75,8 +79,10 @@ class AnalysisResult:
     def to_json_dict(self) -> dict:
         return {
             "project_level": self.project_level,
-            "blocks": {
-                k.as_str(): {
+            "blocks": [
+                {
+                    "owner": k.owner,
+                    "name": k.name,
                     "level": v.level,
                     "structural_changes": v.structural_changes,
                     "definition_changes": v.definition_changes,
@@ -85,12 +91,13 @@ class AnalysisResult:
                     "ast_pipeline_definition_changes": v.ast_pipeline_definition_changes,
                 }
                 for k, v in sorted(self.blocks.items(), key=lambda kv: kv[0].as_str().lower())
-            },
+            ],
             "unknown_events": [e.__dict__ for e in self.unknown_events],
             "total_scripts": self.total_scripts,
             "duplicate_scripts": self.duplicate_scripts,
-            "duplication_ratio": self.duplication_ratio
+            "duplication_ratio": self.duplication_ratio,
         }
+
 
 @dataclass
 class AnalysisConfig:
@@ -98,6 +105,7 @@ class AnalysisConfig:
 
     ignore_metaprogramming_library_definitions: bool = True
     include_unknown_events: bool = True
+
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -153,9 +161,11 @@ DEFINITION_ATTR: str = "definition"
 # Helper functions for repeated patterns
 # ---------------------------------------------------------------------------
 
+
 def _get_selector(elem: ET.Element) -> str:
     """Safely extract and normalize the 's' attribute."""
     return (elem.get("s") or "").strip()
+
 
 def _normalize_name(name: Optional[str]) -> Optional[str]:
     """Normalize a name: strip whitespace, return None if empty."""
@@ -164,15 +174,18 @@ def _normalize_name(name: Optional[str]) -> Optional[str]:
     stripped = name.strip()
     return stripped if stripped else None
 
+
 def _get_text(elem: Optional[ET.Element]) -> str:
     """Safely extract text content from an element."""
     if elem is None:
         return ""
     return (elem.text or "").strip()
 
+
 # ---------------------------------------------------------------------------
 # Efficient parsing
 # ---------------------------------------------------------------------------
+
 
 def parse_snap_xml(path: str | Path) -> ET.Element:
     """Parse the Snap! project XML.
@@ -187,14 +200,17 @@ def parse_snap_xml(path: str | Path) -> ET.Element:
             elem.clear()
     return root
 
+
 # ---------------------------------------------------------------------------
 # Snap! XML utilities
 # ---------------------------------------------------------------------------
+
 
 def _iter_scenes(root: ET.Element) -> Iterator[ET.Element]:
     """Iterate over scene elements in the project."""
     for scene in root.findall(".//scene"):
         yield scene
+
 
 def _iter_scene_block_definitions(scene: ET.Element) -> Iterator[ET.Element]:
     """Scene-level global block definitions."""
@@ -203,6 +219,7 @@ def _iter_scene_block_definitions(scene: ET.Element) -> Iterator[ET.Element]:
         return
     for bd in blocks.findall("block-definition"):
         yield bd
+
 
 def _scene_owner_nodes(scene: ET.Element) -> Iterator[Tuple[str, ET.Element]]:
     """Return (owner_name, owner_elem) for stage and sprites."""
@@ -214,6 +231,7 @@ def _scene_owner_nodes(scene: ET.Element) -> Iterator[Tuple[str, ET.Element]]:
         name = sprite.get("name") or "(unnamed sprite)"
         yield (name, sprite)
 
+
 def _iter_owner_scripts(owner_elem: ET.Element) -> Iterator[ET.Element]:
     """Top-level scripts for the owner (stage/sprite)."""
     scripts_container = owner_elem.find("scripts")
@@ -221,6 +239,7 @@ def _iter_owner_scripts(owner_elem: ET.Element) -> Iterator[ET.Element]:
         return
     for script in scripts_container.findall("script"):
         yield script
+
 
 def _iter_owner_block_definitions(owner_elem: ET.Element) -> Iterator[ET.Element]:
     """Block definitions owned by a sprite/stage."""
@@ -230,18 +249,22 @@ def _iter_owner_block_definitions(owner_elem: ET.Element) -> Iterator[ET.Element
     for bd in blocks.findall("block-definition"):
         yield bd
 
+
 def _block_definition_name(bd: ET.Element) -> str:
     """Extract the name/label of a block-definition."""
     return _get_selector(bd)
+
 
 def _is_ignored_library_block_definition(name: str) -> bool:
     """Check if a block definition belongs to the metaprogramming library."""
     low = name.strip().lower()
     return any(low.startswith(prefix) for prefix in META_LIBRARY_PREFIXES)
 
+
 def _child_elems_of_interest(block_elem: ET.Element) -> List[ET.Element]:
     """Return children that are arguments (excluding scripts)."""
     return [c for c in block_elem if c.tag in ("l", "block", "custom-block")]
+
 
 def _first_child_blocklike(block_elem: ET.Element) -> Optional[ET.Element]:
     """Return the first child that is <block> or <custom-block>."""
@@ -250,14 +273,17 @@ def _first_child_blocklike(block_elem: ET.Element) -> Optional[ET.Element]:
             return c
     return None
 
+
 def _direct_child_scripts(block_elem: ET.Element) -> List[ET.Element]:
     """Return direct child script elements."""
     return [c for c in block_elem if c.tag == "script"]
+
 
 def _extract_option_text(l_elem: ET.Element) -> str:
     """Extract option text from an <l> element."""
     opt = l_elem.find("option")
     return _get_text(opt) if opt is not None else ""
+
 
 def _iter_var_refs(elem: Optional[ET.Element]) -> Iterator[str]:
     """Iterate over variable references in an element subtree."""
@@ -267,6 +293,7 @@ def _iter_var_refs(elem: Optional[ET.Element]) -> Iterator[str]:
         v = b.get("var")
         if v:
             yield v
+
 
 def _find_first_custom_block_name(elem: Optional[ET.Element]) -> Optional[str]:
     """Find the first custom-block name in an element (including itself)."""
@@ -282,9 +309,11 @@ def _find_first_custom_block_name(elem: Optional[ET.Element]) -> Optional[str]:
             return name
     return None
 
+
 # ---------------------------------------------------------------------------
 # Target resolution
 # ---------------------------------------------------------------------------
+
 
 def _resolve_target_block_name(
     target_elem: Optional[ET.Element],
@@ -323,9 +352,11 @@ def _resolve_target_block_name(
 
     return None, "unable to resolve target"
 
+
 # ---------------------------------------------------------------------------
 # Single-pass expression analysis
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class ExprAnalysis:
@@ -335,6 +366,7 @@ class ExprAnalysis:
     has_join: bool = False
     has_split_blocks: bool = False
     has_ast_library: bool = False
+
 
 def _analyze_expr(expr: Optional[ET.Element]) -> ExprAnalysis:
     """Analyze an expression in a single pass, extracting all relevant info."""
@@ -369,13 +401,16 @@ def _analyze_expr(expr: Optional[ET.Element]) -> ExprAnalysis:
 
     return result
 
+
 def _is_ast_like_expr(analysis: ExprAnalysis) -> bool:
     """Check if expression analysis indicates AST-like operations."""
     return analysis.has_split_blocks or analysis.has_ast_library
 
+
 # ---------------------------------------------------------------------------
 # Configured variable detection
 # ---------------------------------------------------------------------------
+
 
 def _collect_configured_vars(root: ET.Element) -> Set[str]:
     """Collect variables that are configured by user interaction.
@@ -403,12 +438,15 @@ def _collect_configured_vars(root: ET.Element) -> Set[str]:
                 value_elem = children[1]
                 var_name = _get_text(var_elem)
                 # Check if value comes from getLastAnswer
-                if (value_elem.tag == "block" 
+                if (
+                    value_elem.tag == "block"
                     and _get_selector(value_elem) == "getLastAnswer"
-                    and var_name):
+                    and var_name
+                ):
                     configured.add(var_name)
 
     return configured
+
 
 def _is_feature_var(var_name: str, configured_vars: Set[str]) -> bool:
     """Determine if a variable is a feature/configuration variable.
@@ -418,9 +456,11 @@ def _is_feature_var(var_name: str, configured_vars: Set[str]) -> bool:
     """
     return var_name in configured_vars
 
+
 # ---------------------------------------------------------------------------
 # Block extractors
 # ---------------------------------------------------------------------------
+
 
 def _extract_do_define_block(block_elem: ET.Element) -> Optional[Tuple[str, str]]:
     """Extract (var_name, label) from doDefineBlock."""
@@ -435,7 +475,10 @@ def _extract_do_define_block(block_elem: ET.Element) -> Optional[Tuple[str, str]
         return None
     return var_name, label
 
-def _extract_do_set_var(block_elem: ET.Element) -> Optional[Tuple[str, Optional[ET.Element]]]:
+
+def _extract_do_set_var(
+    block_elem: ET.Element,
+) -> Optional[Tuple[str, Optional[ET.Element]]]:
     """Extract (var_name, value_expr) from doSetVar."""
     if _get_selector(block_elem) != "doSetVar":
         return None
@@ -448,6 +491,7 @@ def _extract_do_set_var(block_elem: ET.Element) -> Optional[Tuple[str, Optional[
         return None
     return var_name, expr
 
+
 def _extract_list_mutation_target_var(block_elem: ET.Element) -> Optional[str]:
     """Extract the target variable from a list mutation block."""
     if _get_selector(block_elem) not in LIST_MUTATION_BLOCKS:
@@ -456,6 +500,7 @@ def _extract_list_mutation_target_var(block_elem: ET.Element) -> Optional[str]:
         if b.tag == "block" and b.get("var"):
             return b.get("var")
     return None
+
 
 def _extract_do_set_block_attribute(
     block_elem: ET.Element,
@@ -471,9 +516,11 @@ def _extract_do_set_block_attribute(
     value = children[2]
     return opt_text, target, value
 
+
 # ---------------------------------------------------------------------------
 # Script state
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class _GuardContext:
@@ -485,6 +532,7 @@ class _GuardContext:
     @property
     def is_feature_guard(self) -> bool:
         return bool(self.feature_vars)
+
 
 @dataclass
 class _ScriptState:
@@ -508,9 +556,11 @@ class _ScriptState:
         """Check if currently inside a feature-guarded conditional."""
         return any(g.is_feature_guard for g in self.guards)
 
+
 # ---------------------------------------------------------------------------
 # Core analysis - ProjectAnalyzer class
 # ---------------------------------------------------------------------------
+
 
 class ProjectAnalyzer:
     """Analyzes a Snap! project for metaprogramming-based variability."""
@@ -607,7 +657,9 @@ class ProjectAnalyzer:
             state = _ScriptState()
             self._analyze_script(owner, script, state)
 
-    def _analyze_script(self, owner: str, script: ET.Element, state: _ScriptState) -> None:
+    def _analyze_script(
+        self, owner: str, script: ET.Element, state: _ScriptState
+    ) -> None:
         """Recursively analyze a script element."""
         for stmt in [c for c in script if c.tag == "block"]:
             selector = _get_selector(stmt)
@@ -651,7 +703,7 @@ class ProjectAnalyzer:
         attr, target_elem, value_expr = dsba
         target_name, reason = _resolve_target_block_name(target_elem, state.env)
 
-        is_definition = (attr == DEFINITION_ATTR)
+        is_definition = attr == DEFINITION_ATTR
         feature_guarded = state.feature_guarded() if is_definition else False
 
         # Determine level and ast_pipeline
@@ -669,9 +721,9 @@ class ProjectAnalyzer:
             mutated = bool(analysis.var_refs & state.mutated_ast_vars)
 
             ast_pipeline = (
-                (references_ast_vars and (analysis.has_join or analysis.has_split_blocks or mutated))
-                or (_is_ast_like_expr(analysis) and analysis.has_join)
-            )
+                references_ast_vars
+                and (analysis.has_join or analysis.has_split_blocks or mutated)
+            ) or (_is_ast_like_expr(analysis) and analysis.has_join)
 
             inferred_level = 3 if ast_pipeline else 2
             note = (
@@ -698,7 +750,9 @@ class ProjectAnalyzer:
             if not is_definition:
                 self._record_structural(owner, target_name)
             else:
-                self._record_definition(owner, target_name, inferred_level, feature_guarded, ast_pipeline)
+                self._record_definition(
+                    owner, target_name, inferred_level, feature_guarded, ast_pipeline
+                )
 
     def _process_control_flow(
         self,
@@ -718,8 +772,12 @@ class ProjectAnalyzer:
         if selector in CONDITIONAL_BLOCKS:
             cond_expr = _first_child_blocklike(stmt)
             cond_vars = set(_iter_var_refs(cond_expr))
-            feature_vars = {v for v in cond_vars if _is_feature_var(v, self.configured_vars)}
-            base.guards = base.guards + [_GuardContext(selector=selector, feature_vars=feature_vars)]
+            feature_vars = {
+                v for v in cond_vars if _is_feature_var(v, self.configured_vars)
+            }
+            base.guards = base.guards + [
+                _GuardContext(selector=selector, feature_vars=feature_vars)
+            ]
 
         # Analyze branches and collect AST variable info
         branch_ast_vars: Set[str] = set()
@@ -736,19 +794,19 @@ class ProjectAnalyzer:
         state.mutated_ast_vars |= branch_mutated_ast_vars
 
     def _hash_script_structure(self, script: ET.Element) -> str:
-        """ 
-        Generates a hash of the logical structure of a script. 
+        """
+        Generates a hash of the logical structure of a script.
         """
         signature = []
 
         for elem in script.iter():
             if elem.tag in ("block", "custom-block"):
-                selector = elem.get('s')
+                selector = elem.get("s")
                 if selector:
                     signature.append(selector)
-        
+
         return hash("|".join(signature))
-    
+
     def _calculate_duplicate_scripts(self, script_id: str) -> None:
         self.total_scripts += 1
 
@@ -756,7 +814,6 @@ class ProjectAnalyzer:
             self.duplicate_scripts += 1
         else:
             self.seen_hashes.add(script_id)
-
 
     def _build_result(self) -> AnalysisResult:
         """Build the final analysis result."""
@@ -780,26 +837,35 @@ class ProjectAnalyzer:
             unknown_events=self.unknown_events,
             total_scripts=self.total_scripts,
             duplicate_scripts=self.duplicate_scripts,
-            duplication_ratio=duplication_ratio
+            duplication_ratio=duplication_ratio,
         )
+
 
 # ---------------------------------------------------------------------------
 # Public API
 # ---------------------------------------------------------------------------
 
-def analyze_project(root: ET.Element, config: Optional[AnalysisConfig] = None) -> AnalysisResult:
+
+def analyze_project(
+    root: ET.Element, config: Optional[AnalysisConfig] = None
+) -> AnalysisResult:
     """Analyze a Snap! project XML tree."""
     analyzer = ProjectAnalyzer(root, config)
     return analyzer.analyze()
 
-def analyze_file(path: str | Path, config: Optional[AnalysisConfig] = None) -> AnalysisResult:
+
+def analyze_file(
+    path: str | Path, config: Optional[AnalysisConfig] = None
+) -> AnalysisResult:
     """Analyze a Snap! project from a file path."""
     root = parse_snap_xml(path)
     return analyze_project(root, config=config)
 
+
 # ---------------------------------------------------------------------------
 # Report (text)
 # ---------------------------------------------------------------------------
+
 
 def print_report(result: AnalysisResult, *, include_unknown: bool = True) -> None:
     """Print a human-readable (text) report."""
@@ -817,14 +883,22 @@ def print_report(result: AnalysisResult, *, include_unknown: bool = True) -> Non
 
     if result.blocks:
         print("Modified blocks (by owner::block):\n")
-        for key, st in sorted(result.blocks.items(), key=lambda kv: kv[0].as_str().lower()):
+        for key, st in sorted(
+            result.blocks.items(), key=lambda kv: kv[0].as_str().lower()
+        ):
             print(f"- {key.as_str()}")
             print(f"    level={st.level}")
             print(f"    structural_changes={st.structural_changes}")
-            print(f"    definition_changes={st.definition_changes} (definition_level={st.definition_level})")
+            print(
+                f"    definition_changes={st.definition_changes} (definition_level={st.definition_level})"
+            )
             if st.definition_changes:
-                print(f"    feature_guarded_definition_changes={st.feature_guarded_definition_changes}")
-                print(f"    ast_pipeline_definition_changes={st.ast_pipeline_definition_changes}")
+                print(
+                    f"    feature_guarded_definition_changes={st.feature_guarded_definition_changes}"
+                )
+                print(
+                    f"    ast_pipeline_definition_changes={st.ast_pipeline_definition_changes}"
+                )
             print()
 
     if include_unknown and result.unknown_events:
@@ -832,13 +906,17 @@ def print_report(result: AnalysisResult, *, include_unknown: bool = True) -> Non
         for ev in result.unknown_events:
             kind = "definition" if ev.is_definition else "structural"
             fg = "feature-guard" if ev.feature_guarded else "no-guard"
-            print(f"- owner={ev.owner} attr={ev.attribute} ({kind}) level~{ev.inferred_level} {fg}")
+            print(
+                f"- owner={ev.owner} attr={ev.attribute} ({kind}) level~{ev.inferred_level} {fg}"
+            )
             print(f"    note: {ev.note}")
         print()
+
 
 # ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
+
 
 def _build_arg_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(
@@ -864,6 +942,7 @@ def _build_arg_parser() -> argparse.ArgumentParser:
         help="Exclude UNKNOWN events (unresolved targets).",
     )
     return p
+
 
 def main(argv: Optional[Sequence[str]] = None) -> int:
     args = _build_arg_parser().parse_args(list(argv) if argv is not None else None)
@@ -892,6 +971,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         print_report(result, include_unknown=not args.exclude_unknown)
 
     return 0
+
 
 if __name__ == "__main__":
     raise SystemExit(main())
