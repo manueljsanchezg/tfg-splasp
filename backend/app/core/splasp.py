@@ -74,7 +74,11 @@ class AnalysisResult:
 
     total_scripts: int = 0
     duplicate_scripts: int = 0
-    duplication_ratio: float = 0.0
+    duplication_ratio: float = 0
+    total_combinations: int = 0
+    tangling_dict: Dict[int, int] = field(default_factory=dict)
+    scattering_dict: Dict[str, Set[int]] = field(default_factory=dict)
+    dead_features: Set[str] = field(default_factory=set)
 
     def to_json_dict(self) -> dict:
         return {
@@ -96,6 +100,10 @@ class AnalysisResult:
             "total_scripts": self.total_scripts,
             "duplicate_scripts": self.duplicate_scripts,
             "duplication_ratio": self.duplication_ratio,
+            "total_combinations": self.total_combinations,
+            "tangling_dict": self.tangling_dict,
+            "scattering_dict": self.scattering_dict,
+            "dead_features": self.dead_features
         }
 
 
@@ -420,11 +428,19 @@ def _collect_configured_vars(root: ET.Element) -> Set[str]:
     - Question responses: variables assigned from getLastAnswer (doAsk result)
     """
     configured: Set[str] = set()
+    total_combinations = 1
 
     # 1. Variables with slider watchers
     for w in root.iter("watcher"):
+        min = w.get("min")
+        max = w.get("max")
+
         style = (w.get("style") or "").strip().lower()
         if style == "slider":
+            if min is not None and max is not None:
+                w_states = ((int(max)) - int(min)) + 1
+                total_combinations *= w_states
+
             v = _normalize_name(w.get("var"))
             if v:
                 configured.add(v)
@@ -445,7 +461,7 @@ def _collect_configured_vars(root: ET.Element) -> Set[str]:
                 ):
                     configured.add(var_name)
 
-    return configured
+    return configured, total_combinations
 
 
 def _is_feature_var(var_name: str, configured_vars: Set[str]) -> bool:
@@ -574,12 +590,15 @@ class ProjectAnalyzer:
         self.unknown_events: List[UnknownEvent] = []
 
         # Precomputed data
-        self.configured_vars = _collect_configured_vars(root)
+        self.configured_vars, self.total_combinations = _collect_configured_vars(root)
 
         # Duplication data
         self.total_scripts: int = 0
         self.duplicate_scripts: int = 0
         self.seen_hashes: Set[str] = set()
+
+        # Features usage
+        self.features_usage_by_scripts: Dict[str, Set[str]] = dict()
 
     def analyze(self) -> AnalysisResult:
         """Run the analysis and return results."""
@@ -635,6 +654,7 @@ class ProjectAnalyzer:
             for script in _iter_owner_scripts(owner_elem):
                 script_id = self._hash_script_structure(script)
                 self._calculate_duplicate_scripts(script_id)
+                self._calculate_features_usage(script, script_id)
                 state = _ScriptState()
                 self._analyze_script(owner_name, script, state)
 
@@ -654,6 +674,7 @@ class ProjectAnalyzer:
         if script is not None:
             script_id = self._hash_script_structure(script)
             self._calculate_duplicate_scripts(script_id)
+            self._calculate_features_usage(script, script_id)
             state = _ScriptState()
             self._analyze_script(owner, script, state)
 
@@ -815,6 +836,13 @@ class ProjectAnalyzer:
         else:
             self.seen_hashes.add(script_id)
 
+    def _calculate_features_usage(self, script_elem: ET.Element, script_id: str) -> None:
+        vars_in_script = set(_iter_var_refs(script_elem))
+        features_in_script = vars_in_script.intersection(self.configured_vars)
+        
+        if features_in_script:
+            self.features_usage_by_scripts[script_id] = features_in_script
+
     def _build_result(self) -> AnalysisResult:
         """Build the final analysis result."""
         # Compute project-level indicator
@@ -831,6 +859,19 @@ class ProjectAnalyzer:
         if self.total_scripts > 0:
             duplication_ratio = (self.duplicate_scripts / self.total_scripts) * 100
 
+        tangling_dict = dict()
+        scattering_dict = dict()
+        for script_id, features in self.features_usage_by_scripts.items():
+            tangling_dict[script_id] = len(features)
+        
+        for script_id, features in self.features_usage_by_scripts.items():
+            for feature in features:
+                if feature not in scattering_dict:
+                    scattering_dict[feature] = set()
+                scattering_dict[feature].add(script_id)
+
+        dead_features = self.configured_vars - set(scattering_dict.keys())
+
         return AnalysisResult(
             project_level=max_level,
             blocks=self.blocks,
@@ -838,6 +879,10 @@ class ProjectAnalyzer:
             total_scripts=self.total_scripts,
             duplicate_scripts=self.duplicate_scripts,
             duplication_ratio=duplication_ratio,
+            total_combinations=self.total_combinations,
+            tangling_dict=tangling_dict,
+            scattering_dict=scattering_dict,
+            dead_features=dead_features
         )
 
 
