@@ -8,6 +8,9 @@ from app.user.routes import router as user_routes
 from app.auth.routes import router as auth_routes
 from app.projects.routes import router as project_routes
 
+import app.projects.models
+import app.user.models
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
