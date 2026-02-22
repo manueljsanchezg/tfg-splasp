@@ -10,7 +10,7 @@ class BaseRepository(Generic[T]):
         self.session = session
         self.model = model
 
-    async def get_all(self) -> List[object]:
+    async def get_all(self) -> List[T]:
         stmt = select(self.model)
         res = await self.session.execute(stmt)
         return res.scalars().all()
