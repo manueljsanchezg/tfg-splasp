@@ -11,10 +11,19 @@ class Project(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     title: Mapped[str] = mapped_column()
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=func.now())
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=func.now()
+    )
 
-    user_id: Mapped[Optional[int]] = mapped_column(ForeignKey("users.id"), nullable=True)
+    user_id: Mapped[Optional[int]] = mapped_column(
+        ForeignKey("users.id"), nullable=True
+    )
+    session_id: Mapped[Optional[int]] = mapped_column(
+        ForeignKey("sessions.id"), nullable=True
+    )
 
+    user: Mapped[Optional["User"]] = relationship(back_populates="projects")
+    session: Mapped[Optional["Session"]] = relationship(back_populates="projects")
     project_versions: Mapped[List["ProjectVersion"]] = relationship(
         back_populates="project"
     )
@@ -25,7 +34,9 @@ class ProjectVersion(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     version_number: Mapped[int] = mapped_column()
-    uploaded_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=func.now())
+    uploaded_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=func.now()
+    )
 
     project_id: Mapped[int] = mapped_column(ForeignKey("projects.id"))
     project: Mapped["Project"] = relationship(back_populates="project_versions")

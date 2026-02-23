@@ -10,6 +10,7 @@ from app.projects.routes import router as project_routes
 
 import app.projects.models
 import app.user.models
+import app.session.models
 
 
 @asynccontextmanager
