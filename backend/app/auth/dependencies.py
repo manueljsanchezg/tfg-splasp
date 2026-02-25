@@ -59,4 +59,4 @@ def require_role(role: Role):
 
     return dependency
 
-AdminDep = Annotated[User, Depends(require_role(Role.ADMIN))]
+CurrentAdminDep = Annotated[User, Depends(require_role(Role.ADMIN))]
