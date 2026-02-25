@@ -1,5 +1,5 @@
 from typing import Optional
-from datetime import datetime
+from datetime import datetime, timezone
 import string
 import secrets
 
@@ -27,10 +27,10 @@ class SessionService(BaseService[Session, SessionRepository]):
 
         return await self.repository.save(new_session)
     
-    async def join(self, code: str, user_id: int):
+    async def join(self, code: str, user_id: int) -> Optional[int]:
         session = await self.repository.get_by_code(code)
 
-        if not session or not session.is_active:
+        if not session or not session.is_active or session.end_date < datetime.now(timezone.utc):
             return None
         
         user = await self.user_service.get_by_id(user_id)
@@ -51,7 +51,7 @@ class SessionService(BaseService[Session, SessionRepository]):
 
         await self.project_sevice.save(new_project)
 
-        return session
+        return session.id
     
     async def close(self, session_id: int):
         session = await self.repository.get_by_id(session_id)
