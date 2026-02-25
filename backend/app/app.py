@@ -6,9 +6,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.db import Base, engine
 from app.user.routes import router as user_routes
 from app.auth.routes import router as auth_routes
-from app.projects.routes import router as project_routes
+from app.session.routes import router as session_routes
+from app.project.routes import router as project_routes
 
-import app.projects.models
+import app.project.models
 import app.user.models
 import app.session.models
 
@@ -41,7 +42,9 @@ app.add_middleware(
 
 app.include_router(user_routes)
 app.include_router(auth_routes)
+app.include_router(session_routes)
 app.include_router(project_routes)
+
 
 @app.get("/health")
 async def root():
