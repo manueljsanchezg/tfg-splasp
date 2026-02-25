@@ -14,12 +14,12 @@ async def create_session(session: CreateSession, service: SessionServiceDep, use
 
 @router.post("/join")
 async def join_session(session: JoinSession, service: SessionServiceDep, user: CurrentUserDep):
-    joined = await service.join(session.code, user.id)
+    session_id = await service.join(session.code, user.id)
 
-    if joined == None:
+    if session_id == None:
         raise HTTPException(status_code=404, detail="Session not found")
     
-    return joined
+    return {" session_id": session_id }
 
 
 @router.patch("/{session_id}")
