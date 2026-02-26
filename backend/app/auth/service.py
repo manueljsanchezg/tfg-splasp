@@ -24,7 +24,7 @@ class AuthService:
         }
         token = generate_jwt(payload)
 
-        return token
+        return token, existing_user.role
     
     async def register_user(self, username: str, password: str):
         existing_user = await self.user_service.get_by_username(username)
@@ -46,4 +46,4 @@ class AuthService:
 
         token = generate_jwt(payload)
 
-        return token
+        return token, new_user.role

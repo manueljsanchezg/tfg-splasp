@@ -9,6 +9,9 @@ class BaseAuthReq(BaseModel):
 class LoginReq(BaseAuthReq):
     pass
 
+class AuthResponse(BaseModel):
+    access_token: str
+    role: str
 
 class Token(BaseModel):
     access_token: str
