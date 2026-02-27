@@ -10,9 +10,7 @@ import SessionPage from './pages/admin/SessionPages'
 import MyProjectsPage from './pages/user/MyProjectsPage'
 import PageLayout from './components/PageLayout'
 
-
 export default function App() {
-
   const { token, role } = useAuth()
 
   let publicRoutes = <></>
@@ -21,18 +19,32 @@ export default function App() {
   let adminRoutes = <></>
 
   switch (role) {
-    case "ADMIN":
+    case 'ADMIN':
       adminRoutes = (
         <>
-          <Route path='/sessions' element={<AdminRoute><SessionPage /></AdminRoute>} />
+          <Route
+            path="/sessions"
+            element={
+              <AdminRoute>
+                <SessionPage />
+              </AdminRoute>
+            }
+          />
         </>
       )
       break
 
-    case "USER":
+    case 'USER':
       userRoutes = (
         <>
-          <Route path='/projects' element={<ProtectedRoute><MyProjectsPage /></ProtectedRoute>} />
+          <Route
+            path="/projects"
+            element={
+              <ProtectedRoute>
+                <MyProjectsPage />
+              </ProtectedRoute>
+            }
+          />
         </>
       )
       break

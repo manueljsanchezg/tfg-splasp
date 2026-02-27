@@ -1,9 +1,5 @@
-
-function MyProjectsPage () {
-    
-    return (
-        <p>My projects</p>
-    )
+function MyProjectsPage() {
+  return <p>My projects</p>
 }
 
 export default MyProjectsPage

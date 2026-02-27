@@ -24,9 +24,9 @@ function AnalysisResult() {
 
         setProjectMetrics((prev) => ({
           ...prev,
-          projectLevel: result.project_level,
-          duplicateScripts: result.duplicate_scripts,
-          duplicationRatio: result.duplication_ratio,
+          projectLevel: result.projectLevel,
+          duplicateScripts: result.duplicateScripts,
+          duplicationRatio: result.duplicationRatio,
           blocks: result.blocks,
         }))
       } catch (error) {

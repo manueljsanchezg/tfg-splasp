@@ -1,7 +1,6 @@
 import type { AuthResponse, LoginData } from '../types/auth'
 import { api } from './api'
 
-
 export const registerUser = async (loginData: LoginData): Promise<AuthResponse> => {
   try {
     const response = await api.post<AuthResponse>('/auth/register', loginData)

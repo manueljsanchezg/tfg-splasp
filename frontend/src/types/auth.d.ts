@@ -4,7 +4,7 @@ interface AuthData {
 }
 
 export interface AuthResponse {
-  accessToken: string,
+  accessToken: string
   role: string
 }
 

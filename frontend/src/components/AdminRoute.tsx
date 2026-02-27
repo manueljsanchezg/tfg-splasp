@@ -1,5 +1,5 @@
-import { Navigate } from "react-router-dom"
-import { useAuth } from "../hooks/useAuth"
+import { Navigate } from 'react-router-dom'
+import { useAuth } from '../hooks/useAuth'
 
 function AdminRoute({ children }: { children: React.ReactNode }) {
   const { token, role } = useAuth()

@@ -29,82 +29,82 @@ export default function LoginPage() {
         })
         navigate('/')
       }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Login error')
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Login error')
     } finally {
       setIsLoading(false)
     }
   }
 
   return (
-      <div className="w-full max-w-md space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-base-content">
-            Sign In
-          </h2>
+    <div className="w-full max-w-md space-y-8">
+      <div>
+        <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-base-content">
+          Sign In
+        </h2>
+      </div>
+
+      <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
+        {error && <div className="rounded-lg bg-error/20 p-4 text-sm text-error">{error}</div>}
+
+        <div className="form-control w-full">
+          <label className="label">
+            <span className="label-text font-medium">Username</span>
+          </label>
+          <input
+            type="text"
+            placeholder="Your username"
+            className={`input input-bordered w-full ${errors.username ? 'input-error' : ''}`}
+            {...register('username', {
+              required: 'Username is required',
+            })}
+          />
+          {errors.username && (
+            <label className="label">
+              <span className="label-text-alt text-error">{errors.username.message}</span>
+            </label>
+          )}
         </div>
 
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
-          {error && <div className="rounded-lg bg-error/20 p-4 text-sm text-error">{error}</div>}
-
-          <div className="form-control w-full">
+        <div className="form-control w-full">
+          <label className="label">
+            <span className="label-text font-medium">Password</span>
+          </label>
+          <input
+            type="password"
+            placeholder="Your password"
+            className={`input input-bordered w-full ${errors.password ? 'input-error' : ''}`}
+            {...register('password', {
+              required: 'Password is required',
+            })}
+          />
+          {errors.password && (
             <label className="label">
-              <span className="label-text font-medium">Username</span>
+              <span className="label-text-alt text-error">{errors.password.message}</span>
             </label>
-            <input
-              type="text"
-              placeholder="Your username"
-              className={`input input-bordered w-full ${errors.username ? 'input-error' : ''}`}
-              {...register('username', {
-                required: 'Username is required',
-              })}
-            />
-            {errors.username && (
-              <label className="label">
-                <span className="label-text-alt text-error">{errors.username.message}</span>
-              </label>
-            )}
-          </div>
+          )}
+        </div>
 
-          <div className="form-control w-full">
-            <label className="label">
-              <span className="label-text font-medium">Password</span>
-            </label>
-            <input
-              type="password"
-              placeholder="Your password"
-              className={`input input-bordered w-full ${errors.password ? 'input-error' : ''}`}
-              {...register('password', {
-                required: 'Password is required',
-              })}
-            />
-            {errors.password && (
-              <label className="label">
-                <span className="label-text-alt text-error">{errors.password.message}</span>
-              </label>
-            )}
-          </div>
+        <button type="submit" disabled={isLoading} className="btn btn-primary w-full">
+          {isLoading ? (
+            <>
+              <span className="loading loading-spinner loading-sm"></span>
+              Signing in...
+            </>
+          ) : (
+            'Sign In'
+          )}
+        </button>
 
-          <button type="submit" disabled={isLoading} className="btn btn-primary w-full">
-            {isLoading ? (
-              <>
-                <span className="loading loading-spinner loading-sm"></span>
-                Signing in...
-              </>
-            ) : (
-              'Sign In'
-            )}
-          </button>
-
-          <div className="text-center text-sm">
-            <p className="text-base-content/70">
-              Don't have an account?{' '}
-              <Link to="/register" className="font-medium text-primary hover:text-primary/80">
-                Create one here
-              </Link>
-            </p>
-          </div>
-        </form>
-      </div>
+        <div className="text-center text-sm">
+          <p className="text-base-content/70">
+            Don't have an account?{' '}
+            <Link to="/register" className="font-medium text-primary hover:text-primary/80">
+              Create one here
+            </Link>
+          </p>
+        </div>
+      </form>
+    </div>
   )
 }
