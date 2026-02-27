@@ -1,8 +1,8 @@
 from typing import List, Dict
 from fastapi import UploadFile
-from pydantic import BaseModel
+from app.core.base_model_camel import BaseModelCamel
 
-class Block(BaseModel):
+class Block(BaseModelCamel):
     owner: str
     name: str
     level: int
@@ -12,7 +12,7 @@ class Block(BaseModel):
     feature_guarded_definition_changes: int
     ast_pipeline_definition_changes: int
 
-class Result(BaseModel):
+class Result(BaseModelCamel):
     project_level: int
     blocks: List[Block]
     total_scripts: int

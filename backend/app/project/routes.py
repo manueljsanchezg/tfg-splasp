@@ -10,7 +10,7 @@ from app.project.schemas import Result
 router = APIRouter(prefix="/api/projects", tags=["projects"])
 
 @router.post("/analyze")
-async def analyze_snap_project(file: UploadFile, user: CurrentUserDep, project_service: ProjectServiceDep, session_id: int = Form()):
+async def analyze_snap_project(file: UploadFile, user: CurrentUserDep, project_service: ProjectServiceDep, session_id: int = Form(alias="sessionId")):
 
     print(file.filename)
     is_xml_extension = file.filename.lower().endswith(".xml")
