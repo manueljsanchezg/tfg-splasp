@@ -1,13 +1,19 @@
+from typing import List
+
 from fastapi import APIRouter, HTTPException
 
 from app.auth.dependencies import CurrentAdminDep, CurrentUserDep
 from app.session.dependencies import SessionServiceDep
-from app.session.schemas import CreateSession, JoinSession
+from app.session.schemas import CreateSession, JoinSession, ReadSession
 
 
 router = APIRouter(prefix="/api/sessions", tags=["sessions"])
 
-@router.post("/")
+@router.get("", response_model=List[ReadSession])
+async def get_all_sessions(service: SessionServiceDep, user: CurrentAdminDep):
+    return await service.get_all()
+
+@router.post("")
 async def create_session(session: CreateSession, service: SessionServiceDep, user: CurrentAdminDep):
     return await service.create(session.title, session.start_date, session.end_date)
 
