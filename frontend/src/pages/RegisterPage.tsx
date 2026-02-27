@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom'
 import { registerUser } from '../service/auth.service'
 import { useAuthStore } from '../store/authStore'
 import type { LoginData } from '../types/auth'
-import PageLayout from '../components/PageLayout'
 
 interface RegisterFormData extends LoginData {
   email: string
@@ -34,7 +33,7 @@ export default function RegisterPage() {
       })  
       if (response) {
         login({
-          token: response.token,
+          token: response.accessToken,
           role: response.role,
         })
         navigate('/')

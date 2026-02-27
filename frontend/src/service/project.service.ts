@@ -1,6 +1,7 @@
+import type { ProjectMetrics } from '../types/project'
 import { api } from './api'
 
-export const analyzeProject = async (project: File) => {
+export const analyzeProject = async (project: File): Promise<ProjectMetrics> => {
   try {
     const formData = new FormData()
     formData.append('file', project)
@@ -12,5 +13,6 @@ export const analyzeProject = async (project: File) => {
     return response.data
   } catch (error) {
     console.error('Error analyzing project', error)
+    throw error
   }
 }

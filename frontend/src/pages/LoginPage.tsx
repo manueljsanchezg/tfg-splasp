@@ -24,7 +24,7 @@ export default function LoginPage() {
       console.log(response)
       if (response) {
         login({
-          token: response.token,
+          token: response.accessToken,
           role: response.role,
         })
         navigate('/')
