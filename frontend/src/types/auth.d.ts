@@ -3,6 +3,11 @@ interface AuthData {
   role: string
 }
 
+export interface AuthResponse {
+  accessToken: string,
+  role: string
+}
+
 export interface AuthStore {
   token: string | null
   role: string | null
