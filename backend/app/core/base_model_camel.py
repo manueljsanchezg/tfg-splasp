@@ -4,5 +4,6 @@ from pydantic.alias_generators import to_camel
 class BaseModelCamel(BaseModel):
     model_config = ConfigDict(
         alias_generator=to_camel,
-        populate_by_name=True
+        populate_by_name=True,
+        by_alias=True
     )

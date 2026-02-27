@@ -4,13 +4,14 @@ from pydantic import BaseModel
 
 class ReadSession(BaseModelCamel):
     id: int
-    title: str
+    name: str
+    code: str
     start_date: datetime
     end_date: datetime
     is_active: bool
 
 class CreateSession(BaseModelCamel):
-    title: str
+    name: str
     start_date: datetime
     end_date: datetime
 
