@@ -1,13 +1,15 @@
 import { useEffect, useState } from 'react'
 import type { SessionResponse } from '../../types/session'
-import { getAllSessions } from '../../service/session.service'
+import { getAllSessions, closeSession } from '../../service/session.service'
 import CreateSessionModal from '../../components/CreateSessionModal'
+import ConfirmModal from '../../components/ConfirmModal'
 
 function SessionPage() {
   const [sessions, setSessions] = useState<SessionResponse[] | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [sessionToDeactivate, setSessionToDeactivate] = useState<number | null>(null)
 
   const getSessions = async () => {
     try {
@@ -19,6 +21,28 @@ function SessionPage() {
     } finally {
       setIsLoading(false)
     }
+  }
+
+  const handleDeactivate = (sessionId: number) => {
+    setSessionToDeactivate(sessionId)
+  }
+
+  const confirmDeactivate = async () => {
+    if (sessionToDeactivate === null) return
+
+    try {
+      await closeSession(sessionToDeactivate)
+      await getSessions()
+    } catch (err) {
+      console.error(err)
+      setError('Failed to deactivate session')
+    } finally {
+      setSessionToDeactivate(null)
+    }
+  }
+
+  const cancelDeactivate = () => {
+    setSessionToDeactivate(null)
   }
 
   useEffect(() => {
@@ -52,6 +76,14 @@ function SessionPage() {
         </div>
       )}
 
+      <ConfirmModal
+        isOpen={sessionToDeactivate !== null}
+        title="Deactivate session"
+        message="Are you sure you want to deactivate this session?"
+        onConfirm={confirmDeactivate}
+        onCancel={cancelDeactivate}
+      />
+
       {isLoading && (
         <div className="flex justify-center items-center h-64">
           <span className="loading loading-spinner loading-lg text-primary"></span>
@@ -64,13 +96,14 @@ function SessionPage() {
             <table className="table table-lg w-full">
               <thead className="bg-base-300 text-2xl uppercase">
                 <tr>
-                  <th className="px-4 py-4 font-bold text-base-content text-center">
+                  <th className="px-4 py-4 font-bold text-center">
                     Session Name
                   </th>
-                  <th className="px-4 py-4 font-bold text-base-content text-center">Code</th>
-                  <th className="px-4 py-4 font-bold text-base-content text-center">Start Date</th>
-                  <th className="px-4 py-4 font-bold text-base-content text-center">End Date</th>
-                  <th className="px-4 py-4 font-bold text-base-content text-center">Status</th>
+                  <th className="px-4 py-4 font-bold text-center">Code</th>
+                  <th className="px-4 py-4 font-bold text-center">Start Date</th>
+                  <th className="px-4 py-4 font-bold text-center">End Date</th>
+                  <th className="px-4 py-4 font-bold text-center">Status</th>
+                  <th className="px-4 py-4 font-bold text-center">Actions</th>
                 </tr>
               </thead>
 
@@ -96,13 +129,25 @@ function SessionPage() {
                     </td>
                     <td className="px-4 py-4 text-center">
                       {session.isActive ? (
-                        <span className="badge badge-success badge-xl text-xl font-bold">
+                        <span className="badge badge-success badge-xl text-xl font-bold w-30 justify-center">
                           Active
                         </span>
                       ) : (
-                        <span className="badge badge-ghost badge-lg text-xl font-bold">
+                        <span className="badge badge-neutral badge-xl text-xl font-bold w-30 justify-center">
                           Inactive
                         </span>
+                      )}
+                    </td>
+                    <td className="px-4 py-4 text-center text-xl">
+                      {session.isActive ? (
+                        <button
+                          className="btn btn-warning text-xl"
+                          onClick={() => handleDeactivate(session.id)}
+                        >
+                          Deactivate
+                        </button>
+                      ) : (
+                        <span className="text-base-content/50">—</span>
                       )}
                     </td>
                   </tr>

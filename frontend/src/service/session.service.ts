@@ -9,7 +9,6 @@ import type {
 export const getAllSessions = async (): Promise<SessionResponse[]> => {
   try {
     const response = await api.get<SessionResponse[]>('/sessions')
-    console.log(response.data)
     return response.data
   } catch (error) {
     console.error('Error getting sessions:', error)
@@ -20,7 +19,6 @@ export const getAllSessions = async (): Promise<SessionResponse[]> => {
 export const createSession = async (data: SessionData): Promise<SessionResponse> => {
   try {
     const response = await api.post<SessionResponse>('/sessions', data)
-    console.log(response.data)
     return response.data
   } catch (error) {
     console.error('Error getting sessions:', error)
@@ -31,7 +29,6 @@ export const createSession = async (data: SessionData): Promise<SessionResponse>
 export const joinSession = async (code: string): Promise<JoinSessionResponse> => {
   try {
     const response = await api.post<JoinSessionResponse>('/sessions/join', { code })
-    console.log(response.data)
     return response.data
   } catch (error) {
     console.error('Error getting sessions:', error)
@@ -39,12 +36,12 @@ export const joinSession = async (code: string): Promise<JoinSessionResponse> =>
   }
 }
 
-export const closeSession = async (sessionId: number): Promise<void> => {
+export const closeSession = async (sessionId: number): Promise<CloseSessionResponse> => {
   try {
-    const response = await api.patch<CloseSessionResponse>('/sessions/join', { sessionId })
-    console.log(response.data)
+    const response = await api.patch<CloseSessionResponse>(`/sessions/${sessionId}`)
+    return response.data
   } catch (error) {
-    console.error('Error getting sessions:', error)
+    console.error('Error closing session:', error)
     throw error
   }
 }
