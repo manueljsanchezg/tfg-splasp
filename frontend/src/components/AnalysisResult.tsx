@@ -20,7 +20,6 @@ function AnalysisResult() {
       setIsLoading(true)
       try {
         const result = await analyzeProject(projectFile)
-        console.log(result)
 
         setProjectMetrics((prev) => ({
           ...prev,

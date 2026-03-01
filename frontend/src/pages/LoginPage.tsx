@@ -21,7 +21,6 @@ export default function LoginPage() {
     setError(null)
     try {
       const response = await loginUser(data)
-      console.log(response)
       if (response) {
         login({
           token: response.accessToken,

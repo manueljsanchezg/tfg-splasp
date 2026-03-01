@@ -32,7 +32,6 @@ function CreateSessionModal({
         startDate: new Date(data.startDate).toISOString(),
         endDate: new Date(data.endDate).toISOString(),
       }
-      console.log(data)
       await createSession(formattedData)
       reset()
       modalRef.current?.close()
