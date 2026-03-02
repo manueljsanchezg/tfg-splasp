@@ -5,6 +5,7 @@ from fastapi import APIRouter, HTTPException
 from app.auth.dependencies import CurrentAdminDep, CurrentUserDep
 from app.session.dependencies import SessionServiceDep
 from app.session.schemas import CreateSession, JoinSession, ReadSession
+from app.project.schemas import ProjectRead
 
 
 router = APIRouter(prefix="/api/sessions", tags=["sessions"])
@@ -36,3 +37,8 @@ async def close_session(session_id: int, service: SessionServiceDep, user: Curre
         raise HTTPException(status_code=404, detail="Session not found")
 
     return { "message": "Session deactivate"}
+
+
+@router.get("/{session_id}/projects", response_model=List[ProjectRead])
+async def get_projects_by_session(session_id, service: SessionServiceDep):
+    return await service.get_projects_by_session_id(session_id)

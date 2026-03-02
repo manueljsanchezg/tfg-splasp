@@ -53,7 +53,7 @@ class SessionService(BaseService[Session, SessionRepository]):
 
         return session.id
     
-    async def close(self, session_id: int):
+    async def close(self, session_id: int) -> Optional[bool]:
         session = await self.repository.get_by_id(session_id)
 
         if not session:
@@ -64,7 +64,10 @@ class SessionService(BaseService[Session, SessionRepository]):
         await self.repository.save(session)
 
         return True
+
+    async def get_projects_by_session_id(self, session_id: int):
+        return await self.project_sevice.find_project_by_session(session_id)
     
-    def _generate_code(self, size: int):
+    def _generate_code(self, size: int) -> str:
         alphabet = string.ascii_letters + string.digits
         return ''.join(secrets.choice(alphabet) for i in range(size))

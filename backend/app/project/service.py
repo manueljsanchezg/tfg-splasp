@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import List, Optional
 
 from app.core.base_service import BaseService
 
@@ -28,6 +28,9 @@ class ProjectService(BaseService[Project, ProjectRepository]):
         self, user_id: int, session_id: int
     ) -> Optional[Project]:
         return await self.repository.find_by_user_and_session(user_id, session_id)
+    
+    async def find_project_by_session(self, session_id: int) -> List[Project]:
+        return await self.repository.find_by_session(session_id)
 
     async def persist_project(
         self, filename: str, user: User, session_id: int, result: Result
@@ -92,10 +95,16 @@ class ProjectVersionService(BaseService[ProjectVersion, ProjectVersionRepository
     def __init__(self, project_version_repo: ProjectVersionRepository):
         super().__init__(project_version_repo)
 
+    async def get_versions_by_project(self, project_id: int) -> List[ProjectVersion]:
+        return await self.repository.find_by_project_id(project_id)
+
 
 class AnalysisResultService(BaseService[AnalysisResult, AnalysisResultRepository]):
     def __init__(self, analysis_result_repo: AnalysisResultRepository):
         super().__init__(analysis_result_repo)
+
+    async def get_analysis_by_version(self, version_id: int) -> Optional[AnalysisResult]:
+        return await self.repository.find_by_version_id(version_id)
 
 
 class BlockAnalysisService(BaseService[BlockAnalysis, BlockAnalysisRepository]):
