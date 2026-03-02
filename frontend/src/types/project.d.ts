@@ -1,12 +1,13 @@
-interface Block {
+export interface Block {
+  id?: number
   owner: string
   name: string
   level: number
-  structural_changes: number
-  definition_changes: number
-  definition_level: number
-  feature_guarded_definition_changes: number
-  ast_pipeline_definition_changes: number
+  structuralChanges: number
+  definitionChanges: number
+  definitionLevel: number
+  featureGuardedDefinitionChanges: number
+  astPipelineDefinitionChanges: number
 }
 
 export interface ProjectMetrics {
@@ -14,4 +15,37 @@ export interface ProjectMetrics {
   duplicateScripts: number
   duplicationRatio: number
   blocks: Block[]
+}
+
+export interface ProjectResponse {
+  id: number
+  title: string
+  createdAt: string
+  userId: number
+  sessionId: number
+}
+
+export interface ProjectVersionResponse {
+  id: number;
+  versionNumber: number;
+  uploadedAt: string;
+  projectId: number;
+}
+
+export interface DetectedFeature {
+  id: number;
+  name: string;
+  isDead: boolean;
+  scatteringCount: number;
+}
+
+export interface SavedAnalysisResult {
+  id: number;
+  projectLevel: number;
+  totalScripts: number;
+  duplicateScripts: number;
+  totalCombinations: number;
+  maxTangling: number;
+  blocksAnalysis: Block[];
+  detectedFeatures: DetectedFeature[];
 }
