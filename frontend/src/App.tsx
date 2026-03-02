@@ -6,9 +6,11 @@ import RegisterPage from './pages/RegisterPage'
 import ProtectedRoute from './components/ProtectedRoute'
 import { useAuth } from './hooks/useAuth'
 import AdminRoute from './components/AdminRoute'
-import SessionPage from './pages/admin/SessionPages'
+import SessionPage from './pages/admin/SessionsPage'
 import MyProjectsPage from './pages/user/MyProjectsPage'
 import PageLayout from './components/PageLayout'
+import SessionInfoPage from './pages/admin/SessionInfoPage'
+import UsersPage from './pages/admin/UsersPage'
 
 export default function App() {
   const { token, role } = useAuth()
@@ -27,6 +29,22 @@ export default function App() {
             element={
               <AdminRoute>
                 <SessionPage />
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="/sessions/:sessionId"
+            element={
+              <AdminRoute>
+                <SessionInfoPage />
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="/users"
+            element={
+              <AdminRoute>
+                <UsersPage />
               </AdminRoute>
             }
           />
