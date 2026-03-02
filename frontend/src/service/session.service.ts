@@ -5,6 +5,7 @@ import type {
   SessionData,
   SessionResponse,
 } from '../types/session'
+import type { ProjectResponse } from '../types/project'
 
 export const getAllSessions = async (): Promise<SessionResponse[]> => {
   try {
@@ -42,6 +43,16 @@ export const closeSession = async (sessionId: number): Promise<CloseSessionRespo
     return response.data
   } catch (error) {
     console.error('Error closing session:', error)
+    throw error
+  }
+}
+
+export const getProjectsBySession = async (sessionId: number): Promise<ProjectResponse[]> => {
+  try {
+    const response = await api.get<ProjectResponse[]>(`/sessions/${sessionId}/projects`)
+    return response.data
+  } catch (error) {
+    console.error(`Error getting projects for session ${sessionId}:`, error)
     throw error
   }
 }
