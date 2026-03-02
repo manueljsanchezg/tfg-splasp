@@ -46,24 +46,24 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="w-full max-w-md space-y-8">
+    <div className="w-full max-w-lg space-y-8">
       <div>
-        <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-base-content">
+        <h2 className="mt-6 text-center text-5xl font-black tracking-tight text-base-content">
           Create Account
         </h2>
       </div>
 
       <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
-        {error && <div className="rounded-lg bg-error/20 p-4 text-sm text-error">{error}</div>}
+        {error && <div className="rounded-xl bg-error/20 p-5 text-lg text-error font-medium">{error}</div>}
 
-        <div className="form-control w-full">
-          <label className="label">
-            <span className="label-text font-medium">Username</span>
+        <div className="form-control w-full gap-2">
+          <label className="label pb-0">
+            <span className="label-text text-xl font-bold">Username</span>
           </label>
           <input
             type="text"
             placeholder="Choose a username"
-            className={`input input-bordered w-full ${errors.username ? 'input-error' : ''}`}
+            className={`input input-bordered input-lg w-full text-lg ${errors.username ? 'input-error' : ''}`}
             {...register('username', {
               required: 'Username is required',
               minLength: {
@@ -73,20 +73,20 @@ export default function RegisterPage() {
             })}
           />
           {errors.username && (
-            <label className="label">
-              <span className="label-text-alt text-error">{errors.username.message}</span>
+            <label className="label pt-0">
+              <span className="label-text-alt text-error text-base font-medium">{errors.username.message}</span>
             </label>
           )}
         </div>
 
-        <div className="form-control w-full">
-          <label className="label">
-            <span className="label-text font-medium">Password</span>
+        <div className="form-control w-full gap-2">
+          <label className="label pb-0">
+            <span className="label-text text-xl font-bold">Password</span>
           </label>
           <input
             type="password"
             placeholder="Choose a password"
-            className={`input input-bordered w-full ${errors.password ? 'input-error' : ''}`}
+            className={`input input-bordered input-lg w-full text-lg ${errors.password ? 'input-error' : ''}`}
             {...register('password', {
               required: 'Password is required',
               minLength: {
@@ -96,36 +96,36 @@ export default function RegisterPage() {
             })}
           />
           {errors.password && (
-            <label className="label">
-              <span className="label-text-alt text-error">{errors.password.message}</span>
+            <label className="label pt-0">
+              <span className="label-text-alt text-error text-base font-medium">{errors.password.message}</span>
             </label>
           )}
         </div>
 
-        <div className="form-control w-full">
-          <label className="label">
-            <span className="label-text font-medium">Confirm Password</span>
+        <div className="form-control w-full gap-2">
+          <label className="label pb-0">
+            <span className="label-text text-xl font-bold">Confirm Password</span>
           </label>
           <input
             type="password"
             placeholder="Repeat your password"
-            className={`input input-bordered w-full ${errors.confirmPassword ? 'input-error' : ''}`}
+            className={`input input-bordered input-lg w-full text-lg ${errors.confirmPassword ? 'input-error' : ''}`}
             {...register('confirmPassword', {
               required: 'You must confirm the password',
               validate: (value) => value === password || 'Passwords do not match',
             })}
           />
           {errors.confirmPassword && (
-            <label className="label">
-              <span className="label-text-alt text-error">{errors.confirmPassword.message}</span>
+            <label className="label pt-0">
+              <span className="label-text-alt text-error text-base font-medium">{errors.confirmPassword.message}</span>
             </label>
           )}
         </div>
 
-        <button type="submit" disabled={isLoading} className="btn btn-primary w-full">
+        <button type="submit" disabled={isLoading} className="btn btn-primary btn-lg w-full text-2xl mt-4">
           {isLoading ? (
             <>
-              <span className="loading loading-spinner loading-sm"></span>
+              <span className="loading loading-spinner loading-md"></span>
               Registering...
             </>
           ) : (
@@ -133,10 +133,10 @@ export default function RegisterPage() {
           )}
         </button>
 
-        <div className="text-center text-sm">
-          <p className="text-base-content/70">
+        <div className="text-center text-lg mt-6">
+          <p className="text-base-content/70 font-medium">
             Already have an account?{' '}
-            <a href="/login" className="font-medium text-primary hover:text-primary/80">
+            <a href="/login" className="font-bold text-primary hover:text-primary-focus underline decoration-2 underline-offset-4">
               Sign in here
             </a>
           </p>
