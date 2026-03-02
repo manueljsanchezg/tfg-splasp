@@ -156,31 +156,31 @@ function AnalysisResult() {
 
                       <td className="text-center">
                         <span className="font-mono text-2xl font-bold text-base-content/80">
-                          {block.structural_changes}
+                          {block.structuralChanges}
                         </span>
                       </td>
 
                       <td className="text-center">
                         <span className="font-mono text-2xl font-bold text-base-content/80">
-                          {block.definition_changes}
+                          {block.definitionChanges}
                         </span>
                       </td>
 
                       <td className="text-center">
                         <span className="font-mono text-2xl font-bold text-base-content/80">
-                          {block.definition_level}
+                          {block.definitionLevel}
                         </span>
                       </td>
 
                       <td className="text-center">
                         <span className="font-mono text-2xl font-bold text-base-content/80">
-                          {block.feature_guarded_definition_changes}
+                          {block.featureGuardedDefinitionChanges}
                         </span>
                       </td>
 
                       <td className="pr-8 text-center">
                         <span className="font-mono text-2xl font-bold text-base-content/80">
-                          {block.ast_pipeline_definition_changes}
+                          {block.astPipelineDefinitionChanges}
                         </span>
                       </td>
                     </tr>

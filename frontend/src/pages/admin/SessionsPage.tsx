@@ -3,8 +3,10 @@ import type { SessionResponse } from '../../types/session'
 import { getAllSessions, closeSession } from '../../service/session.service'
 import CreateSessionModal from '../../components/CreateSessionModal'
 import ConfirmModal from '../../components/ConfirmModal'
+import { useNavigate } from 'react-router-dom'
 
 function SessionPage() {
+  const navigate = useNavigate()
   const [sessions, setSessions] = useState<SessionResponse[] | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState<boolean>(true)
@@ -139,16 +141,23 @@ function SessionPage() {
                       )}
                     </td>
                     <td className="px-4 py-4 text-center text-xl">
-                      {session.isActive ? (
+                      <div className="flex flex-col gap-2 items-center justify-center">
                         <button
-                          className="btn btn-warning text-xl"
-                          onClick={() => handleDeactivate(session.id)}
+                          className="btn btn-info text-xl w-full"
+                          onClick={() => navigate(`/sessions/${session.id}`)}
                         >
-                          Deactivate
+                          View
                         </button>
-                      ) : (
-                        <span className="text-base-content/50">—</span>
-                      )}
+                        {session.isActive && (
+                          <button
+                            className="btn btn-warning text-xl w-full"
+                            onClick={() => handleDeactivate(session.id)}
+                          >
+                            Deactivate
+                          </button>
+                        )}
+                        {!session.isActive && <span className="text-base-content/50">—</span>}
+                      </div>
                     </td>
                   </tr>
                 ))}
