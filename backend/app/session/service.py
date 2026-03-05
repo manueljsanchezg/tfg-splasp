@@ -40,7 +40,7 @@ class SessionService(BaseService[Session, SessionRepository]):
         existing_project = await self.project_sevice.find_project_by_user_and_session(user.id, session.id)
 
         if existing_project:
-            return session
+            return session.id
 
         print("Creando un nuevo proyecto") 
         new_project = Project(
