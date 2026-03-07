@@ -11,6 +11,8 @@ import MyProjectsPage from './pages/user/MyProjectsPage'
 import PageLayout from './components/PageLayout'
 import SessionInfoPage from './pages/admin/SessionInfoPage'
 import UsersPage from './pages/admin/UsersPage'
+import JoinSessionPage from './pages/user/JoinSessionPage'
+import UserSessionPage from './pages/user/SessionPage'
 
 export default function App() {
   const { token, role } = useAuth()
@@ -63,6 +65,22 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/sessions/join"
+            element={
+              <ProtectedRoute>
+                <JoinSessionPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/sessions/:sessionId"
+            element={
+              <ProtectedRoute>
+                <UserSessionPage />
+              </ProtectedRoute>
+            }
+          />
         </>
       )
       break
@@ -71,26 +89,18 @@ export default function App() {
       break
   }
 
-  if (token) {
-    privateRoutes = (
-      <>
-        <Route
-          path="/"
-          element={
-            <ProtectedRoute>
-              <HomePage />
-            </ProtectedRoute>
-          }
-        />
-      </>
-    )
-  }
-
   if (!token) {
     publicRoutes = (
       <>
+        <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+      </>
+    )
+  } else {
+    privateRoutes = (
+      <>
+        <Route path="/" element={<HomePage />} />
       </>
     )
   }

@@ -13,7 +13,6 @@ function AnalysisMetricsView({ metrics }: AnalysisMetricsViewProps) {
   return (
     <div className="flex flex-col items-center w-full gap-12 animate-fade-in mx-auto">
       
-      {/* Tarjetas Superiores */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 w-full max-w-7xl">
         <div className="flex flex-col items-center justify-center bg-base-100 p-6 rounded-2xl shadow-xl border-2 border-base-300">
           <span className="text-6xl font-black text-primary mb-2">{metrics.projectLevel}</span>
@@ -37,7 +36,6 @@ function AnalysisMetricsView({ metrics }: AnalysisMetricsViewProps) {
 
       <div className="w-full max-w-7xl border-t-2 border-base-300/50 my-2"></div>
 
-      {/* Tabla de Bloques */}
       <div className="w-full max-w-7xl">
         <h3 className="text-3xl font-bold mb-6">Blocks Analysis</h3>
         <div className="bg-base-100 rounded-xl shadow-2xl border-2 border-base-300 overflow-hidden">
@@ -77,7 +75,6 @@ function AnalysisMetricsView({ metrics }: AnalysisMetricsViewProps) {
         </div>
       </div>
 
-      {/* Tabla de Features Detectadas */}
       {metrics.detectedFeatures && metrics.detectedFeatures.length > 0 && (
         <div className="w-full max-w-7xl mb-8">
           <h3 className="text-3xl font-bold mb-6">Detected Features</h3>

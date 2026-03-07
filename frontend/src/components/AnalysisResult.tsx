@@ -2,7 +2,7 @@ import { useState, type ChangeEvent } from 'react'
 import { analyzeProject } from '../service/project.service'
 import type { ProjectMetrics } from '../types/project'
 
-function AnalysisResult() {
+function AnalysisResult({ sessionId }: { sessionId: number}) {
   const [projectFile, setProjectFile] = useState<File | null>(null)
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
@@ -18,8 +18,9 @@ function AnalysisResult() {
   const handleAnalyze = async () => {
     if (projectFile) {
       setIsLoading(true)
+      setError(null)
       try {
-        const result = await analyzeProject(projectFile)
+        const result = await analyzeProject(projectFile, sessionId)
 
         setProjectMetrics((prev) => ({
           ...prev,
@@ -39,16 +40,7 @@ function AnalysisResult() {
   return (
     <div>
       <div className="flex flex-col items-center gap-8 w-full max-w-5xl">
-        <div className="flex flex-col items-center gap-3">
-          <h1 className="text-8xl font-black tracking-tight text-base-content drop-shadow-sm">
-            Splasp<span className="text-primary">!</span>
-          </h1>
-          <h2 className="text-3xl text-base-content/60 font-medium text-center">
-            Variability Analyzer for Snap!
-          </h2>
-        </div>
-
-        <div className="flex flex-row gap-4 w-full justify-center">
+        <div className="flex flex-row gap-4 w-full justify-center m-8">
           <input
             type="file"
             onChange={handleFile}
