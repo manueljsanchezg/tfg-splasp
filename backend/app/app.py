@@ -8,32 +8,14 @@ from app.user.routes import router as user_routes
 from app.auth.routes import router as auth_routes
 from app.session.routes import router as session_routes
 from app.project.routes import router as project_routes
-
-import app.project.models
-import app.user.models
-import app.session.models
+from backend.app.env import CORS_ORIGINS
 
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    async with engine.begin() as conn:
-        print("Creating table")
-        await conn.run_sync(Base.metadata.create_all)
-    yield
-    await engine.dispose()
-
-
-app = FastAPI(lifespan=lifespan)
-
-
-
-origins = [
-    "http://localhost:5173",
-]
+app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

@@ -1,0 +1,2 @@
+Create migration -> alembic revision --autogenerate -m "tu_mensaje_aqui"
+Apply migrations -> alembic upgrade head
