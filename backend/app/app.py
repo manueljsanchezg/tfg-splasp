@@ -8,7 +8,7 @@ from app.user.routes import router as user_routes
 from app.auth.routes import router as auth_routes
 from app.session.routes import router as session_routes
 from app.project.routes import router as project_routes
-from backend.app.env import CORS_ORIGINS
+from app.env import CORS_ORIGINS
 
 
 app = FastAPI()

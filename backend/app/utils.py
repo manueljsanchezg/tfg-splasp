@@ -2,7 +2,7 @@ import jwt
 
 from pwdlib import PasswordHash
 
-from backend.app.env import SECRET_KEY
+from app.env import SECRET_KEY
 
 password_hash = PasswordHash.recommended()
 
