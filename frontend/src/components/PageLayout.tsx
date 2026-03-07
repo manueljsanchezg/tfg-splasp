@@ -2,7 +2,7 @@ import React from 'react'
 import NavBar from './NavBar'
 import { useLocation } from 'react-router-dom'
 
-export default function PageLayout({
+function PageLayout({
   children,
   showNav = true,
 }: {
@@ -22,3 +22,5 @@ export default function PageLayout({
     </>
   )
 }
+
+export default PageLayout

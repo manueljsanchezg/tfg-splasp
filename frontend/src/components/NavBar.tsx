@@ -2,7 +2,7 @@ import { NavLink, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import { useAuth } from '../hooks/useAuth'
 
-export default function NavBar() {
+function NavBar() {
   const navigate = useNavigate()
   const { token, role, logout } = useAuth()
   const [isOpen, setIsOpen] = useState(false)
@@ -16,10 +16,10 @@ export default function NavBar() {
   const toggleMenu = () => setIsOpen(!isOpen)
 
   const linkClass = ({ isActive }: { isActive: boolean }) =>
-    `px-5 py-3 rounded-xl font-bold text-lg transition-all duration-200 ${
+    `btn btn-ghost text-lg font-bold ${
       isActive
-        ? 'bg-[#009BA6] text-white shadow-md'
-        : 'text-base-content/70 hover:bg-[#009BA6]/10 hover:text-[#009BA6]'
+        ? 'text-[#009BA6] bg-[#009BA6]/10'
+        : 'text-base-content/70'
     }`
 
   let publicRoutes = <></>
@@ -48,10 +48,13 @@ export default function NavBar() {
       userRoutes = (
         <>
           <NavLink className={linkClass} to="/" onClick={() => setIsOpen(false)}>
-            Inicio
+            Home
           </NavLink>
           <NavLink className={linkClass} to="/projects" onClick={() => setIsOpen(false)}>
-            Mis proyectos
+            My Projects
+          </NavLink>
+          <NavLink className={linkClass} to="/sessions/join" onClick={() => setIsOpen(false)}>
+            Join Session
           </NavLink>
         </>
       )
@@ -78,12 +81,9 @@ export default function NavBar() {
   } else {
     privateRoutes = (
       <>
-        <NavLink className={linkClass} to="/profile" onClick={() => setIsOpen(false)}>
-          Perfil
-        </NavLink>
         <button
           onClick={handleLogout}
-          className="px-6 py-3 bg-red-500 text-white font-bold text-lg rounded-xl hover:bg-red-600 hover:shadow-lg transition-all duration-200 ml-4"
+          className="btn btn-error text-lg"
         >
           Logout
         </button>
@@ -145,3 +145,5 @@ export default function NavBar() {
     </nav>
   )
 }
+
+export default NavBar
