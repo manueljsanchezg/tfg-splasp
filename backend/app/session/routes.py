@@ -40,5 +40,5 @@ async def close_session(session_id: int, service: SessionServiceDep, user: Curre
 
 
 @router.get("/{session_id}/projects", response_model=List[ProjectRead])
-async def get_projects_by_session(session_id, service: SessionServiceDep):
+async def get_projects_by_session(session_id: int, service: SessionServiceDep):
     return await service.get_projects_by_session_id(session_id)

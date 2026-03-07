@@ -1,11 +1,18 @@
 from typing import Annotated
+import os
+
+from dotenv import load_dotenv
 
 from sqlalchemy.ext.asyncio import AsyncSession, AsyncAttrs, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase
 
 from fastapi import Depends
 
-engine = create_async_engine("sqlite+aiosqlite:///./test.db", echo=True)
+load_dotenv()
+
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+engine = create_async_engine(DATABASE_URL, echo=True)
 
 async_session = async_sessionmaker(engine, expire_on_commit=False)
 
