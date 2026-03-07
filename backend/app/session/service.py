@@ -18,6 +18,9 @@ class SessionService(BaseService[Session, SessionRepository]):
         self.project_sevice = project_service
 
     async def create(self, name: str, start_date: datetime, end_date: datetime):
+        start_date = start_date.astimezone(timezone.utc)
+        end_date = end_date.astimezone(timezone.utc)
+        
         new_session = Session(
             name=name,
             code=self._generate_code(8),

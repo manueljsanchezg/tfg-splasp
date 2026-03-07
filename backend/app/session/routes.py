@@ -26,7 +26,7 @@ async def join_session(session: JoinSession, service: SessionServiceDep, user: C
     if session_id == None:
         raise HTTPException(status_code=404, detail="Session not found")
     
-    return {" sessionId": session_id }
+    return {"sessionId": session_id}
 
 
 @router.patch("/{session_id}")

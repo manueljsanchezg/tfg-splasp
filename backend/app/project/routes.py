@@ -1,14 +1,26 @@
 from typing import List
 import xml.etree.ElementTree as ET
-from fastapi import APIRouter, Form, UploadFile, HTTPException
+from fastapi import APIRouter, Form, Query, UploadFile, HTTPException
 
 from app.core.splasp import analyze_project
 from app.auth.dependencies import CurrentUserDep
 
 from app.project.dependencies import AnalysisResultServiceDep, ProjectServiceDep, ProjectVersionServiceDep
-from app.project.schemas import AnalysisResultRead, AnalysisResultSchema, ProjectVersionRead, Result
+from app.project.schemas import AnalysisResultRead, AnalysisResultSchema, ProjectRead, ProjectVersionRead, Result
 
 router = APIRouter(prefix="/api/projects", tags=["projects"])
+
+@router.get("/mine", response_model=ProjectRead)
+async def get_my_project_for_session(
+    user: CurrentUserDep,
+    service: ProjectServiceDep,
+    session_id: int = Query(alias="sessionId"),
+):
+    project = await service.find_project_by_user_and_session(user.id, session_id)
+    if not project:
+        raise HTTPException(status_code=404, detail="You have not joined this session")
+    return project
+
 
 @router.post("/analyze", response_model=AnalysisResultSchema)
 async def analyze_snap_project(file: UploadFile, user: CurrentUserDep, service: ProjectServiceDep, session_id: int = Form(alias="sessionId")):
