@@ -70,7 +70,7 @@ function UsersPage() {
 				onClose={() => setIsModalOpen(false)}
 				onSuccess={() => {
 					setIsModalOpen(false);
-					loadUsers();
+					getUsers();
 				}}
 			/>
 
