@@ -20,11 +20,10 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+import xml.etree.ElementTree as ET
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Dict, Iterator, List, Optional, Sequence, Set, Tuple
-
-import xml.etree.ElementTree as ET
 
 # ---------------------------------------------------------------------------
 # Data model
@@ -103,7 +102,7 @@ class AnalysisResult:
             "total_combinations": self.total_combinations,
             "tangling_dict": self.tangling_dict,
             "scattering_dict": self.scattering_dict,
-            "dead_features": self.dead_features
+            "dead_features": self.dead_features,
         }
 
 
@@ -678,9 +677,7 @@ class ProjectAnalyzer:
             state = _ScriptState()
             self._analyze_script(owner, script, state)
 
-    def _analyze_script(
-        self, owner: str, script: ET.Element, state: _ScriptState
-    ) -> None:
+    def _analyze_script(self, owner: str, script: ET.Element, state: _ScriptState) -> None:
         """Recursively analyze a script element."""
         for stmt in [c for c in script if c.tag == "block"]:
             selector = _get_selector(stmt)
@@ -742,8 +739,7 @@ class ProjectAnalyzer:
             mutated = bool(analysis.var_refs & state.mutated_ast_vars)
 
             ast_pipeline = (
-                references_ast_vars
-                and (analysis.has_join or analysis.has_split_blocks or mutated)
+                references_ast_vars and (analysis.has_join or analysis.has_split_blocks or mutated)
             ) or (_is_ast_like_expr(analysis) and analysis.has_join)
 
             inferred_level = 3 if ast_pipeline else 2
@@ -793,9 +789,7 @@ class ProjectAnalyzer:
         if selector in CONDITIONAL_BLOCKS:
             cond_expr = _first_child_blocklike(stmt)
             cond_vars = set(_iter_var_refs(cond_expr))
-            feature_vars = {
-                v for v in cond_vars if _is_feature_var(v, self.configured_vars)
-            }
+            feature_vars = {v for v in cond_vars if _is_feature_var(v, self.configured_vars)}
             base.guards = base.guards + [
                 _GuardContext(selector=selector, feature_vars=feature_vars)
             ]
@@ -839,7 +833,7 @@ class ProjectAnalyzer:
     def _calculate_features_usage(self, script_elem: ET.Element, script_id: str) -> None:
         vars_in_script = set(_iter_var_refs(script_elem))
         features_in_script = vars_in_script.intersection(self.configured_vars)
-        
+
         if features_in_script:
             self.features_usage_by_scripts[script_id] = features_in_script
 
@@ -863,7 +857,7 @@ class ProjectAnalyzer:
         scattering_dict = dict()
         for script_id, features in self.features_usage_by_scripts.items():
             tangling_dict[script_id] = len(features)
-        
+
         for script_id, features in self.features_usage_by_scripts.items():
             for feature in features:
                 if feature not in scattering_dict:
@@ -882,7 +876,7 @@ class ProjectAnalyzer:
             total_combinations=self.total_combinations,
             tangling_dict=tangling_dict,
             scattering_dict=scattering_dict,
-            dead_features=dead_features
+            dead_features=dead_features,
         )
 
 
@@ -891,17 +885,13 @@ class ProjectAnalyzer:
 # ---------------------------------------------------------------------------
 
 
-def analyze_project(
-    root: ET.Element, config: Optional[AnalysisConfig] = None
-) -> AnalysisResult:
+def analyze_project(root: ET.Element, config: Optional[AnalysisConfig] = None) -> AnalysisResult:
     """Analyze a Snap! project XML tree."""
     analyzer = ProjectAnalyzer(root, config)
     return analyzer.analyze()
 
 
-def analyze_file(
-    path: str | Path, config: Optional[AnalysisConfig] = None
-) -> AnalysisResult:
+def analyze_file(path: str | Path, config: Optional[AnalysisConfig] = None) -> AnalysisResult:
     """Analyze a Snap! project from a file path."""
     root = parse_snap_xml(path)
     return analyze_project(root, config=config)
@@ -928,9 +918,7 @@ def print_report(result: AnalysisResult, *, include_unknown: bool = True) -> Non
 
     if result.blocks:
         print("Modified blocks (by owner::block):\n")
-        for key, st in sorted(
-            result.blocks.items(), key=lambda kv: kv[0].as_str().lower()
-        ):
+        for key, st in sorted(result.blocks.items(), key=lambda kv: kv[0].as_str().lower()):
             print(f"- {key.as_str()}")
             print(f"    level={st.level}")
             print(f"    structural_changes={st.structural_changes}")
@@ -941,9 +929,7 @@ def print_report(result: AnalysisResult, *, include_unknown: bool = True) -> Non
                 print(
                     f"    feature_guarded_definition_changes={st.feature_guarded_definition_changes}"
                 )
-                print(
-                    f"    ast_pipeline_definition_changes={st.ast_pipeline_definition_changes}"
-                )
+                print(f"    ast_pipeline_definition_changes={st.ast_pipeline_definition_changes}")
             print()
 
     if include_unknown and result.unknown_events:
@@ -951,9 +937,7 @@ def print_report(result: AnalysisResult, *, include_unknown: bool = True) -> Non
         for ev in result.unknown_events:
             kind = "definition" if ev.is_definition else "structural"
             fg = "feature-guard" if ev.feature_guarded else "no-guard"
-            print(
-                f"- owner={ev.owner} attr={ev.attribute} ({kind}) level~{ev.inferred_level} {fg}"
-            )
+            print(f"- owner={ev.owner} attr={ev.attribute} ({kind}) level~{ev.inferred_level} {fg}")
             print(f"    note: {ev.note}")
         print()
 

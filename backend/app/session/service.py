@@ -1,7 +1,7 @@
-from typing import Optional
-from datetime import datetime, timezone
-import string
 import secrets
+import string
+from datetime import datetime, timezone
+from typing import Optional
 
 from app.core.base_service import BaseService
 from app.project.models import Project
@@ -12,7 +12,12 @@ from app.user.service import UserService
 
 
 class SessionService(BaseService[Session, SessionRepository]):
-    def __init__(self, session_repo: SessionRepository, user_service: UserService, project_service: ProjectService):
+    def __init__(
+        self,
+        session_repo: SessionRepository,
+        user_service: UserService,
+        project_service: ProjectService,
+    ):
         super().__init__(session_repo)
         self.user_service = user_service
         self.project_sevice = project_service
@@ -20,42 +25,37 @@ class SessionService(BaseService[Session, SessionRepository]):
     async def create(self, name: str, start_date: datetime, end_date: datetime):
         start_date = start_date.astimezone(timezone.utc)
         end_date = end_date.astimezone(timezone.utc)
-        
+
         new_session = Session(
-            name=name,
-            code=self._generate_code(8),
-            start_date=start_date,
-            end_date=end_date
+            name=name, code=self._generate_code(8), start_date=start_date, end_date=end_date
         )
 
         return await self.repository.save(new_session)
-    
+
     async def join(self, code: str, user_id: int) -> Optional[int]:
         session = await self.repository.get_by_code(code)
 
         if not session or not session.is_active or session.end_date < datetime.now(timezone.utc):
             return None
-        
+
         user = await self.user_service.get_by_id(user_id)
         if not user:
             return None
-            
-        existing_project = await self.project_sevice.find_project_by_user_and_session(user.id, session.id)
+
+        existing_project = await self.project_sevice.find_project_by_user_and_session(
+            user.id, session.id
+        )
 
         if existing_project:
             return session.id
 
-        print("Creando un nuevo proyecto") 
-        new_project = Project(
-            title="dump",
-            user_id = user.id,
-            session_id = session.id
-        )
+        print("Creando un nuevo proyecto")
+        new_project = Project(title="dump", user_id=user.id, session_id=session.id)
 
         await self.project_sevice.save(new_project)
 
         return session.id
-    
+
     async def close(self, session_id: int) -> Optional[bool]:
         session = await self.repository.get_by_id(session_id)
 
@@ -70,7 +70,7 @@ class SessionService(BaseService[Session, SessionRepository]):
 
     async def get_projects_by_session_id(self, session_id: int):
         return await self.project_sevice.find_project_by_session(session_id)
-    
+
     def _generate_code(self, size: int) -> str:
         alphabet = string.ascii_letters + string.digits
-        return ''.join(secrets.choice(alphabet) for i in range(size))
+        return "".join(secrets.choice(alphabet) for i in range(size))

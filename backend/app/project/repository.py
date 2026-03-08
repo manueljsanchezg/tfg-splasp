@@ -6,11 +6,11 @@ from sqlalchemy.orm import selectinload
 
 from app.core.base_repository import BaseRepository
 from app.project.models import (
-    Project,
-    ProjectVersion,
     AnalysisResult,
     BlockAnalysis,
     DetectedFeature,
+    Project,
+    ProjectVersion,
 )
 
 
@@ -19,21 +19,23 @@ class ProjectRepository(BaseRepository[Project]):
         super().__init__(session, Project)
 
     async def find_by_user_and_session(self, user_id: int, session_id: int) -> Optional[Project]:
-        stmt = (select(Project)
-                .where(Project.user_id == user_id, 
-                       Project.session_id == session_id)
-                       .options(selectinload(Project.project_versions)))
+        stmt = (
+            select(Project)
+            .where(Project.user_id == user_id, Project.session_id == session_id)
+            .options(selectinload(Project.project_versions))
+        )
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none()
-    
+
     async def find_by_session(self, session_id: int) -> List[Project]:
         stmt = select(Project).where(Project.session_id == session_id)
         result = await self.session.execute(stmt)
         return result.scalars().all()
 
+
 class ProjectVersionRepository(BaseRepository[ProjectVersion]):
     def __init__(self, session: AsyncSession):
-        super().__init__(session, ProjectVersion )
+        super().__init__(session, ProjectVersion)
 
     async def find_by_project_id(self, project_id: int) -> List[ProjectVersion]:
         stmt = select(ProjectVersion).where(ProjectVersion.project_id == project_id)
@@ -51,13 +53,13 @@ class AnalysisResultRepository(BaseRepository[AnalysisResult]):
             .where(AnalysisResult.project_versions_id == version_id)
             .options(
                 selectinload(AnalysisResult.blocks_analysis),
-                selectinload(AnalysisResult.detected_features)
+                selectinload(AnalysisResult.detected_features),
             )
         )
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none()
 
-    
+
 class BlockAnalysisRepository(BaseRepository[BlockAnalysis]):
     def __init__(self, session: AsyncSession):
         super().__init__(session, BlockAnalysis)

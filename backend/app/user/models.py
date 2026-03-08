@@ -9,9 +9,11 @@ from app.db import Base
 if TYPE_CHECKING:
     from app.project.models import Project
 
+
 class Role(str, Enum):
     ADMIN = "admin"
     USER = "user"
+
 
 class User(Base):
     __tablename__ = "users"

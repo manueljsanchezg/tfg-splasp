@@ -1,38 +1,30 @@
-from typing import TYPE_CHECKING, List, Optional
 from datetime import datetime
-from sqlalchemy import ForeignKey, DateTime, UniqueConstraint, func
+from typing import TYPE_CHECKING, List, Optional
+
+from sqlalchemy import DateTime, ForeignKey, UniqueConstraint, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db import Base
 
 if TYPE_CHECKING:
-    from app.user.models import User
     from app.session.models import Session
+    from app.user.models import User
+
 
 class Project(Base):
     __tablename__ = "projects"
-    __table_args__ = (
-        UniqueConstraint("user_id", "session_id", name="uix_user_session_project"),
-    )
+    __table_args__ = (UniqueConstraint("user_id", "session_id", name="uix_user_session_project"),)
 
     id: Mapped[int] = mapped_column(primary_key=True)
     title: Mapped[str] = mapped_column()
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), default=func.now()
-    )
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=func.now())
 
-    user_id: Mapped[int] = mapped_column(
-        ForeignKey("users.id"), nullable=True
-    )
-    session_id: Mapped[int] = mapped_column(
-        ForeignKey("sessions.id"), nullable=True
-    )
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=True)
+    session_id: Mapped[int] = mapped_column(ForeignKey("sessions.id"), nullable=True)
 
     user: Mapped[Optional["User"]] = relationship(back_populates="projects")
     session: Mapped[Optional["Session"]] = relationship(back_populates="projects")
-    project_versions: Mapped[List["ProjectVersion"]] = relationship(
-        back_populates="project"
-    )
+    project_versions: Mapped[List["ProjectVersion"]] = relationship(back_populates="project")
 
 
 class ProjectVersion(Base):
@@ -40,16 +32,12 @@ class ProjectVersion(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     version_number: Mapped[int] = mapped_column()
-    uploaded_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), default=func.now()
-    )
+    uploaded_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=func.now())
 
     project_id: Mapped[int] = mapped_column(ForeignKey("projects.id"))
     project: Mapped["Project"] = relationship(back_populates="project_versions")
 
-    analysis_result: Mapped["AnalysisResult"] = relationship(
-        back_populates="project_version"
-    )
+    analysis_result: Mapped["AnalysisResult"] = relationship(back_populates="project_version")
 
 
 class AnalysisResult(Base):
@@ -62,16 +50,12 @@ class AnalysisResult(Base):
     total_combinations: Mapped[int] = mapped_column()
     max_tangling: Mapped[int] = mapped_column()
 
-    project_versions_id: Mapped[int] = mapped_column(
-        ForeignKey("project_versions.id"), unique=True
-    )
+    project_versions_id: Mapped[int] = mapped_column(ForeignKey("project_versions.id"), unique=True)
     project_version: Mapped["ProjectVersion"] = relationship(
         back_populates="analysis_result", single_parent=True
     )
 
-    blocks_analysis: Mapped[List["BlockAnalysis"]] = relationship(
-        back_populates="analysis_result"
-    )
+    blocks_analysis: Mapped[List["BlockAnalysis"]] = relationship(back_populates="analysis_result")
     detected_features: Mapped[List["DetectedFeature"]] = relationship(
         back_populates="analysis_result"
     )
@@ -91,9 +75,7 @@ class BlockAnalysis(Base):
     ast_pipeline_definition_changes: Mapped[int] = mapped_column()
 
     analysis_result_id: Mapped[int] = mapped_column(ForeignKey("analysis_results.id"))
-    analysis_result: Mapped["AnalysisResult"] = relationship(
-        back_populates="blocks_analysis"
-    )
+    analysis_result: Mapped["AnalysisResult"] = relationship(back_populates="blocks_analysis")
 
 
 class DetectedFeature(Base):
@@ -105,6 +87,4 @@ class DetectedFeature(Base):
     scattering_count: Mapped[int] = mapped_column()
 
     analysis_result_id: Mapped[int] = mapped_column(ForeignKey("analysis_results.id"))
-    analysis_result: Mapped["AnalysisResult"] = relationship(
-        back_populates="detected_features"
-    )
+    analysis_result: Mapped["AnalysisResult"] = relationship(back_populates="detected_features")

@@ -1,7 +1,8 @@
-from typing import Generic, TypeVar, List, Optional
+from typing import Generic, List, Optional, TypeVar
 
 T = TypeVar("T")
 R = TypeVar("R")
+
 
 class BaseService(Generic[T, R]):
     def __init__(self, repository: R):
@@ -19,6 +20,6 @@ class BaseService(Generic[T, R]):
 
     async def delete(self, entity: T) -> int:
         return await self.repository.delete(entity)
-    
+
     async def delete_by_id(self, id: int) -> int:
         return await self.repository.delete_by_id(id)

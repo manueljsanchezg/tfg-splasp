@@ -1,8 +1,8 @@
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timedelta, timezone
 
 from app.user.models import User
-from app.utils import verify_password, hash_password, generate_jwt
 from app.user.service import UserService
+from app.utils import generate_jwt, hash_password, verify_password
 
 
 class AuthService:
@@ -16,7 +16,7 @@ class AuthService:
             return None
         if not verify_password(password, existing_user.password):
             return None
-        
+
         expires_delta = timedelta(minutes=60)
         payload = {
             "sub": existing_user.username,
@@ -25,13 +25,13 @@ class AuthService:
         token = generate_jwt(payload)
 
         return token, existing_user.role
-    
+
     async def register_user(self, username: str, password: str):
         existing_user = await self.user_service.get_by_username(username)
 
         if existing_user:
             return None
-        
+
         hashed_password = hash_password(password)
 
         user = User(username=username, password=hashed_password)

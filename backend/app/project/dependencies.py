@@ -4,18 +4,18 @@ from fastapi import Depends
 
 from app.db import SessionDep
 from app.project.repository import (
-    ProjectRepository,
-    ProjectVersionRepository,
     AnalysisResultRepository,
     BlockAnalysisRepository,
     DetectedFeatureRepository,
+    ProjectRepository,
+    ProjectVersionRepository,
 )
 from app.project.service import (
-    ProjectService,
-    ProjectVersionService,
     AnalysisResultService,
     BlockAnalysisService,
     DetectedFeatureService,
+    ProjectService,
+    ProjectVersionService,
 )
 
 
@@ -74,18 +74,10 @@ def get_detected_feature_service(
 # Dependencies
 ProjectServiceDep = Annotated[ProjectService, Depends(get_project_service)]
 
-ProjectVersionServiceDep = Annotated[
-    ProjectVersionService, Depends(get_project_version_service)
-]
+ProjectVersionServiceDep = Annotated[ProjectVersionService, Depends(get_project_version_service)]
 
-AnalysisResultServiceDep = Annotated[
-    AnalysisResultService, Depends(get_analysis_result_service)
-]
+AnalysisResultServiceDep = Annotated[AnalysisResultService, Depends(get_analysis_result_service)]
 
-BlockAnalysisServiceDep = Annotated[
-    BlockAnalysisService, Depends(get_block_analysis_service)
-]
+BlockAnalysisServiceDep = Annotated[BlockAnalysisService, Depends(get_block_analysis_service)]
 
-DetectedFeatureServiceDep = Annotated[
-    DetectedFeatureService, Depends(get_detected_feature_service)
-]
+DetectedFeatureServiceDep = Annotated[DetectedFeatureService, Depends(get_detected_feature_service)]

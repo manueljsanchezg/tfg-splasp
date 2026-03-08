@@ -1,0 +1,8 @@
+Alembic
+Create migration -> alembic revision --autogenerate -m "tu_mensaje_aqui"
+Apply migrations -> alembic upgrade head
+
+ruff
+Linting -> uv run ruff check app/
+Imports -> uv run ruff ceck --select I app/
+Format  -> uv run ruff format app/

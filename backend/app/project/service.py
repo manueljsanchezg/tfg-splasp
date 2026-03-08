@@ -1,20 +1,19 @@
 from typing import List, Optional
 
 from app.core.base_service import BaseService
-
 from app.project.models import (
-    Project,
-    ProjectVersion,
     AnalysisResult,
     BlockAnalysis,
     DetectedFeature,
+    Project,
+    ProjectVersion,
 )
 from app.project.repository import (
-    ProjectRepository,
-    ProjectVersionRepository,
     AnalysisResultRepository,
     BlockAnalysisRepository,
     DetectedFeatureRepository,
+    ProjectRepository,
+    ProjectVersionRepository,
 )
 from app.project.schemas import Result
 from app.user.models import User
@@ -28,17 +27,13 @@ class ProjectService(BaseService[Project, ProjectRepository]):
         self, user_id: int, session_id: int
     ) -> Optional[Project]:
         return await self.repository.find_by_user_and_session(user_id, session_id)
-    
+
     async def find_project_by_session(self, session_id: int) -> List[Project]:
         return await self.repository.find_by_session(session_id)
 
-    async def persist_project(
-        self, filename: str, user: User, session_id: int, result: Result
-    ):
-        
-        existing_project = await self.find_project_by_user_and_session(
-            user.id, session_id
-        )
+    async def persist_project(self, filename: str, user: User, session_id: int, result: Result):
+
+        existing_project = await self.find_project_by_user_and_session(user.id, session_id)
 
         if not existing_project:
             return None
@@ -71,8 +66,7 @@ class ProjectService(BaseService[Project, ProjectRepository]):
             total_scripts=result.total_scripts,
             duplicate_scripts=result.duplicate_scripts,
             total_combinations=result.total_combinations,
-            max_tangling=max(result.tangling_dict.values())
-            if result.tangling_dict else 0,
+            max_tangling=max(result.tangling_dict.values()) if result.tangling_dict else 0,
             blocks_analysis=new_blocks,
             detected_features=new_features,
         )
@@ -87,9 +81,9 @@ class ProjectService(BaseService[Project, ProjectRepository]):
             version_number=version_number, analysis_result=new_analysis_result
         )
 
-        
         existing_project.project_versions.append(new_project_version)
         return await self.save(existing_project)
+
 
 class ProjectVersionService(BaseService[ProjectVersion, ProjectVersionRepository]):
     def __init__(self, project_version_repo: ProjectVersionRepository):

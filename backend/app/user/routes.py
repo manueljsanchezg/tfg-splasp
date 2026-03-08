@@ -2,11 +2,10 @@ from typing import List
 
 from fastapi import APIRouter, HTTPException
 
-from app.utils import hash_password
-
-from app.user.models import User
 from app.user.dependencies import UserServiceDep
-from app.user.schemas import ReadUser, CreateOrUpdateUser
+from app.user.models import User
+from app.user.schemas import CreateOrUpdateUser, ReadUser
+from app.utils import hash_password
 
 router = APIRouter(prefix="/api/users", tags=["users"])
 
@@ -22,7 +21,7 @@ async def get_user(user_id: int, service: UserServiceDep):
 
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
-    
+
     return user
 
 
@@ -32,7 +31,7 @@ async def create_user(user: CreateOrUpdateUser, service: UserServiceDep):
 
     if existing_username:
         raise HTTPException(status_code=400, detail="Username already exists")
-    
+
     hashed_password = hash_password(user.password)
 
     new_user = User(username=user.username, password=hashed_password)
@@ -45,13 +44,13 @@ async def update_user(user_id: int, user: CreateOrUpdateUser, service: UserServi
 
     if not existing_user:
         raise HTTPException(status_code=404, detail="User not found")
-    
+
     existing_user.username = user.username
 
     if user.password:
         hashed_password = hash_password(user.password)
         existing_user.password = hashed_password
-    
+
     return await service.save(existing_user)
 
 
@@ -61,5 +60,5 @@ async def delete_user(user_id: int, service: UserServiceDep):
 
     if res == 0:
         raise HTTPException(status_code=404, detail="User not found")
-    
-    return { "message": "Deleted successfully" }
+
+    return {"message": "Deleted successfully"}

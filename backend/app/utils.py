@@ -1,10 +1,10 @@
 import jwt
-
 from pwdlib import PasswordHash
 
 from app.env import SECRET_KEY
 
 password_hash = PasswordHash.recommended()
+
 
 def hash_password(password: str):
     return password_hash.hash(password)

@@ -1,5 +1,5 @@
-from typing import TYPE_CHECKING, List
 from datetime import datetime
+from typing import TYPE_CHECKING, List
 
 from sqlalchemy import DateTime
 from sqlalchemy.orm import Mapped, mapped_column, relationship
