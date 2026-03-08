@@ -1,81 +1,94 @@
 import { useState } from "react";
-import type { ProjectResponse, ProjectVersionResponse } from "../types/project";
 import { getProjectVersions } from "../service/project.service";
+import type { ProjectResponse, ProjectVersionResponse } from "../types/project";
 
 const formatDate = (dateString: string | undefined | null) => {
-    if (!dateString) return 'N/A'
-    const date = new Date(dateString)
-    return isNaN(date.getTime()) ? 'N/A' : date.toLocaleDateString()
-}
+	if (!dateString) return "N/A";
+	const date = new Date(dateString);
+	return Number.isNaN(date.getTime()) ? "N/A" : date.toLocaleDateString();
+};
 
 function ProjectRow({
-    project,
-    onViewAnalysis
+	project,
+	onViewAnalysis,
 }: {
-    project: ProjectResponse;
-    onViewAnalysis: (v: ProjectVersionResponse, title: string) => void
+	project: ProjectResponse;
+	onViewAnalysis: (v: ProjectVersionResponse, title: string) => void;
 }) {
-    const [isExpanded, setIsExpanded] = useState(false)
-    const [versions, setVersions] = useState<ProjectVersionResponse[] | null>(null)
-    const [isLoading, setIsLoading] = useState(false)
+	const [isExpanded, setIsExpanded] = useState(false);
+	const [versions, setVersions] = useState<ProjectVersionResponse[] | null>(
+		null,
+	);
+	const [isLoading, setIsLoading] = useState(false);
 
-    const handleToggle = async () => {
-        setIsExpanded(!isExpanded)
+	const handleToggle = async () => {
+		setIsExpanded(!isExpanded);
 
-        if (!isExpanded && versions === null) {
-            setIsLoading(true)
-            try {
-                const data = await getProjectVersions(project.id)
-                setVersions(data)
-            } catch (error) {
-                console.error(error)
-            } finally {
-                setIsLoading(false)
-            }
-        }
-    }
+		if (!isExpanded && versions === null) {
+			setIsLoading(true);
+			try {
+				const data = await getProjectVersions(project.id);
+				setVersions(data);
+			} catch (error) {
+				console.error(error);
+			} finally {
+				setIsLoading(false);
+			}
+		}
+	};
 
-    return (
-        <>
-            <tr className="hover:bg-base-200 cursor-pointer text-2xl" onClick={handleToggle}>
-                <td className="font-bold pl-8 py-6">{project.title}</td>
-                <td className="text-center pr-8 py-6">{formatDate(project.createdAt)}</td>
-            </tr>
+	return (
+		<>
+			<tr
+				className="hover:bg-base-200 cursor-pointer text-2xl"
+				onClick={handleToggle}
+			>
+				<td className="font-bold pl-8 py-6">{project.title}</td>
+				<td className="text-center pr-8 py-6">
+					{formatDate(project.createdAt)}
+				</td>
+			</tr>
 
-            {isExpanded && (
-                <tr className="bg-base-200/40">
-                    <td colSpan={2} className="p-8 border-b border-base-300">
-                        <h4 className="font-bold mb-6 text-2xl border-b pb-2">Versions</h4>
+			{isExpanded && (
+				<tr className="bg-base-200/40">
+					<td colSpan={2} className="p-8 border-b border-base-300">
+						<h4 className="font-bold mb-6 text-2xl border-b pb-2">Versions</h4>
 
-                        {isLoading ? (
-                            <span className="loading loading-spinner loading-lg text-primary"></span>
-                        ) : !versions || versions.length === 0 ? (
-                            <p className="text-xl text-base-content/60">No versions found.</p>
-                        ) : (
-                            <div className="flex flex-wrap gap-4">
-                                {versions.map((version) => (
-                                    <div key={version.id} className="card bg-base-100 shadow-sm border border-base-300 w-72">
-                                        <div className="card-body p-6">
-                                            <h5 className="font-bold text-2xl mb-1">Version {version.versionNumber}</h5>
-                                            <p className="text-lg text-base-content/60 mb-4">
-                                                {formatDate(version.uploadedAt)}
-                                            </p>
-                                            <button
-                                                className="btn btn-primary text-lg"
-                                                onClick={() => onViewAnalysis(version, project.title)}
-                                            >
-                                                View Results
-                                            </button>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    </td>
-                </tr>
-            )}
-        </>
-    )
+						{isLoading ? (
+							<span className="loading loading-spinner loading-lg text-primary"></span>
+						) : !versions || versions.length === 0 ? (
+							<p className="text-xl text-base-content/60">No versions found.</p>
+						) : (
+							<div className="flex flex-wrap gap-4">
+								{versions.map((version) => (
+									<div
+										key={version.id}
+										className="card bg-base-100 shadow-sm border border-base-300 w-72"
+									>
+										<div className="card-body p-6">
+											<h5 className="font-bold text-2xl mb-1">
+												Version {version.versionNumber}
+											</h5>
+											<p className="text-lg text-base-content/60 mb-4">
+												{formatDate(version.uploadedAt)}
+											</p>
+											<button
+												type="button"
+												className="btn btn-primary text-lg"
+												onClick={() => onViewAnalysis(version, project.title)}
+											>
+												View Results
+											</button>
+										</div>
+									</div>
+								))}
+							</div>
+						)}
+					</td>
+				</tr>
+			)}
+		</>
+	);
 }
 
-export default ProjectRow
+export default ProjectRow;

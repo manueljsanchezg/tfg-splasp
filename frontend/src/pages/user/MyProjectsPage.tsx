@@ -1,5 +1,5 @@
 function MyProjectsPage() {
-  return <p>My projects</p>
+	return <p>My projects</p>;
 }
 
-export default MyProjectsPage
+export default MyProjectsPage;

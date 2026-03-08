@@ -1,21 +1,21 @@
 interface AuthData {
-  token: string
-  role: string
+	token: string;
+	role: string;
 }
 
 export interface AuthResponse {
-  accessToken: string
-  role: string
+	accessToken: string;
+	role: string;
 }
 
 export interface AuthStore {
-  token: string | null
-  role: string | null
-  login: (data: AuthData) => void
-  logout: () => void
+	token: string | null;
+	role: string | null;
+	login: (data: AuthData) => void;
+	logout: () => void;
 }
 
 export interface LoginData {
-  username: string
-  password: string
+	username: string;
+	password: string;
 }

@@ -1,10 +1,10 @@
 export interface UserResponse {
-  id: number
-  username: string
-  role: string
+	id: number;
+	username: string;
+	role: string;
 }
 
 export interface CreateUserData {
-  username: string
-  password: string
+	username: string;
+	password: string;
 }
