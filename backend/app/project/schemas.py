@@ -1,6 +1,5 @@
 from typing import Any, List, Dict
 from datetime import datetime
-from fastapi import UploadFile
 from app.core.base_model_camel import BaseModelCamel
 
 class Block(BaseModelCamel):

@@ -1,9 +1,7 @@
-from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.db import Base, engine
 from app.user.routes import router as user_routes
 from app.auth.routes import router as auth_routes
 from app.session.routes import router as session_routes
