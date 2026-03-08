@@ -20,7 +20,6 @@ load_dotenv()
 # access to the values within the .ini file in use.
 config = context.config
 
-# Leemos la URL del .env
 database_url = os.environ.get("DATABASE_URL")
 if database_url:
     config.set_main_option("sqlalchemy.url", database_url)
@@ -65,13 +64,9 @@ async def run_async_migrations():
         poolclass=pool.NullPool,
     )
 
-    # Usamos "async with" para conectarnos de forma asíncrona
     async with connectable.connect() as connection:
-        # Usamos run_sync para que Alembic (que es síncrono por dentro) 
-        # pueda usar nuestra conexión asíncrona de forma segura
         await connection.run_sync(do_run_migrations)
 
-    # Cerramos el motor limpiamente
     await connectable.dispose()
 
 
