@@ -26,9 +26,10 @@ function UsersPage() {
 		}
 	};
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: pass
 	useEffect(() => {
 		getUsers();
-	});
+	}, []);
 
 	const handleDeleteUser = (userId: number) => {
 		setUserToDelete(userId);
