@@ -1,10 +1,13 @@
-from typing import List, Optional
+from typing import TYPE_CHECKING, List, Optional
 from datetime import datetime
 from sqlalchemy import ForeignKey, DateTime, UniqueConstraint, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db import Base
 
+if TYPE_CHECKING:
+    from app.user.models import User
+    from app.session.models import Session
 
 class Project(Base):
     __tablename__ = "projects"

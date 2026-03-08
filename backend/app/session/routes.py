@@ -23,7 +23,7 @@ async def create_session(session: CreateSession, service: SessionServiceDep, use
 async def join_session(session: JoinSession, service: SessionServiceDep, user: CurrentUserDep):
     session_id = await service.join(session.code, user.id)
 
-    if session_id == None:
+    if session_id is None:
         raise HTTPException(status_code=404, detail="Session not found")
     
     return {"sessionId": session_id}
@@ -33,7 +33,7 @@ async def join_session(session: JoinSession, service: SessionServiceDep, user: C
 async def close_session(session_id: int, service: SessionServiceDep, user: CurrentAdminDep):
     closed = await service.close(session_id)
 
-    if closed == None:
+    if closed is None:
         raise HTTPException(status_code=404, detail="Session not found")
 
     return { "message": "Session deactivate"}

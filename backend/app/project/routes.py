@@ -52,7 +52,7 @@ async def analyze_snap_project(file: UploadFile, user: CurrentUserDep, service: 
 
     new_analyzed_project = await service.persist_project(file.filename, user, session_id, Result(**response))
 
-    if new_analyzed_project == None:
+    if new_analyzed_project is None:
         raise HTTPException(status_code=400, detail="Fuilure saving the result of the analysis")
 
     return response

@@ -9,7 +9,7 @@ from app.auth.schemas import AuthResponse, LoginReq, Token
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
 @router.post("/register", response_model=AuthResponse)
-async def login(login_req: LoginReq, auth_service: AuthServiceDep):
+async def register(login_req: LoginReq, auth_service: AuthServiceDep):
     token, role = await auth_service.register_user(login_req.username, login_req.password)
     if token is None:
         raise HTTPException(status_code=400, detail="Username already exists")

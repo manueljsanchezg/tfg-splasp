@@ -1,10 +1,13 @@
 from enum import Enum
-from typing import List
+from typing import TYPE_CHECKING, List
 
 from sqlalchemy import Enum as SAEnum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db import Base
+
+if TYPE_CHECKING:
+    from app.project.models import Project
 
 class Role(str, Enum):
     ADMIN = "admin"

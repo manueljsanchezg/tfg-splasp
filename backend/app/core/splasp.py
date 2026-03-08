@@ -396,7 +396,7 @@ def _analyze_expr(expr: Optional[ET.Element]) -> ExprAnalysis:
                 result.has_join = True
             elif selector == "reportTextSplit":
                 # Check if split by "blocks"
-                for l in elem.findall("l"):
+                for l in elem.findall("l"):  # noqa: E741
                     if _extract_option_text(l) == "blocks":
                         result.has_split_blocks = True
                         break
