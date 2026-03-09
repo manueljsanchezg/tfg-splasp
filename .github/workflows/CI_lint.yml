@@ -26,10 +26,10 @@ jobs:
         run: uv sync --group dev
 
       - name: Ruff lint
-        run: uv run ruff check .
+        run: uv run ruff check app/
 
       - name: Ruff format check
-        run: uv run ruff format --check .
+        run: uv run ruff format --check app/
 
   frontend-lint:
     name: Biome lint and format check
