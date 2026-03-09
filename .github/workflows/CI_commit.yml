@@ -10,4 +10,4 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Validate commit messages
-              uses: webiny/action-conventional-commits@v1.30
+              uses: webiny/action-conventional-commits@v1.3.0
