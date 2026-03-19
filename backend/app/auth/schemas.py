@@ -14,7 +14,6 @@ class LoginReq(BaseAuthReq):
 
 class AuthResponse(BaseModelCamel):
     access_token: str
-    role: str
 
 
 class Token(BaseModel):
