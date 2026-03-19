@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta, timezone
+from typing import Optional
 
 from app.user.models import User
 from app.user.service import UserService
@@ -9,7 +10,7 @@ class AuthService:
     def __init__(self, user_service: UserService):
         self.user_service = user_service
 
-    async def login_user(self, username: str, password: str):
+    async def login_user(self, username: str, password: str) -> Optional[str]:
         existing_user = await self.user_service.get_by_username(username)
 
         if not existing_user:
@@ -24,9 +25,9 @@ class AuthService:
         }
         token = generate_jwt(payload)
 
-        return token, existing_user.role
+        return token
 
-    async def register_user(self, username: str, password: str):
+    async def register_user(self, username: str, password: str) -> Optional[str]:
         existing_user = await self.user_service.get_by_username(username)
 
         if existing_user:
@@ -46,4 +47,4 @@ class AuthService:
 
         token = generate_jwt(payload)
 
-        return token, new_user.role
+        return token

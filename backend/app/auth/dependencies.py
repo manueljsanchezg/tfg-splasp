@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from typing import Annotated
 
 from fastapi import Depends, HTTPException
@@ -6,7 +7,7 @@ from jwt import ExpiredSignatureError, InvalidTokenError
 
 from app.auth.service import AuthService
 from app.user.dependencies import UserServiceDep
-from app.user.models import Role, User
+from app.user.models import User
 from app.utils import verify_jwt
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/access-token")
@@ -47,14 +48,37 @@ async def get_current_user(token: TokenDep, user_service: UserServiceDep):
 
 CurrentUserDep = Annotated[User, Depends(get_current_user)]
 
+@dataclass
+class AnonymousContext:
+    project_id: int
+    session_id: int
+    device_id: str
 
-def require_role(role: Role):
-    async def dependency(user: CurrentUserDep):
-        if user.role != role:
-            raise HTTPException(status_code=403, detail="Forbidden")
-        return user
+async def get_current_anonymous(token: TokenDep) -> AnonymousContext:
+    credentials_exception = HTTPException(status_code=401, detail="Could not validate credentials")
 
-    return dependency
+    try:
+        payload = verify_jwt(token)
+
+        if payload.get("type") != "anonymous":
+            raise credentials_exception
+
+        project_id = payload.get("project_id")
+        session_id = payload.get("session_id")
+        device_id = payload.get("device_id")
+
+        if not all([project_id, session_id, device_id]):
+            raise credentials_exception
+
+        return AnonymousContext(
+            project_id=project_id, session_id=session_id, device_id=device_id
+        )
+
+    except ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Token expired")
+
+    except InvalidTokenError:
+        raise credentials_exception
 
 
-CurrentAdminDep = Annotated[User, Depends(require_role(Role.ADMIN))]
+CurrentAnonymousDep = Annotated[AnonymousContext, Depends(get_current_anonymous)]
