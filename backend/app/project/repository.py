@@ -18,10 +18,21 @@ class ProjectRepository(BaseRepository[Project]):
     def __init__(self, session: AsyncSession):
         super().__init__(session, Project)
 
-    async def find_by_user_and_session(self, user_id: int, session_id: int) -> Optional[Project]:
+    async def find_by_device_id_and_session(
+        self, device_id: str, session_id: int
+    ) -> Optional[Project]:
         stmt = (
             select(Project)
-            .where(Project.user_id == user_id, Project.session_id == session_id)
+            .where(Project.device_id == device_id, Project.session_id == session_id)
+            .options(selectinload(Project.project_versions))
+        )
+        result = await self.session.execute(stmt)
+        return result.scalar_one_or_none()
+
+    async def find_by_id_with_versions(self, project_id: int) -> Optional[Project]:
+        stmt = (
+            select(Project)
+            .where(Project.id == project_id)
             .options(selectinload(Project.project_versions))
         )
         result = await self.session.execute(stmt)
