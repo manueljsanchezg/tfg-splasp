@@ -19,7 +19,6 @@ from app.project.service import (
 )
 
 
-# Repositories dependencies
 def get_project_repository(session: SessionDep):
     return ProjectRepository(session)
 
@@ -40,7 +39,6 @@ def get_detected_feature_repository(session: SessionDep):
     return DetectedFeatureRepository(session)
 
 
-# Services dependencies
 def get_project_service(
     repository: ProjectRepository = Depends(get_project_repository),
 ):
@@ -71,7 +69,6 @@ def get_detected_feature_service(
     return DetectedFeatureService(repository)
 
 
-# Dependencies
 ProjectServiceDep = Annotated[ProjectService, Depends(get_project_service)]
 
 ProjectVersionServiceDep = Annotated[ProjectVersionService, Depends(get_project_version_service)]

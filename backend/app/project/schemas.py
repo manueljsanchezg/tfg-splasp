@@ -44,7 +44,7 @@ class ProjectRead(BaseModelCamel):
     title: str
     created_at: datetime
     session_id: int
-    user_id: int
+    device_id: str | None = None
 
 
 class ProjectVersionRead(BaseModelCamel):

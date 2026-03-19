@@ -16,28 +16,37 @@ from app.project.repository import (
     ProjectVersionRepository,
 )
 from app.project.schemas import Result
-from app.user.models import User
 
 
 class ProjectService(BaseService[Project, ProjectRepository]):
     def __init__(self, project_repo: ProjectRepository):
         super().__init__(project_repo)
 
-    async def find_project_by_user_and_session(
-        self, user_id: int, session_id: int
+    async def find_project_by_device_id_and_session(
+        self, device_id: str, session_id: int
     ) -> Optional[Project]:
-        return await self.repository.find_by_user_and_session(user_id, session_id)
+        return await self.repository.find_by_device_id_and_session(device_id, session_id)
+
+    async def find_project_by_id_with_versions(
+        self, project_id: int
+    ) -> Optional[Project]:
+        return await self.repository.find_by_id_with_versions(project_id)
 
     async def find_project_by_session(self, session_id: int) -> List[Project]:
         return await self.repository.find_by_session(session_id)
 
-    async def persist_project(self, filename: str, user: User, session_id: int, result: Result):
 
-        existing_project = await self.find_project_by_user_and_session(user.id, session_id)
+    async def persist_anonymous_project(
+        self, filename: str, project_id: int, result: Result
+    ):
+        existing_project = await self.find_project_by_id_with_versions(project_id)
 
         if not existing_project:
             return None
 
+        return await self._save_analysis(existing_project, filename, result)
+
+    async def _save_analysis(self, project: Project, filename: str, result: Result):
         new_blocks = [
             BlockAnalysis(
                 owner=b.owner,
@@ -71,18 +80,15 @@ class ProjectService(BaseService[Project, ProjectRepository]):
             detected_features=new_features,
         )
 
-        existing_project.title = filename
-
-        version_number = 1
-        if existing_project:
-            version_number = len(existing_project.project_versions) + 1
+        project.title = filename
+        version_number = len(project.project_versions) + 1
 
         new_project_version = ProjectVersion(
             version_number=version_number, analysis_result=new_analysis_result
         )
 
-        existing_project.project_versions.append(new_project_version)
-        return await self.save(existing_project)
+        project.project_versions.append(new_project_version)
+        return await self.save(project)
 
 
 class ProjectVersionService(BaseService[ProjectVersion, ProjectVersionRepository]):

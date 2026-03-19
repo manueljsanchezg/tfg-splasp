@@ -3,7 +3,7 @@ from typing import List
 
 from fastapi import APIRouter, Form, HTTPException, Query, UploadFile
 
-from app.auth.dependencies import CurrentUserDep
+from app.auth.dependencies import CurrentAnonymousDep, CurrentUserDep
 from app.core.splasp import analyze_project
 from app.project.dependencies import (
     AnalysisResultServiceDep,
@@ -21,6 +21,7 @@ from app.project.schemas import (
 router = APIRouter(prefix="/api/projects", tags=["projects"])
 
 
+
 @router.get("/mine", response_model=ProjectRead)
 async def get_my_project_for_session(
     user: CurrentUserDep,
@@ -31,6 +32,18 @@ async def get_my_project_for_session(
     if not project:
         raise HTTPException(status_code=404, detail="You have not joined this session")
     return project
+
+
+@router.get("/mine/anonymous", response_model=ProjectRead)
+async def get_my_anonymous_project(
+    anonymous: CurrentAnonymousDep,
+    service: ProjectServiceDep,
+):
+    project = await service.find_project_by_id_with_versions(anonymous.project_id)
+    if not project:
+        raise HTTPException(status_code=404, detail="Project not found")
+    return project
+
 
 
 @router.post("/analyze", response_model=AnalysisResultSchema)
@@ -66,6 +79,35 @@ async def analyze_snap_project(
 
     if new_analyzed_project is None:
         raise HTTPException(status_code=400, detail="Fuilure saving the result of the analysis")
+
+    return response
+
+
+@router.post("/analyze/anonymous", response_model=AnalysisResultSchema)
+async def analyze_snap_project_anonymous(
+    file: UploadFile,
+    anonymous_user: CurrentAnonymousDep,
+    service: ProjectServiceDep,
+):
+    if not file.filename or not file.filename.lower().endswith(".xml"):
+        raise HTTPException(status_code=400, detail="The file is not xml")
+
+    content = await file.read()
+
+    try:
+        root = ET.fromstring(content)
+    except ET.ParseError:
+        raise HTTPException(status_code=400, detail="The content is corrupted or malformed")
+
+    result = analyze_project(root)
+    response = result.to_json_dict()
+
+    new_analyzed_project = await service.persist_anonymous_project(
+        file.filename, anonymous_user.project_id, Result(**response)
+    )
+
+    if new_analyzed_project is None:
+        raise HTTPException(status_code=400, detail="Failure saving the result of the analysis")
 
     return response
 
