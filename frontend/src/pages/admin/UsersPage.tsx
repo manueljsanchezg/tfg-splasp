@@ -102,7 +102,6 @@ function UsersPage() {
 							<thead className="bg-base-300 text-2xl uppercase">
 								<tr>
 									<th className="px-4 py-4 font-bold text-center">Username</th>
-									<th className="px-4 py-4 font-bold text-center">Role</th>
 									<th className="px-4 py-4 font-bold text-center">Actions</th>
 								</tr>
 							</thead>
@@ -116,11 +115,6 @@ function UsersPage() {
 										<td className="px-4 py-4 text-center">
 											<span className="font-bold text-2xl text-base-content">
 												{user.username}
-											</span>
-										</td>
-										<td className="px-4 py-4 text-center">
-											<span className="badge badge-lg badge-outline text-xl font-semibold">
-												{user.role.toUpperCase()}
 											</span>
 										</td>
 										<td className="px-4 py-4 text-center text-xl flex flex-col gap-3 items-center">

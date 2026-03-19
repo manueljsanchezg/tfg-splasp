@@ -34,7 +34,6 @@ export default function RegisterPage() {
 			if (response) {
 				login({
 					token: response.accessToken,
-					role: response.role,
 				});
 				navigate("/");
 			}

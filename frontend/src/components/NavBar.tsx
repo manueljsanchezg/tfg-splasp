@@ -3,7 +3,7 @@ import { useAuth } from "../hooks/useAuth";
 
 function NavBar() {
 	const navigate = useNavigate();
-	const { token, role, logout } = useAuth();
+	const { isUserAuthenticated, hasSessionAccess, isAnonymous, logout } = useAuth();
 
 	const handleLogout = async () => {
 		logout();
@@ -16,48 +16,16 @@ function NavBar() {
 		}`;
 
 	let publicRoutes = <></>;
+	let anonymousRoutes = <></>;
 	let privateRoutes = <></>;
-	let userRoutes = <></>;
 	let adminRoutes = <></>;
+	const alwaysRoutes = (
+		<NavLink className={linkClass} to="/sessions/join">
+			Join Session
+		</NavLink>
+	);
 
-	switch (role) {
-		case "ADMIN":
-			adminRoutes = (
-				<>
-					<NavLink className={linkClass} to="/">
-						Home
-					</NavLink>
-					<NavLink className={linkClass} to="/sessions">
-						Sessions
-					</NavLink>
-					<NavLink className={linkClass} to="/users">
-						Users
-					</NavLink>
-				</>
-			);
-			break;
-
-		case "USER":
-			userRoutes = (
-				<>
-					<NavLink className={linkClass} to="/">
-						Home
-					</NavLink>
-					<NavLink className={linkClass} to="/projects">
-						My Projects
-					</NavLink>
-					<NavLink className={linkClass} to="/sessions/join">
-						Join Session
-					</NavLink>
-				</>
-			);
-			break;
-
-		default:
-			break;
-	}
-
-	if (!token) {
+	if (!hasSessionAccess) {
 		publicRoutes = (
 			<>
 				<NavLink className={linkClass} to="/">
@@ -66,12 +34,23 @@ function NavBar() {
 				<NavLink className={linkClass} to="/login">
 					Login
 				</NavLink>
-				<NavLink className={linkClass} to="/register">
-					Register
+			</>
+		);
+	} else if (isUserAuthenticated) {
+		adminRoutes = (
+			<>
+				<NavLink className={linkClass} to="/">
+					Home
+				</NavLink>
+				<NavLink className={linkClass} to="/sessions">
+					Sessions
+				</NavLink>
+				<NavLink className={linkClass} to="/users">
+					Users
 				</NavLink>
 			</>
 		);
-	} else {
+
 		privateRoutes = (
 			<button
 				type="button"
@@ -79,6 +58,24 @@ function NavBar() {
 				className="btn btn-error text-lg"
 			>
 				Logout
+			</button>
+		);
+	} else if (isAnonymous) {
+		anonymousRoutes = (
+			<>
+				<NavLink className={linkClass} to="/">
+					Home
+				</NavLink>
+			</>
+		);
+
+		privateRoutes = (
+			<button
+				type="button"
+				onClick={handleLogout}
+				className="btn btn-error text-lg"
+			>
+				Leave Session
 			</button>
 		);
 	}
@@ -96,8 +93,9 @@ function NavBar() {
 				</NavLink>
 
 				<div className="flex gap-4 items-center">
+					{alwaysRoutes}
 					{adminRoutes}
-					{userRoutes}
+					{anonymousRoutes}
 					{privateRoutes}
 					{publicRoutes}
 				</div>

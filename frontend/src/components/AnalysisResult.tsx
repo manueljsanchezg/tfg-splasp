@@ -1,8 +1,13 @@
 import { type ChangeEvent, useState } from "react";
-import { analyzeProject } from "../service/project.service";
+import { useAuth } from "../hooks/useAuth";
+import {
+	analyzeProject,
+	analyzeProjectAnonymous,
+} from "../service/project.service";
 import type { ProjectMetrics } from "../types/project";
 
 function AnalysisResult({ sessionId }: { sessionId: number }) {
+	const { isAnonymous } = useAuth();
 	const [projectFile, setProjectFile] = useState<File | null>(null);
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const [error, setError] = useState<string | null>(null);
@@ -22,7 +27,9 @@ function AnalysisResult({ sessionId }: { sessionId: number }) {
 			setIsLoading(true);
 			setError(null);
 			try {
-				const result = await analyzeProject(projectFile, sessionId);
+				const result = isAnonymous
+					? await analyzeProjectAnonymous(projectFile)
+					: await analyzeProject(projectFile, sessionId);
 
 				setProjectMetrics((prev) => ({
 					...prev,

@@ -9,96 +9,67 @@ import SessionPage from "./pages/admin/SessionsPage";
 import UsersPage from "./pages/admin/UsersPage";
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
-import RegisterPage from "./pages/RegisterPage";
 import JoinSessionPage from "./pages/user/JoinSessionPage";
-import MyProjectsPage from "./pages/user/MyProjectsPage";
 import UserSessionPage from "./pages/user/SessionPage";
 
 export default function App() {
-	const { token, role } = useAuth();
+	const { isUserAuthenticated } = useAuth();
 
 	let publicRoutes = <></>;
 	let privateRoutes = <></>;
-	let userRoutes = <></>;
 	let adminRoutes = <></>;
+	const alwaysRoutes = (
+		<>
+			<Route path="/sessions/join" element={<JoinSessionPage />} />
+				<Route
+					path="/sessions/:sessionId"
+					element={
+						<ProtectedRoute>
+							<UserSessionPage />
+						</ProtectedRoute>
+					}
+				/>
+			<Route path="*" element={<Navigate to="/" replace />} />
+		</>
+	);
 
-	switch (role) {
-		case "ADMIN":
-			adminRoutes = (
-				<>
-					<Route
-						path="/sessions"
-						element={
-							<AdminRoute>
-								<SessionPage />
-							</AdminRoute>
-						}
-					/>
-					<Route
-						path="/sessions/:sessionId"
-						element={
-							<AdminRoute>
-								<SessionInfoPage />
-							</AdminRoute>
-						}
-					/>
-					<Route
-						path="/users"
-						element={
-							<AdminRoute>
-								<UsersPage />
-							</AdminRoute>
-						}
-					/>
-				</>
-			);
-			break;
-
-		case "USER":
-			userRoutes = (
-				<>
-					<Route
-						path="/projects"
-						element={
-							<ProtectedRoute>
-								<MyProjectsPage />
-							</ProtectedRoute>
-						}
-					/>
-					<Route
-						path="/sessions/join"
-						element={
-							<ProtectedRoute>
-								<JoinSessionPage />
-							</ProtectedRoute>
-						}
-					/>
-					<Route
-						path="/sessions/:sessionId"
-						element={
-							<ProtectedRoute>
-								<UserSessionPage />
-							</ProtectedRoute>
-						}
-					/>
-				</>
-			);
-			break;
-
-		default:
-			break;
-	}
-
-	if (!token) {
+	if (!isUserAuthenticated) {
 		publicRoutes = (
 			<>
 				<Route path="/" element={<HomePage />} />
 				<Route path="/login" element={<LoginPage />} />
-				<Route path="/register" element={<RegisterPage />} />
 			</>
 		);
 	} else {
 		privateRoutes = <Route path="/" element={<HomePage />} />;
+		adminRoutes = (
+			<>
+				<Route
+					path="/sessions"
+					element={
+						<AdminRoute>
+							<SessionPage />
+						</AdminRoute>
+					}
+				/>
+				<Route
+					path="/sessions/:sessionId"
+					element={
+						<AdminRoute>
+							<SessionInfoPage />
+						</AdminRoute>
+					}
+				/>
+				<Route
+					path="/users"
+					element={
+						<AdminRoute>
+							<UsersPage />
+						</AdminRoute>
+					}
+				/>
+			</>
+		);
 	}
 
 	return (
@@ -106,9 +77,8 @@ export default function App() {
 			<Routes>
 				{publicRoutes}
 				{privateRoutes}
-				{userRoutes}
 				{adminRoutes}
-				<Route path="*" element={<Navigate to="/" replace />} />
+				{alwaysRoutes}
 			</Routes>
 		</PageLayout>
 	);

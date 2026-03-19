@@ -2,12 +2,14 @@ import { AxiosError } from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import AnalysisResult from "../../components/AnalysisResult";
-import { getMyProjectForSession } from "../../service/project.service";
+import { useAuth } from "../../hooks/useAuth";
+import { getMyAnonymousProject } from "../../service/project.service";
 import type { ProjectResponse } from "../../types/project";
 
 function SessionPage() {
 	const { sessionId } = useParams<{ sessionId: string }>();
 	const navigate = useNavigate();
+	const { isAnonymous, deviceId } = useAuth();
 	const [project, setProject] = useState<ProjectResponse | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
@@ -22,7 +24,7 @@ function SessionPage() {
 
 		const verifyAccess = async () => {
 			try {
-				const myProject = await getMyProjectForSession(numericSessionId);
+				const myProject = await getMyAnonymousProject();
 				setProject(myProject);
 			} catch (error) {
 				if (error instanceof AxiosError && error.response?.status === 404) {
@@ -69,6 +71,16 @@ function SessionPage() {
 				<div className="badge badge-success badge-lg gap-2 py-4 px-6 text-base font-bold">
 					Active in Session
 				</div>
+				<p className="text-base-content/60 text-lg">
+					{isAnonymous && (
+						<>
+							Device{" "}
+							<span className="font-semibold text-base-content">
+								{deviceId}
+							</span>
+						</>
+					)}
+				</p>
 				<p className="text-base-content/60 text-lg">
 					Project:{" "}
 					<span className="font-semibold text-base-content">

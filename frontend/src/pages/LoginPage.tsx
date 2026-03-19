@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { loginUser } from "../service/auth.service";
 import { useAuthStore } from "../store/authStore";
 import type { LoginData } from "../types/auth";
@@ -24,7 +24,6 @@ export default function LoginPage() {
 			if (response) {
 				login({
 					token: response.accessToken,
-					role: response.role,
 				});
 				navigate("/");
 			}
@@ -109,13 +108,7 @@ export default function LoginPage() {
 
 				<div className="text-center text-lg mt-6">
 					<p className="text-base-content/70 font-medium">
-						Don't have an account?{" "}
-						<Link
-							to="/register"
-							className="font-bold text-primary hover:text-primary-focus underline decoration-2 underline-offset-4"
-						>
-							Create one here
-						</Link>
+						Use your teacher credentials to sign in.
 					</p>
 				</div>
 			</form>

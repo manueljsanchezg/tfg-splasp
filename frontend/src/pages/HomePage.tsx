@@ -3,7 +3,7 @@ import { useAuth } from "../hooks/useAuth";
 
 function HomePage() {
 	const navigate = useNavigate();
-	const { isAuthenticated, role } = useAuth();
+	const { isAuthenticated } = useAuth();
 
 	return (
 		<div className="flex flex-col items-center gap-20 w-full py-20 px-6">
@@ -23,34 +23,9 @@ function HomePage() {
 						>
 							Login
 						</button>
-						<button
-							type="button"
-							className="btn btn-outline btn-lg text-xl px-10"
-							onClick={() => navigate("/register")}
-						>
-							Register
-						</button>
 					</div>
 				)}
-				{isAuthenticated && role === "USER" && (
-					<div className="flex gap-4 mt-6">
-						<button
-							type="button"
-							className="btn btn-primary btn-lg text-xl px-10"
-							onClick={() => navigate("/sessions/join")}
-						>
-							Join Session
-						</button>
-						<button
-							type="button"
-							className="btn btn-outline btn-lg text-xl px-10"
-							onClick={() => navigate("/projects")}
-						>
-							My Projects
-						</button>
-					</div>
-				)}
-				{isAuthenticated && role === "ADMIN" && (
+				{isAuthenticated && (
 					<div className="flex gap-4 mt-6">
 						<button
 							type="button"

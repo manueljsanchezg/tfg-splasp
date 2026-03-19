@@ -10,7 +10,7 @@ function PageLayout({
 	showNav?: boolean;
 }) {
 	const location = useLocation();
-	const hideNavPaths = ["/login", "/register"];
+	const hideNavPaths = ["/login"];
 	const effectiveShowNav = showNav && !hideNavPaths.includes(location.pathname);
 
 	return (
