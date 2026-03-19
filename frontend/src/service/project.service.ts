@@ -26,16 +26,30 @@ export const analyzeProject = async (
 	}
 };
 
-export const getMyProjectForSession = async (
-	sessionId: number,
-): Promise<ProjectResponse> => {
+export const analyzeProjectAnonymous = async (
+	project: File,
+): Promise<ProjectMetrics> => {
 	try {
-		const response = await api.get<ProjectResponse>("/projects/mine", {
-			params: { sessionId },
+		const formData = new FormData();
+		formData.append("file", project);
+		const response = await api.post("/projects/analyze/anonymous", formData, {
+			headers: {
+				"Content-Type": "multipart/form-data",
+			},
 		});
 		return response.data;
 	} catch (error) {
-		console.error(`Error getting my project for session ${sessionId}:`, error);
+		console.error("Error analyzing project", error);
+		throw error;
+	}
+};
+
+export const getMyAnonymousProject = async (): Promise<ProjectResponse> => {
+	try {
+		const response = await api.get<ProjectResponse>("/projects/mine/anonymous");
+		return response.data;
+	} catch (error) {
+		console.error("Error getting my project:", error);
 		throw error;
 	}
 };

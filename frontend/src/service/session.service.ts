@@ -1,7 +1,8 @@
 import type { ProjectResponse } from "../types/project";
 import type {
 	CloseSessionResponse,
-	JoinSessionResponse,
+	JoinAnonymousSessionRequest,
+	JoinAnonymousSessionResponse,
 	SessionData,
 	SessionResponse,
 } from "../types/session";
@@ -29,16 +30,20 @@ export const createSession = async (
 	}
 };
 
-export const joinSession = async (
-	code: string,
-): Promise<JoinSessionResponse> => {
+
+export const joinSessionAnonymous = async (
+	data: JoinAnonymousSessionRequest,
+): Promise<JoinAnonymousSessionResponse> => {
 	try {
-		const response = await api.post<JoinSessionResponse>("/sessions/join", {
-			code,
-		});
+		console.log(data)
+		const response = await api.post<JoinAnonymousSessionResponse>(
+			"/sessions/join-anonymous",
+			data,
+		);
+		console.log(response)
 		return response.data;
 	} catch (error) {
-		console.error("Error getting sessions:", error);
+		console.error("Error joining session:", error);
 		throw error;
 	}
 };

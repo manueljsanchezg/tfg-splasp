@@ -2,15 +2,25 @@ import { useAuthStore } from "../store/authStore";
 
 export const useAuth = () => {
 	const token = useAuthStore((state) => state.token);
-	const role = useAuthStore((state) => state.role);
 	const login = useAuthStore((state) => state.login);
+	const loginAnonymous = useAuthStore((state) => state.loginAnonymous);
 	const logout = useAuthStore((state) => state.logout);
+	const isAnonymous = useAuthStore((state) => state.isAnonymous);
+	const deviceId = useAuthStore((state) => state.deviceId);
+	const projectId = useAuthStore((state) => state.projectId);
+	const hasToken = !!token;
+	const isUserAuthenticated = hasToken && !isAnonymous;
 
 	return {
-		isAuthenticated: !!token,
+		isAuthenticated: isUserAuthenticated,
+		hasSessionAccess: hasToken,
+		isUserAuthenticated,
 		token,
-		role,
+		isAnonymous,
+		deviceId,
+		projectId,
 		login,
+		loginAnonymous,
 		logout,
 	};
 };
