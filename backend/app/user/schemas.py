@@ -8,7 +8,6 @@ class BaseUser(BaseModel):
 
 class ReadUser(BaseUser):
     pass
-    role: str
 
 
 class CreateOrUpdateUser(BaseUser):

@@ -2,36 +2,47 @@ from typing import List
 
 from fastapi import APIRouter, HTTPException
 
-from app.auth.dependencies import CurrentAdminDep, CurrentUserDep
+from app.auth.dependencies import CurrentUserDep
 from app.project.schemas import ProjectRead
 from app.session.dependencies import SessionServiceDep
-from app.session.schemas import CreateSession, JoinSession, ReadSession
+from app.session.schemas import (
+    AnonymousTokenResponse,
+    CreateSession,
+    JoinAnonymousSession,
+    ReadSession,
+)
 
 router = APIRouter(prefix="/api/sessions", tags=["sessions"])
 
 
 @router.get("", response_model=List[ReadSession])
-async def get_all_sessions(service: SessionServiceDep, user: CurrentAdminDep):
+async def get_all_sessions(service: SessionServiceDep, user: CurrentUserDep):
     return await service.get_all()
 
 
 @router.post("", response_model=ReadSession)
-async def create_session(session: CreateSession, service: SessionServiceDep, user: CurrentAdminDep):
+async def create_session(session: CreateSession, service: SessionServiceDep, user: CurrentUserDep):
     return await service.create(session.name, session.start_date, session.end_date)
 
 
-@router.post("/join")
-async def join_session(session: JoinSession, service: SessionServiceDep, user: CurrentUserDep):
-    session_id = await service.join(session.code, user.id)
+@router.post("/join-anonymous", response_model=AnonymousTokenResponse)
+async def join_session_anonymous(
+    data: JoinAnonymousSession, service: SessionServiceDep
+):
+    print(data)
+    result = await service.join_anonymous(data.code, data.device_id)
 
-    if session_id is None:
-        raise HTTPException(status_code=404, detail="Session not found")
+    if result is None:
+        raise HTTPException(status_code=404, detail="Session not found or not active")
 
-    return {"sessionId": session_id}
+    token, project_id, session_id = result
+    return AnonymousTokenResponse(
+        access_token=token, project_id=project_id, session_id=session_id
+    )
 
 
 @router.patch("/{session_id}")
-async def close_session(session_id: int, service: SessionServiceDep, user: CurrentAdminDep):
+async def close_session(session_id: int, service: SessionServiceDep, user: CurrentUserDep):
     closed = await service.close(session_id)
 
     if closed is None:

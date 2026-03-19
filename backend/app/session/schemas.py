@@ -20,5 +20,12 @@ class CreateSession(BaseModelCamel):
     end_date: datetime
 
 
-class JoinSession(BaseModel):
+class JoinAnonymousSession(BaseModelCamel):
     code: str
+    device_id: str
+
+
+class AnonymousTokenResponse(BaseModelCamel):
+    access_token: str
+    project_id: int
+    session_id: int

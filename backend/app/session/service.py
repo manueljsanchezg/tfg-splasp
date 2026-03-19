@@ -1,7 +1,7 @@
 import secrets
 import string
-from datetime import datetime, timezone
-from typing import Optional
+from datetime import datetime, timedelta, timezone
+from typing import Optional, Tuple
 
 from app.core.base_service import BaseService
 from app.project.models import Project
@@ -9,6 +9,7 @@ from app.project.service import ProjectService
 from app.session.models import Session
 from app.session.repository import SessionRepository
 from app.user.service import UserService
+from app.utils import generate_jwt
 
 
 class SessionService(BaseService[Session, SessionRepository]):
@@ -32,29 +33,28 @@ class SessionService(BaseService[Session, SessionRepository]):
 
         return await self.repository.save(new_session)
 
-    async def join(self, code: str, user_id: int) -> Optional[int]:
+
+    async def join_anonymous(self, code: str, device_id: str) -> Optional[Tuple[str, int, int]]:
         session = await self.repository.get_by_code(code)
 
         if not session or not session.is_active or session.end_date < datetime.now(timezone.utc):
             return None
 
-        user = await self.user_service.get_by_id(user_id)
-        if not user:
-            return None
-
-        existing_project = await self.project_sevice.find_project_by_user_and_session(
-            user.id, session.id
+        existing_project = await self.project_sevice.find_project_by_device_id_and_session(
+            device_id, session.id
         )
 
         if existing_project:
-            return session.id
+            token = self._generate_anonymous_token(existing_project.id, session.id, device_id)
+            return token, existing_project.id, session.id
 
-        print("Creando un nuevo proyecto")
-        new_project = Project(title="dump", user_id=user.id, session_id=session.id)
+        new_project = Project(
+            title="dump", device_id=device_id, session_id=session.id
+        )
+        saved_project = await self.project_sevice.save(new_project)
 
-        await self.project_sevice.save(new_project)
-
-        return session.id
+        token = self._generate_anonymous_token(saved_project.id, session.id, device_id)
+        return token, saved_project.id, session.id
 
     async def close(self, session_id: int) -> Optional[bool]:
         session = await self.repository.get_by_id(session_id)
@@ -74,3 +74,13 @@ class SessionService(BaseService[Session, SessionRepository]):
     def _generate_code(self, size: int) -> str:
         alphabet = string.ascii_letters + string.digits
         return "".join(secrets.choice(alphabet) for i in range(size))
+
+    def _generate_anonymous_token(self, project_id: int, session_id: int, device_id: str) -> str:
+        payload = {
+            "type": "anonymous",
+            "project_id": project_id,
+            "session_id": session_id,
+            "device_id": device_id,
+            "exp": datetime.now(timezone.utc) + timedelta(hours=24),
+        }
+        return generate_jwt(payload)
