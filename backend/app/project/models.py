@@ -13,16 +13,17 @@ if TYPE_CHECKING:
 
 class Project(Base):
     __tablename__ = "projects"
-    __table_args__ = (UniqueConstraint("user_id", "session_id", name="uix_user_session_project"),)
+    __table_args__ = (
+        UniqueConstraint("device_id", "session_id", name="uix_device_session_project"),
+    )
 
     id: Mapped[int] = mapped_column(primary_key=True)
     title: Mapped[str] = mapped_column()
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=func.now())
+    device_id: Mapped[Optional[str]] = mapped_column(nullable=True)
 
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=True)
     session_id: Mapped[int] = mapped_column(ForeignKey("sessions.id"), nullable=True)
 
-    user: Mapped[Optional["User"]] = relationship(back_populates="projects")
     session: Mapped[Optional["Session"]] = relationship(back_populates="projects")
     project_versions: Mapped[List["ProjectVersion"]] = relationship(back_populates="project")
 
