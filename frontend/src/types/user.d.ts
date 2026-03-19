@@ -1,7 +1,6 @@
 export interface UserResponse {
 	id: number;
 	username: string;
-	role: string;
 }
 
 export interface CreateUserData {

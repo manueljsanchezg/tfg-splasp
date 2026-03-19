@@ -1,21 +1,36 @@
 import { create } from "zustand";
-import type { AuthStore } from "../types/auth";
+import type { AnonymousAuthData, AuthData, AuthStore } from "../types/auth";
 
 export const useAuthStore = create<AuthStore>((set) => ({
 	token: null,
-	role: null,
+	isAnonymous: false,
+	deviceId: null,
+	projectId: null,
 
-	login: (data) => {
+	login: (data: AuthData) => {
 		set({
 			token: data.token,
-			role: data.role,
+			isAnonymous: false,
+			deviceId: null,
+			projectId: null,
+		});
+	},
+
+	loginAnonymous: (data: AnonymousAuthData, deviceId: string) => {
+		set({
+			token: data.accessToken,
+			isAnonymous: true,
+			deviceId,
+			projectId: data.projectId,
 		});
 	},
 
 	logout: () => {
 		set({
 			token: null,
-			role: null,
+			isAnonymous: false,
+			deviceId: null,
+			projectId: null,
 		});
 	},
 }));

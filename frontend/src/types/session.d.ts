@@ -13,7 +13,16 @@ export interface SessionData {
 	endDate: string;
 }
 
-export interface JoinSessionResponse {
+
+
+export interface JoinAnonymousSessionRequest {
+	code: string;
+	deviceId: string;
+}
+
+export interface JoinAnonymousSessionResponse {
+	accessToken: string;
+	projectId: number;
 	sessionId: number;
 }
 
