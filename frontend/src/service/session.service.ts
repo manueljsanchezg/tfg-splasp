@@ -30,17 +30,16 @@ export const createSession = async (
 	}
 };
 
-
 export const joinSessionAnonymous = async (
 	data: JoinAnonymousSessionRequest,
 ): Promise<JoinAnonymousSessionResponse> => {
 	try {
-		console.log(data)
+		console.log(data);
 		const response = await api.post<JoinAnonymousSessionResponse>(
 			"/sessions/join-anonymous",
 			data,
 		);
-		console.log(response)
+		console.log(response);
 		return response.data;
 	} catch (error) {
 		console.error("Error joining session:", error);

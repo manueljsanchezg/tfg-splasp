@@ -3,7 +3,8 @@ import { useAuth } from "../hooks/useAuth";
 
 function NavBar() {
 	const navigate = useNavigate();
-	const { isUserAuthenticated, hasSessionAccess, isAnonymous, logout } = useAuth();
+	const { isUserAuthenticated, hasSessionAccess, isAnonymous, logout } =
+		useAuth();
 
 	const handleLogout = async () => {
 		logout();
@@ -62,11 +63,9 @@ function NavBar() {
 		);
 	} else if (isAnonymous) {
 		anonymousRoutes = (
-			<>
-				<NavLink className={linkClass} to="/">
-					Home
-				</NavLink>
-			</>
+			<NavLink className={linkClass} to="/">
+				Home
+			</NavLink>
 		);
 
 		privateRoutes = (

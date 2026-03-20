@@ -21,14 +21,14 @@ export default function App() {
 	const alwaysRoutes = (
 		<>
 			<Route path="/sessions/join" element={<JoinSessionPage />} />
-				<Route
-					path="/sessions/:sessionId"
-					element={
-						<ProtectedRoute>
-							<UserSessionPage />
-						</ProtectedRoute>
-					}
-				/>
+			<Route
+				path="/sessions/:sessionId"
+				element={
+					<ProtectedRoute>
+						<UserSessionPage />
+					</ProtectedRoute>
+				}
+			/>
 			<Route path="*" element={<Navigate to="/" replace />} />
 		</>
 	);
