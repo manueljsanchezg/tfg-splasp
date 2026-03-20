@@ -4,5 +4,5 @@ Apply migrations -> alembic upgrade head
 
 ruff
 Linting -> uv run ruff check app/
-Imports -> uv run ruff ceck --select I app/
+Imports -> uv run ruff check --select I app/
 Format  -> uv run ruff format app/

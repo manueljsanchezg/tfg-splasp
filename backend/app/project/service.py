@@ -27,18 +27,13 @@ class ProjectService(BaseService[Project, ProjectRepository]):
     ) -> Optional[Project]:
         return await self.repository.find_by_device_id_and_session(device_id, session_id)
 
-    async def find_project_by_id_with_versions(
-        self, project_id: int
-    ) -> Optional[Project]:
+    async def find_project_by_id_with_versions(self, project_id: int) -> Optional[Project]:
         return await self.repository.find_by_id_with_versions(project_id)
 
     async def find_project_by_session(self, session_id: int) -> List[Project]:
         return await self.repository.find_by_session(session_id)
 
-
-    async def persist_anonymous_project(
-        self, filename: str, project_id: int, result: Result
-    ):
+    async def persist_anonymous_project(self, filename: str, project_id: int, result: Result):
         existing_project = await self.find_project_by_id_with_versions(project_id)
 
         if not existing_project:

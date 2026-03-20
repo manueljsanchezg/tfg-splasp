@@ -26,9 +26,7 @@ async def create_session(session: CreateSession, service: SessionServiceDep, use
 
 
 @router.post("/join-anonymous", response_model=AnonymousTokenResponse)
-async def join_session_anonymous(
-    data: JoinAnonymousSession, service: SessionServiceDep
-):
+async def join_session_anonymous(data: JoinAnonymousSession, service: SessionServiceDep):
     print(data)
     result = await service.join_anonymous(data.code, data.device_id)
 
@@ -36,9 +34,7 @@ async def join_session_anonymous(
         raise HTTPException(status_code=404, detail="Session not found or not active")
 
     token, project_id, session_id = result
-    return AnonymousTokenResponse(
-        access_token=token, project_id=project_id, session_id=session_id
-    )
+    return AnonymousTokenResponse(access_token=token, project_id=project_id, session_id=session_id)
 
 
 @router.patch("/{session_id}")

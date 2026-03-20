@@ -48,11 +48,13 @@ async def get_current_user(token: TokenDep, user_service: UserServiceDep):
 
 CurrentUserDep = Annotated[User, Depends(get_current_user)]
 
+
 @dataclass
 class AnonymousContext:
     project_id: int
     session_id: int
     device_id: str
+
 
 async def get_current_anonymous(token: TokenDep) -> AnonymousContext:
     credentials_exception = HTTPException(status_code=401, detail="Could not validate credentials")
@@ -70,9 +72,7 @@ async def get_current_anonymous(token: TokenDep) -> AnonymousContext:
         if not all([project_id, session_id, device_id]):
             raise credentials_exception
 
-        return AnonymousContext(
-            project_id=project_id, session_id=session_id, device_id=device_id
-        )
+        return AnonymousContext(project_id=project_id, session_id=session_id, device_id=device_id)
 
     except ExpiredSignatureError:
         raise HTTPException(status_code=401, detail="Token expired")

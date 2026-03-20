@@ -1,7 +1,5 @@
 from datetime import datetime
 
-from pydantic import BaseModel
-
 from app.core.base_model_camel import BaseModelCamel
 
 

@@ -21,7 +21,6 @@ from app.project.schemas import (
 router = APIRouter(prefix="/api/projects", tags=["projects"])
 
 
-
 @router.get("/mine", response_model=ProjectRead)
 async def get_my_project_for_session(
     user: CurrentUserDep,
@@ -43,7 +42,6 @@ async def get_my_anonymous_project(
     if not project:
         raise HTTPException(status_code=404, detail="Project not found")
     return project
-
 
 
 @router.post("/analyze", response_model=AnalysisResultSchema)

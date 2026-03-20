@@ -33,7 +33,6 @@ class SessionService(BaseService[Session, SessionRepository]):
 
         return await self.repository.save(new_session)
 
-
     async def join_anonymous(self, code: str, device_id: str) -> Optional[Tuple[str, int, int]]:
         session = await self.repository.get_by_code(code)
 
@@ -48,9 +47,7 @@ class SessionService(BaseService[Session, SessionRepository]):
             token = self._generate_anonymous_token(existing_project.id, session.id, device_id)
             return token, existing_project.id, session.id
 
-        new_project = Project(
-            title="dump", device_id=device_id, session_id=session.id
-        )
+        new_project = Project(title="dump", device_id=device_id, session_id=session.id)
         saved_project = await self.project_sevice.save(new_project)
 
         token = self._generate_anonymous_token(saved_project.id, session.id, device_id)

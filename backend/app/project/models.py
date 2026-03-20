@@ -8,7 +8,6 @@ from app.db import Base
 
 if TYPE_CHECKING:
     from app.session.models import Session
-    from app.user.models import User
 
 
 class Project(Base):

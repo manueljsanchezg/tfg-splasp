@@ -1,11 +1,12 @@
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING
 
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db import Base
 
 if TYPE_CHECKING:
-    from app.project.models import Project
+    pass
+
 
 class User(Base):
     __tablename__ = "users"
