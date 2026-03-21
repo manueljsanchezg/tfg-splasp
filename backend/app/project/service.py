@@ -1,6 +1,10 @@
 from typing import List, Optional
+from xml.etree.ElementTree import Element
+
+from sqlalchemy import Tuple
 
 from app.core.base_service import BaseService
+from app.core.splasp import analyze_project
 from app.project.models import (
     AnalysisResult,
     BlockAnalysis,
@@ -33,15 +37,38 @@ class ProjectService(BaseService[Project, ProjectRepository]):
     async def find_project_by_session(self, session_id: int) -> List[Project]:
         return await self.repository.find_by_session(session_id)
 
-    async def persist_anonymous_project(self, filename: str, project_id: int, result: Result):
+    async def persist_anonymous_project(self, filename: str, project_id: int, root: Element[str]):
         existing_project = await self.find_project_by_id_with_versions(project_id)
 
         if not existing_project:
             return None
 
-        return await self._save_analysis(existing_project, filename, result)
+        result = analyze_project(root)
+        analysis = result.to_json_dict()
 
-    async def _save_analysis(self, project: Project, filename: str, result: Result):
+        existing_project = await self._build_analysis_project(
+            existing_project, filename, Result(**analysis)
+        )
+
+        await self.save(existing_project)
+
+        return analysis
+
+    async def persist_batch_projects(
+        self, session_id: int, projects_roots_list: List[Tuple[str, Element[str]]]
+    ):
+        projects_list = []
+        for project_root in projects_roots_list:
+            result = analyze_project(project_root[1])
+            analysis = result.to_json_dict()
+            new_project = Project(title=project_root[0], session_id=session_id)
+            new_project_with_analysis = await self._build_analysis_project(
+                new_project, project_root[0], Result(**analysis)
+            )
+            projects_list.append(new_project_with_analysis)
+        await self.repository.save_batch(projects_list)
+
+    async def _build_analysis_project(self, project: Project, filename: str, result: Result):
         new_blocks = [
             BlockAnalysis(
                 owner=b.owner,
@@ -83,7 +110,7 @@ class ProjectService(BaseService[Project, ProjectRepository]):
         )
 
         project.project_versions.append(new_project_version)
-        return await self.save(project)
+        return project
 
 
 class ProjectVersionService(BaseService[ProjectVersion, ProjectVersionRepository]):
