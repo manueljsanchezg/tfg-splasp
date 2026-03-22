@@ -74,7 +74,7 @@ async def analyze_batch_snap_project(
                 raise HTTPException(status_code=400, detail="The content is corrupted or malformed")
 
     await service.persist_batch_projects(session_id, roots_list)
-    return {"message": "Projects saved succesfully"}
+    return {"message": "Projects saved succesfully", "total_saved": len(roots_list)}
 
 
 @router.get("/{project_id}/versions", response_model=List[ProjectVersionRead])
