@@ -17,6 +17,11 @@ export interface ProjectMetrics {
 	blocks: Block[];
 }
 
+export interface SavedBatchProjects {
+	message: string;
+	totalSaved: number;
+}
+
 export interface ProjectResponse {
 	id: number;
 	title: string;

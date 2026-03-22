@@ -1,13 +1,8 @@
 import { type ChangeEvent, useState } from "react";
-import { useAuth } from "../hooks/useAuth";
-import {
-	analyzeProject,
-	analyzeProjectAnonymous,
-} from "../service/project.service";
+import { analyzeProjectAnonymous } from "../service/project.service";
 import type { ProjectMetrics } from "../types/project";
 
-function AnalysisResult({ sessionId }: { sessionId: number }) {
-	const { isAnonymous } = useAuth();
+function AnalysisResult() {
 	const [projectFile, setProjectFile] = useState<File | null>(null);
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const [error, setError] = useState<string | null>(null);
@@ -27,10 +22,7 @@ function AnalysisResult({ sessionId }: { sessionId: number }) {
 			setIsLoading(true);
 			setError(null);
 			try {
-				const result = isAnonymous
-					? await analyzeProjectAnonymous(projectFile)
-					: await analyzeProject(projectFile, sessionId);
-
+				const result = await analyzeProjectAnonymous(projectFile);
 				setProjectMetrics((prev) => ({
 					...prev,
 					projectLevel: result.projectLevel,
@@ -53,7 +45,7 @@ function AnalysisResult({ sessionId }: { sessionId: number }) {
 					<input
 						type="file"
 						onChange={handleFile}
-						className="file-input file-input-bordered file-input-lg w-full max-w-md bg-base-100 text-xl shadow-md"
+						className="file-input file-input-bordered file-input-lg w-full"
 					/>
 					<button
 						type="button"

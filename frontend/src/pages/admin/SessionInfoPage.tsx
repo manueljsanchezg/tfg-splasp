@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import AnalysisMetricsView from "../../components/AnalysisMetricsView";
-import ProjectRow from "../../components/ProjectRow";
+import ProjectRow from "../../components/admin/ProjectRow";
 import { getVersionAnalysis } from "../../service/project.service";
 import { getProjectsBySession } from "../../service/session.service";
 import type {
@@ -9,44 +8,45 @@ import type {
 	ProjectVersionResponse,
 	SavedAnalysisResult,
 } from "../../types/project";
+import UploadZipModal from "../../components/admin/UploadZipModal";
+import ProjectAnalysisModal from "../../components/admin/ProjectAnalysisModal";
 
 function SessionInfoPage() {
 	const { sessionId } = useParams<{ sessionId: string }>();
 	const navigate = useNavigate();
-
 	const [projects, setProjects] = useState<ProjectResponse[]>([]);
 	const [isLoadingProjects, setIsLoadingProjects] = useState(true);
-
-	const [isModalOpen, setIsModalOpen] = useState(false);
+	const [isZipModalOpen, setIsZipModalOpen] = useState(false);
+	const [isAnalysisModalOpen, setIsAnalysisModalOpen] = useState(false);
 	const [activeVersionName, setActiveVersionName] = useState("");
 	const [selectedAnalysis, setSelectedAnalysis] =
 		useState<SavedAnalysisResult | null>(null);
 	const [isLoadingAnalysis, setIsLoadingAnalysis] = useState(false);
 
+	const fetchProjects = async () => {
+		setIsLoadingProjects(true);
+		try {
+			const data = await getProjectsBySession(Number(sessionId));
+			setProjects(data);
+		} catch (error) {
+			console.error("Error loading projects:", error);
+		} finally {
+			setIsLoadingProjects(false);
+		}
+	};
+
+	// biome-ignore lint/correctness/useExhaustiveDependencies: pass
 	useEffect(() => {
 		if (!sessionId) return;
-
-		const fetchProjects = async () => {
-			setIsLoadingProjects(true);
-			try {
-				const data = await getProjectsBySession(Number(sessionId));
-				setProjects(data);
-			} catch (error) {
-				console.error("Error loading projects:", error);
-			} finally {
-				setIsLoadingProjects(false);
-			}
-		};
-
 		fetchProjects();
 	}, [sessionId]);
 
-	const handleOpenModal = async (
+	const handleOpenAnaylisisModal = async (
 		version: ProjectVersionResponse,
 		projectTitle: string,
 	) => {
 		setActiveVersionName(`${projectTitle} - v${version.versionNumber}`);
-		setIsModalOpen(true);
+		setIsAnalysisModalOpen(true);
 		setIsLoadingAnalysis(true);
 		setSelectedAnalysis(null);
 
@@ -64,6 +64,15 @@ function SessionInfoPage() {
 		<div className="flex flex-col gap-6 w-full px-8 py-6 max-w-7xl mx-auto">
 			<div className="flex items-center justify-between mb-4">
 				<h1 className="text-5xl font-black">Session {sessionId}</h1>
+
+				<button
+					type="button"
+					className="btn btn-lg btn-primary"
+					onClick={() => setIsZipModalOpen(true)}
+				>
+					Upload a zip
+				</button>
+
 				<button
 					type="button"
 					className="btn btn-outline btn-lg text-xl"
@@ -99,7 +108,7 @@ function SessionInfoPage() {
 								<ProjectRow
 									key={project.id}
 									project={project}
-									onViewAnalysis={handleOpenModal}
+									onViewAnalysis={handleOpenAnaylisisModal}
 								/>
 							))
 						)}
@@ -107,39 +116,20 @@ function SessionInfoPage() {
 				</table>
 			</div>
 
-			<dialog className={`modal ${isModalOpen ? "modal-open" : ""}`}>
-				<div className="modal-box w-11/12 max-w-7xl h-[90vh] flex flex-col p-0">
-					<div className="p-8 bg-base-200 flex justify-between items-center border-b border-base-300">
-						<h3 className="font-bold text-4xl">{activeVersionName}</h3>
-						<button
-							type="button"
-							className="btn btn-ghost btn-lg text-2xl"
-							onClick={() => setIsModalOpen(false)}
-						>
-							✕
-						</button>
-					</div>
+			<UploadZipModal
+				sessionId={Number(sessionId)}
+				isOpen={isZipModalOpen}
+				onClose={() => setIsZipModalOpen(false)}
+				onSuccess={fetchProjects}
+			/>
 
-					<div className="p-8 overflow-y-auto flex-1 bg-base-100">
-						{isLoadingAnalysis ? (
-							<div className="flex flex-col items-center justify-center h-full gap-4">
-								<span className="loading loading-spinner loading-lg text-primary"></span>
-								<span className="text-2xl font-medium text-base-content/70">
-									Loading analysis...
-								</span>
-							</div>
-						) : selectedAnalysis ? (
-							<AnalysisMetricsView metrics={selectedAnalysis} />
-						) : null}
-					</div>
-				</div>
-
-				<form method="dialog" className="modal-backdrop">
-					<button type="button" onClick={() => setIsModalOpen(false)}>
-						close
-					</button>
-				</form>
-			</dialog>
+			<ProjectAnalysisModal
+				isOpen={isAnalysisModalOpen}
+				activeVersionName={activeVersionName}
+				selectedAnalysis={selectedAnalysis}
+				isLoadingAnalysis={isLoadingAnalysis}
+				onClose={() => setIsAnalysisModalOpen(false)}
+			/>
 		</div>
 	);
 }

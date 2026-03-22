@@ -1,6 +1,9 @@
 import { useState } from "react";
-import { getProjectVersions } from "../service/project.service";
-import type { ProjectResponse, ProjectVersionResponse } from "../types/project";
+import { getProjectVersions } from "../../service/project.service";
+import type {
+	ProjectResponse,
+	ProjectVersionResponse,
+} from "../../types/project";
 
 const formatDate = (dateString: string | undefined | null) => {
 	if (!dateString) return "N/A";

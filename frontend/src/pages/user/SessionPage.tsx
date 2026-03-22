@@ -88,7 +88,7 @@ function SessionPage() {
 					</span>
 				</p>
 			</div>
-			<AnalysisResult sessionId={numericSessionId} />
+			<AnalysisResult />
 		</div>
 	);
 }

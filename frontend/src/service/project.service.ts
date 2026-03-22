@@ -1,30 +1,12 @@
+import { data } from "react-router-dom";
 import type {
 	ProjectMetrics,
 	ProjectResponse,
 	ProjectVersionResponse,
 	SavedAnalysisResult,
+	SavedBatchProjects,
 } from "../types/project";
 import { api } from "./api";
-
-export const analyzeProject = async (
-	project: File,
-	sessionId: number,
-): Promise<ProjectMetrics> => {
-	try {
-		const formData = new FormData();
-		formData.append("file", project);
-		formData.append("sessionId", String(sessionId));
-		const response = await api.post("/projects/analyze", formData, {
-			headers: {
-				"Content-Type": "multipart/form-data",
-			},
-		});
-		return response.data;
-	} catch (error) {
-		console.error("Error analyzing project", error);
-		throw error;
-	}
-};
 
 export const analyzeProjectAnonymous = async (
 	project: File,
@@ -37,6 +19,27 @@ export const analyzeProjectAnonymous = async (
 				"Content-Type": "multipart/form-data",
 			},
 		});
+		return response.data;
+	} catch (error) {
+		console.error("Error analyzing project", error);
+		throw error;
+	}
+};
+
+export const analyzeBatchProjects = async (
+	zip: File,
+	sessionId: number,
+): Promise<SavedBatchProjects> => {
+	try {
+		const formData = new FormData();
+		formData.append("file", zip);
+		formData.append("sessionId", sessionId.toString());
+		const response = await api.post("/projects/analyze-batch", formData, {
+			headers: {
+				"Content-Type": "multipart/form-data",
+			},
+		});
+		console.log(data);
 		return response.data;
 	} catch (error) {
 		console.error("Error analyzing project", error);
