@@ -5,7 +5,7 @@ from typing import List
 
 from fastapi import APIRouter, Form, HTTPException, UploadFile
 
-from app.auth.dependencies import CurrentAnonymousDep
+from app.auth.dependencies import CurrentAnonymousDep, CurrentUserDep
 from app.project.dependencies import (
     AnalysisResultServiceDep,
     ProjectServiceDep,
@@ -60,7 +60,10 @@ async def analyze_snap_project_anonymous(
 
 @router.post("/analyze-batch")
 async def analyze_batch_snap_project(
-    file: UploadFile, service: ProjectServiceDep, session_id: int = Form(alias="sessionId")
+    file: UploadFile,
+    service: ProjectServiceDep,
+    user: CurrentUserDep,
+    session_id: int = Form(alias="sessionId"),
 ):
     content = await file.read()
     roots_list = []
@@ -78,13 +81,17 @@ async def analyze_batch_snap_project(
 
 
 @router.get("/{project_id}/versions", response_model=List[ProjectVersionRead])
-async def get_project_versions(project_id: int, version_service: ProjectVersionServiceDep):
+async def get_project_versions(
+    project_id: int, version_service: ProjectVersionServiceDep, user: CurrentUserDep
+):
     versions = await version_service.get_versions_by_project(project_id)
     return versions
 
 
 @router.get("/versions/{version_id}/analysis", response_model=AnalysisResultRead)
-async def get_version_analysis(version_id: int, analysis_service: AnalysisResultServiceDep):
+async def get_version_analysis(
+    version_id: int, analysis_service: AnalysisResultServiceDep, user: CurrentUserDep
+):
     analysis = await analysis_service.get_analysis_by_version(version_id)
 
     if analysis is None:
