@@ -27,28 +27,6 @@ async def http_exception_handler(request: Request, ex: HTTPException):
     )
 
 
-"""
-
-@app.exception_handler(RequestValidationError)
-async def request_validation_exception_handler(request: Request, ex: RequestValidationError):
-    errors = ex.errors()
-    if not errors:
-        message = "Validation error"
-    else:
-        parsed_errors = []
-        for err in errors:
-            loc = ".".join(str(part) for part in err.get("loc", []) if part != "body")
-            detail = err.get("msg", "Invalid value")
-            parsed_errors.append(f"{loc}: {detail}" if loc else detail)
-        message = "; ".join(parsed_errors)
-
-    return JSONResponse(
-        status_code=422,
-        content=ApiResponse(success=False, error=message).model_dump(),
-    )
-"""
-
-
 @app.exception_handler(Exception)
 async def unhandled_exception_handler(request: Request, ex: Exception):
     return JSONResponse(
