@@ -44,8 +44,6 @@ class ProjectRepository(BaseRepository[Project]):
         return result.scalars().all()
 
     async def save_batch(self, projects_list: List[Project]) -> List[Project]:
-        print("hace batch")
-        print(projects_list)
         self.session.add_all(projects_list)
         await self.session.commit()
 
