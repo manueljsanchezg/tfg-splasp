@@ -27,12 +27,15 @@ function UploadZipModal({
 	const handleUpload = async () => {
 		if (zipFile) {
 			setIsLoadingZip(true);
+			setError(null);
 			try {
 				await analyzeBatchProjects(zipFile, sessionId);
 				onSuccess();
 				onClose();
-			} catch (_error) {
-				setError("Error analyzing project");
+			} catch (error) {
+				setError(
+					error instanceof Error ? error.message : "Error analyzing project",
+				);
 			} finally {
 				setIsLoadingZip(false);
 			}

@@ -1,4 +1,4 @@
-import type { SavedAnalysisResult } from "../types/project";
+import type { SavedAnalysisResult } from "../../types/project";
 
 interface AnalysisMetricsViewProps {
 	metrics: SavedAnalysisResult;

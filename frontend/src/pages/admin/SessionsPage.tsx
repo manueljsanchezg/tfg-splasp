@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ConfirmModal from "../../components/ConfirmModal";
-import CreateSessionModal from "../../components/CreateSessionModal";
+import CreateSessionModal from "../../components/admin/CreateSessionModal";
 import { closeSession, getAllSessions } from "../../service/session.service";
 import type { SessionResponse } from "../../types/session";
 
@@ -20,8 +20,9 @@ function SessionPage() {
 			const sessions = await getAllSessions();
 			setSessions(sessions);
 		} catch (error) {
-			console.error(error);
-			setError("Error retrieving sessions");
+			setError(
+				error instanceof Error ? error.message : "Error retrieving sessions",
+			);
 		} finally {
 			setIsLoading(false);
 		}
@@ -37,9 +38,10 @@ function SessionPage() {
 		try {
 			await closeSession(sessionToDeactivate);
 			await getSessions();
-		} catch (err) {
-			console.error(err);
-			setError("Failed to deactivate session");
+		} catch (error) {
+			setError(
+				error instanceof Error ? error.message : "Failed to deactivate session",
+			);
 		} finally {
 			setSessionToDeactivate(null);
 		}

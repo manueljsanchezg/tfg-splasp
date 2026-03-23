@@ -21,12 +21,10 @@ export default function LoginPage() {
 		setError(null);
 		try {
 			const response = await loginUser(data);
-			if (response) {
-				login({
-					token: response.accessToken,
-				});
-				navigate("/");
-			}
+			login({
+				token: response.accessToken,
+			});
+			navigate("/");
 		} catch (error) {
 			setError(error instanceof Error ? error.message : "Login error");
 		} finally {
@@ -43,12 +41,6 @@ export default function LoginPage() {
 			</div>
 
 			<form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
-				{error && (
-					<div className="rounded-xl bg-error/20 p-5 text-lg text-error font-medium">
-						{error}
-					</div>
-				)}
-
 				<div className="form-control w-full gap-2">
 					<div className="label pb-0">
 						<span className="label-text text-xl font-bold">Username</span>
@@ -90,6 +82,12 @@ export default function LoginPage() {
 						</div>
 					)}
 				</div>
+
+				{error && (
+					<div className="rounded-xl bg-error/20 p-5 text-lg text-error text-center font-medium">
+						{error}
+					</div>
+				)}
 
 				<button
 					type="submit"

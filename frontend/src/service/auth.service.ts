@@ -1,26 +1,18 @@
 import type { AuthResponse, LoginData } from "../types/auth";
+import type { ApiResponse } from "../types/request";
 import { api } from "./api";
-
-export const registerUser = async (
-	loginData: LoginData,
-): Promise<AuthResponse> => {
-	try {
-		const response = await api.post<AuthResponse>("/auth/register", loginData);
-		return { accessToken: response.data.accessToken };
-	} catch (error) {
-		console.error("Error registering:", error);
-		throw error;
-	}
-};
 
 export const loginUser = async (
 	loginData: LoginData,
 ): Promise<AuthResponse> => {
-	try {
-		const response = await api.post<AuthResponse>("/auth/login", loginData);
-		return { accessToken: response.data.accessToken };
-	} catch (error) {
-		console.error("Error logging in:", error);
-		throw error;
+	const response = await api.post<ApiResponse<AuthResponse>>(
+		"/auth/login",
+		loginData,
+	);
+
+	if (!response.data.data) {
+		throw new Error("Invalid login response");
 	}
+
+	return response.data.data;
 };

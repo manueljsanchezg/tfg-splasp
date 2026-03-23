@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import ConfirmModal from "../../components/ConfirmModal";
-import CreateUserModal from "../../components/CreateUserModal";
+import CreateUserModal from "../../components/admin/CreateUserModal";
 import { deleteUser, getAllUsers } from "../../service/user.service";
 import type { UserResponse } from "../../types/user";
 
@@ -18,9 +18,10 @@ function UsersPage() {
 		try {
 			const data = await getAllUsers();
 			setUsers(data);
-		} catch (err) {
-			console.error(err);
-			setError("Error retrieving users");
+		} catch (error) {
+			setError(
+				error instanceof Error ? error.message : "Error retrieving users",
+			);
 		} finally {
 			setIsLoading(false);
 		}
@@ -41,9 +42,10 @@ function UsersPage() {
 		try {
 			await deleteUser(userToDelete);
 			await getUsers();
-		} catch (err) {
-			console.error(err);
-			setError("Failed to delete user");
+		} catch (error) {
+			setError(
+				error instanceof Error ? error.message : "Failed to delete user",
+			);
 		} finally {
 			setUserToDelete(null);
 		}

@@ -1,4 +1,3 @@
-import { AxiosError } from "axios";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
@@ -59,11 +58,11 @@ function JoinSessionPage() {
 
 			navigate(`/sessions/${response.sessionId}`);
 		} catch (error) {
-			if (error instanceof AxiosError && error.response?.status === 404) {
-				setError("Session not found. Check the code and try again.");
-			} else {
-				setError("An error occurred. Please try again.");
-			}
+			setError(
+				error instanceof Error
+					? error.message
+					: "An error occurred. Please try again.",
+			);
 		} finally {
 			setIsLoading(false);
 		}

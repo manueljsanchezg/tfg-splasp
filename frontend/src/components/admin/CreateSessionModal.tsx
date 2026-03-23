@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { createSession } from "../service/session.service";
-import type { SessionData } from "../types/session";
+import { createSession } from "../../service/session.service";
+import type { SessionData } from "../../types/session";
 
 function CreateSessionModal({
 	isOpen,
@@ -36,8 +36,10 @@ function CreateSessionModal({
 			reset();
 			modalRef.current?.close();
 			onSuccess();
-		} catch (_error) {
-			setError("Error creating session");
+		} catch (error) {
+			setError(
+				error instanceof Error ? error.message : "Error creating session",
+			);
 		} finally {
 			setIsLoading(false);
 		}

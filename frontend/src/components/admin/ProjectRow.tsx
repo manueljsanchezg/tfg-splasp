@@ -23,17 +23,21 @@ function ProjectRow({
 		null,
 	);
 	const [isLoading, setIsLoading] = useState(false);
+	const [error, setError] = useState<string | null>(null);
 
 	const handleToggle = async () => {
 		setIsExpanded(!isExpanded);
 
 		if (!isExpanded && versions === null) {
 			setIsLoading(true);
+			setError(null);
 			try {
 				const data = await getProjectVersions(project.id);
 				setVersions(data);
 			} catch (error) {
-				console.error(error);
+				setError(
+					error instanceof Error ? error.message : "Error loading versions",
+				);
 			} finally {
 				setIsLoading(false);
 			}
@@ -56,6 +60,7 @@ function ProjectRow({
 				<tr className="bg-base-200/40">
 					<td colSpan={2} className="p-8 border-b border-base-300">
 						<h4 className="font-bold mb-6 text-2xl border-b pb-2">Versions</h4>
+						{error && <p className="text-error text-lg mb-4">{error}</p>}
 
 						{isLoading ? (
 							<span className="loading loading-spinner loading-lg text-primary"></span>

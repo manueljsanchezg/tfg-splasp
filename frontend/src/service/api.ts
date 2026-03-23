@@ -15,3 +15,17 @@ api.interceptors.request.use((config) => {
 	}
 	return config;
 });
+
+api.interceptors.response.use(
+	(response) => response,
+	(error) => {
+		if (axios.isAxiosError(error)) {
+			const message = error.response?.data?.error ?? "Unexpected request error";
+			return Promise.reject(new Error(message));
+		}
+
+		if (error instanceof Error) return Promise.reject(error);
+
+		return Promise.reject(new Error("Unexpected request error"));
+	},
+);

@@ -1,6 +1,6 @@
 import { type ChangeEvent, useState } from "react";
-import { analyzeProjectAnonymous } from "../service/project.service";
-import type { ProjectMetrics } from "../types/project";
+import { analyzeProjectAnonymous } from "../../service/project.service";
+import type { ProjectMetrics } from "../../types/project";
 
 function AnalysisResult() {
 	const [projectFile, setProjectFile] = useState<File | null>(null);
@@ -30,8 +30,10 @@ function AnalysisResult() {
 					duplicationRatio: result.duplicationRatio,
 					blocks: result.blocks,
 				}));
-			} catch (_error) {
-				setError("Error analyzing project");
+			} catch (error) {
+				setError(
+					error instanceof Error ? error.message : "Error analyzing project",
+				);
 			} finally {
 				setIsLoading(false);
 			}

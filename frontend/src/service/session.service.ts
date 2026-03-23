@@ -1,4 +1,5 @@
 import type { ProjectResponse } from "../types/project";
+import type { ApiResponse } from "../types/request";
 import type {
 	CloseSessionResponse,
 	JoinAnonymousSessionRequest,
@@ -9,68 +10,59 @@ import type {
 import { api } from "./api";
 
 export const getAllSessions = async (): Promise<SessionResponse[]> => {
-	try {
-		const response = await api.get<SessionResponse[]>("/sessions");
-		return response.data;
-	} catch (error) {
-		console.error("Error getting sessions:", error);
-		throw error;
+	const response = await api.get<ApiResponse<SessionResponse[]>>("/sessions");
+	if (!response.data.data) {
+		throw new Error("Invalid sessions response");
 	}
+	return response.data.data;
 };
 
 export const createSession = async (
 	data: SessionData,
 ): Promise<SessionResponse> => {
-	try {
-		const response = await api.post<SessionResponse>("/sessions", data);
-		return response.data;
-	} catch (error) {
-		console.error("Error getting sessions:", error);
-		throw error;
+	const response = await api.post<ApiResponse<SessionResponse>>(
+		"/sessions",
+		data,
+	);
+	if (!response.data.data) {
+		throw new Error("Invalid session response");
 	}
+	return response.data.data;
 };
 
 export const joinSessionAnonymous = async (
 	data: JoinAnonymousSessionRequest,
 ): Promise<JoinAnonymousSessionResponse> => {
-	try {
-		console.log(data);
-		const response = await api.post<JoinAnonymousSessionResponse>(
-			"/sessions/join-anonymous",
-			data,
-		);
-		console.log(response);
-		return response.data;
-	} catch (error) {
-		console.error("Error joining session:", error);
-		throw error;
+	const response = await api.post<ApiResponse<JoinAnonymousSessionResponse>>(
+		"/sessions/join-anonymous",
+		data,
+	);
+	if (!response.data.data) {
+		throw new Error("Invalid anonymous session response");
 	}
+	return response.data.data;
 };
 
 export const closeSession = async (
 	sessionId: number,
 ): Promise<CloseSessionResponse> => {
-	try {
-		const response = await api.patch<CloseSessionResponse>(
-			`/sessions/${sessionId}`,
-		);
-		return response.data;
-	} catch (error) {
-		console.error("Error closing session:", error);
-		throw error;
+	const response = await api.patch<ApiResponse<CloseSessionResponse>>(
+		`/sessions/${sessionId}`,
+	);
+	if (!response.data.data) {
+		throw new Error("Invalid close session response");
 	}
+	return response.data.data;
 };
 
 export const getProjectsBySession = async (
 	sessionId: number,
 ): Promise<ProjectResponse[]> => {
-	try {
-		const response = await api.get<ProjectResponse[]>(
-			`/sessions/${sessionId}/projects`,
-		);
-		return response.data;
-	} catch (error) {
-		console.error(`Error getting projects for session ${sessionId}:`, error);
-		throw error;
+	const response = await api.get<ApiResponse<ProjectResponse[]>>(
+		`/sessions/${sessionId}/projects`,
+	);
+	if (!response.data.data) {
+		throw new Error("Invalid projects response");
 	}
+	return response.data.data;
 };

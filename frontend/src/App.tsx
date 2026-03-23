@@ -11,6 +11,7 @@ import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import JoinSessionPage from "./pages/user/JoinSessionPage";
 import UserSessionPage from "./pages/user/SessionPage";
+import ScrollToTop from "./components/ScrollToTop";
 
 export default function App() {
 	const { isUserAuthenticated } = useAuth();
@@ -74,6 +75,7 @@ export default function App() {
 
 	return (
 		<PageLayout>
+			<ScrollToTop />
 			<Routes>
 				{publicRoutes}
 				{privateRoutes}

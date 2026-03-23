@@ -1,4 +1,4 @@
-import AnalysisMetricsView from "../AnalysisMetricsView";
+import AnalysisMetricsView from "./AnalysisMetricsView";
 import type { SavedAnalysisResult } from "../../types/project";
 
 interface ProjectAnalysisModalProps {

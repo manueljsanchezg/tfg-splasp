@@ -1,7 +1,6 @@
-import { AxiosError } from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import AnalysisResult from "../../components/AnalysisResult";
+import AnalysisResult from "../../components/user/AnalysisResult";
 import { useAuth } from "../../hooks/useAuth";
 import { getMyAnonymousProject } from "../../service/project.service";
 import type { ProjectResponse } from "../../types/project";
@@ -27,11 +26,11 @@ function SessionPage() {
 				const myProject = await getMyAnonymousProject();
 				setProject(myProject);
 			} catch (error) {
-				if (error instanceof AxiosError && error.response?.status === 404) {
-					setError("You have not joined this session. Please join first.");
-				} else {
-					setError("Failed to load session data.");
-				}
+				setError(
+					error instanceof Error
+						? error.message
+						: "Failed to load session data.",
+				);
 			} finally {
 				setIsLoading(false);
 			}

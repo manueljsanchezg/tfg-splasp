@@ -1,4 +1,3 @@
-import { data } from "react-router-dom";
 import type {
 	ProjectMetrics,
 	ProjectResponse,
@@ -6,81 +5,91 @@ import type {
 	SavedAnalysisResult,
 	SavedBatchProjects,
 } from "../types/project";
+import type { ApiResponse } from "../types/request";
 import { api } from "./api";
 
 export const analyzeProjectAnonymous = async (
 	project: File,
 ): Promise<ProjectMetrics> => {
-	try {
-		const formData = new FormData();
-		formData.append("file", project);
-		const response = await api.post("/projects/analyze/anonymous", formData, {
+	const formData = new FormData();
+	formData.append("file", project);
+	const response = await api.post<ApiResponse<ProjectMetrics>>(
+		"/projects/analyze/anonymous",
+		formData,
+		{
 			headers: {
 				"Content-Type": "multipart/form-data",
 			},
-		});
-		return response.data;
-	} catch (error) {
-		console.error("Error analyzing project", error);
-		throw error;
+		},
+	);
+
+	if (!response.data.data) {
+		throw new Error("Invalid project analysis response");
 	}
+
+	return response.data.data;
 };
 
 export const analyzeBatchProjects = async (
 	zip: File,
 	sessionId: number,
 ): Promise<SavedBatchProjects> => {
-	try {
-		const formData = new FormData();
-		formData.append("file", zip);
-		formData.append("sessionId", sessionId.toString());
-		const response = await api.post("/projects/analyze-batch", formData, {
+	const formData = new FormData();
+	formData.append("file", zip);
+	formData.append("sessionId", sessionId.toString());
+	const response = await api.post<ApiResponse<SavedBatchProjects>>(
+		"/projects/analyze-batch",
+		formData,
+		{
 			headers: {
 				"Content-Type": "multipart/form-data",
 			},
-		});
-		console.log(data);
-		return response.data;
-	} catch (error) {
-		console.error("Error analyzing project", error);
-		throw error;
+		},
+	);
+
+	if (!response.data.data) {
+		throw new Error("Invalid batch analysis response");
 	}
+
+	return response.data.data;
 };
 
 export const getMyAnonymousProject = async (): Promise<ProjectResponse> => {
-	try {
-		const response = await api.get<ProjectResponse>("/projects/mine/anonymous");
-		return response.data;
-	} catch (error) {
-		console.error("Error getting my project:", error);
-		throw error;
+	const response = await api.get<ApiResponse<ProjectResponse>>(
+		"/projects/mine/anonymous",
+	);
+
+	if (!response.data.data) {
+		throw new Error("Invalid project response");
 	}
+
+	return response.data.data;
 };
 
 export const getProjectVersions = async (
 	projectId: number,
 ): Promise<ProjectVersionResponse[]> => {
-	try {
-		const response = await api.get<ProjectVersionResponse[]>(
-			`/projects/${projectId}/versions`,
-		);
-		return response.data;
-	} catch (error) {
-		console.error(`Error getting versions for project ${projectId}:`, error);
-		throw error;
+	const response = await api.get<ApiResponse<ProjectVersionResponse[]>>(
+		`/projects/${projectId}/versions`,
+	);
+
+	if (!response.data.data) {
+		throw new Error("Invalid project versions response");
 	}
+
+	return response.data.data;
 };
 
 export const getVersionAnalysis = async (
 	versionId: number,
 ): Promise<SavedAnalysisResult> => {
-	try {
-		const response = await api.get<SavedAnalysisResult>(
-			`/projects/versions/${versionId}/analysis`,
-		);
-		return response.data;
-	} catch (error) {
-		console.error(`Error getting analysis for version ${versionId}:`, error);
-		throw error;
+	const response = await api.get<ApiResponse<SavedAnalysisResult>>(
+		`/projects/versions/${versionId}/analysis`,
+	);
+
+	if (!response.data.data) {
+		throw new Error("Invalid version analysis response");
 	}
+
+	return response.data.data;
 };

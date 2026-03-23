@@ -22,14 +22,18 @@ function SessionInfoPage() {
 	const [selectedAnalysis, setSelectedAnalysis] =
 		useState<SavedAnalysisResult | null>(null);
 	const [isLoadingAnalysis, setIsLoadingAnalysis] = useState(false);
+	const [error, setError] = useState<string | null>(null);
 
 	const fetchProjects = async () => {
 		setIsLoadingProjects(true);
+		setError(null);
 		try {
 			const data = await getProjectsBySession(Number(sessionId));
 			setProjects(data);
 		} catch (error) {
-			console.error("Error loading projects:", error);
+			setError(
+				error instanceof Error ? error.message : "Error loading projects",
+			);
 		} finally {
 			setIsLoadingProjects(false);
 		}
@@ -49,21 +53,24 @@ function SessionInfoPage() {
 		setIsAnalysisModalOpen(true);
 		setIsLoadingAnalysis(true);
 		setSelectedAnalysis(null);
+		setError(null);
 
 		try {
 			const data = await getVersionAnalysis(version.id);
 			setSelectedAnalysis(data);
 		} catch (error) {
-			console.error("Error loading analysis:", error);
+			setError(
+				error instanceof Error ? error.message : "Error loading analysis",
+			);
 		} finally {
 			setIsLoadingAnalysis(false);
 		}
 	};
 
 	return (
-		<div className="flex flex-col gap-6 w-full px-8 py-6 max-w-7xl mx-auto">
+		<div className="flex flex-col gap-6 w-full px-8 py-6 max-w-7xl ">
 			<div className="flex items-center justify-between mb-4">
-				<h1 className="text-5xl font-black">Session {sessionId}</h1>
+				<h1 className="text-5xl font-black">Session: {sessionId}</h1>
 
 				<button
 					type="button"
@@ -81,6 +88,12 @@ function SessionInfoPage() {
 					Back to Sessions
 				</button>
 			</div>
+
+			{error && (
+				<div className="alert alert-error shadow-lg">
+					<span>{error}</span>
+				</div>
+			)}
 
 			<div className="bg-base-100 rounded-xl shadow-lg border border-base-300 overflow-hidden">
 				<table className="table table-lg w-full">

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { createUser } from "../service/user.service";
-import type { CreateUserData } from "../types/user";
+import { createUser } from "../../service/user.service";
+import type { CreateUserData } from "../../types/user";
 
 interface CreateUserModalProps {
 	isOpen: boolean;
@@ -42,9 +42,8 @@ function CreateUserModal({ isOpen, onClose, onSuccess }: CreateUserModalProps) {
 			await createUser(data);
 			reset();
 			onSuccess();
-		} catch (err) {
-			console.error(err);
-			setError("Error creating user");
+		} catch (error) {
+			setError(error instanceof Error ? error.message : "Error creating user");
 		} finally {
 			setIsLoading(false);
 		}
