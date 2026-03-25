@@ -29,14 +29,37 @@ class ProjectRepository(BaseRepository[Project]):
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none()
 
-    async def find_by_id_with_versions(self, project_id: int) -> Optional[Project]:
+    async def find_by_session_id_with_analysis(self, session_id: int) -> List[Project]:
         stmt = (
             select(Project)
-            .where(Project.id == project_id)
-            .options(selectinload(Project.project_versions))
+            .where(Project.session_id == session_id)
+            .options(
+                selectinload(Project.project_versions).options(
+                    selectinload(ProjectVersion.analysis_result).options(
+                        selectinload(AnalysisResult.blocks_analysis),
+                        selectinload(AnalysisResult.detected_features),
+                    )
+                )
+            )
         )
         result = await self.session.execute(stmt)
-        return result.scalar_one_or_none()
+        return result.scalars().all()
+
+    async def find_by_session_with_analysis(self, session_id: int) -> list[Project]:
+        stmt = (
+            select(Project)
+            .where(Project.session_id == session_id)
+            .options(
+                selectinload(Project.project_versions)
+                .selectinload(ProjectVersion.analysis_result)
+                .options(
+                    selectinload(AnalysisResult.blocks_analysis),
+                    selectinload(AnalysisResult.detected_features),
+                )
+            )
+        )
+        result = await self.session.execute(stmt)
+        return result.scalars().unique().all()
 
     async def find_by_session(self, session_id: int) -> List[Project]:
         stmt = select(Project).where(Project.session_id == session_id)

@@ -1,3 +1,5 @@
+import csv
+from io import StringIO
 from typing import List, Optional
 from xml.etree.ElementTree import Element
 
@@ -34,7 +36,7 @@ class ProjectService(BaseService[Project, ProjectRepository]):
     async def find_project_by_id_with_versions(self, project_id: int) -> Optional[Project]:
         return await self.repository.find_by_id_with_versions(project_id)
 
-    async def find_project_by_session(self, session_id: int) -> List[Project]:
+    async def find_projects_by_session(self, session_id: int) -> List[Project]:
         return await self.repository.find_by_session(session_id)
 
     async def persist_anonymous_project(self, filename: str, project_id: int, root: Element[str]):
@@ -67,6 +69,45 @@ class ProjectService(BaseService[Project, ProjectRepository]):
             )
             projects_list.append(new_project_with_analysis)
         await self.repository.save_batch(projects_list)
+
+    async def generate_projects_csv_by_session(self, session_id: int):
+        projects = await self.repository.find_by_session_id_with_analysis(session_id)
+
+        if len(projects) == 0:
+            return False
+
+        projects_csv = StringIO()
+        writer = csv.writer(projects_csv)
+        writer.writerow(
+            [
+                "project_level",
+                "total_scripts",
+                "duplicate_scripts",
+                "total_combinations",
+                "max_tangling",
+                "detected_features",
+                "dead_features",
+            ]
+        )
+
+        for project in projects:
+            last_analysis = max(
+                project.project_versions, key=lambda p: p.version_number
+            ).analysis_result
+            print(project)
+            writer.writerow(
+                [
+                    last_analysis.project_level,
+                    last_analysis.total_scripts,
+                    last_analysis.duplicate_scripts,
+                    last_analysis.total_combinations,
+                    last_analysis.max_tangling,
+                    len(last_analysis.detected_features),
+                    sum(1 for f in last_analysis.detected_features if f.is_dead),
+                ]
+            )
+
+        return projects_csv.getvalue()
 
     async def _build_analysis_project(self, project: Project, filename: str, result: Result):
         new_blocks = [

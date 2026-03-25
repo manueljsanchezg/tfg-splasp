@@ -1,6 +1,6 @@
 from typing import List
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Response
 
 from app.auth.dependencies import CurrentUserDep
 from app.core.api_response import ApiResponse
@@ -60,3 +60,22 @@ async def close_session(session_id: int, service: SessionServiceDep, user: Curre
 async def get_projects_by_session(session_id: int, service: SessionServiceDep):
     projects = await service.get_projects_by_session_id(session_id)
     return ApiResponse(success=True, data=projects)
+
+
+@router.get(
+    "/{session_id}/projects-csv",
+    response_class=Response,
+)
+async def get_projects_analysis_csv_by_session_id(
+    session_id: int, service: SessionServiceDep, user: CurrentUserDep
+):
+    projects_csv = await service.get_csv_project_by_session_id(session_id)
+
+    if not projects_csv:
+        raise HTTPException(status_code=404, detail="No projects csv found")
+
+    return Response(
+        content=projects_csv,
+        media_type="text/csv",
+        headers={"Content-Disposition": "attachment; filename=projects.csv"},
+    )

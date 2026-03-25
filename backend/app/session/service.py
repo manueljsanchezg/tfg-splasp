@@ -55,18 +55,18 @@ class SessionService(BaseService[Session, SessionRepository]):
 
     async def close(self, session_id: int) -> Optional[bool]:
         session = await self.repository.get_by_id(session_id)
-
         if not session:
             return None
 
         session.is_active = False
-
         await self.repository.save(session)
-
         return True
 
     async def get_projects_by_session_id(self, session_id: int):
-        return await self.project_sevice.find_project_by_session(session_id)
+        return await self.project_sevice.find_projects_by_session(session_id)
+
+    async def get_csv_project_by_session_id(self, session_id: int):
+        return await self.project_sevice.generate_projects_csv_by_session(session_id)
 
     def _generate_code(self, size: int) -> str:
         alphabet = string.ascii_letters + string.digits
