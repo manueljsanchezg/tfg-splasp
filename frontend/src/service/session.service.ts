@@ -66,3 +66,20 @@ export const getProjectsBySession = async (
 	}
 	return response.data.data;
 };
+
+export const downloadProjectsCSVBySession = async (
+	sessionId: number,
+): Promise<void> => {
+	const response = await api.get(`/sessions/${sessionId}/projects-csv`, {
+		responseType: "blob",
+	});
+	//const blob = new Blob([response.data], { type: 'text/csv' });
+	const url = URL.createObjectURL(response.data);
+	const link = document.createElement("a");
+	link.href = url;
+	link.setAttribute("download", "projects.csv");
+	document.body.appendChild(link);
+	link.click();
+	document.body.removeChild(link);
+	URL.revokeObjectURL(url);
+};

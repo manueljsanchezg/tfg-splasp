@@ -2,7 +2,10 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import ProjectRow from "../../components/admin/ProjectRow";
 import { getVersionAnalysis } from "../../service/project.service";
-import { getProjectsBySession } from "../../service/session.service";
+import {
+	downloadProjectsCSVBySession,
+	getProjectsBySession,
+} from "../../service/session.service";
 import type {
 	ProjectResponse,
 	ProjectVersionResponse,
@@ -82,6 +85,17 @@ function SessionInfoPage() {
 
 				<button
 					type="button"
+					className="btn btn-lg btn-primary"
+					onClick={async () => {
+						if (!sessionId) return;
+						await downloadProjectsCSVBySession(Number(sessionId));
+					}}
+				>
+					Download csv
+				</button>
+
+				<button
+					type="button"
 					className="btn btn-outline btn-lg text-xl"
 					onClick={() => navigate("/sessions")}
 				>
@@ -97,7 +111,7 @@ function SessionInfoPage() {
 
 			<div className="bg-base-100 rounded-xl shadow-lg border border-base-300 overflow-hidden">
 				<table className="table table-lg w-full">
-					<thead className="bg-base-300 text-2xl uppercase tracking-wider">
+					<thead className="bg-base-300 text-2xl uppercase">
 						<tr>
 							<th className="pl-8 py-6">Project Name</th>
 							<th className="text-center pr-8 w-64 py-6">Created At</th>
