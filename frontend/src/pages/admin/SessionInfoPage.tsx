@@ -11,7 +11,7 @@ import type {
 	ProjectVersionResponse,
 	SavedAnalysisResult,
 } from "../../types/project";
-import UploadZipModal from "../../components/admin/UploadZipModal";
+import UploadZipModal from "../../components/admin/UploadZipUrlsModal";
 import ProjectAnalysisModal from "../../components/admin/ProjectAnalysisModal";
 
 function SessionInfoPage() {
@@ -80,7 +80,7 @@ function SessionInfoPage() {
 					className="btn btn-lg btn-primary"
 					onClick={() => setIsZipModalOpen(true)}
 				>
-					Upload a zip
+					Upload projects
 				</button>
 
 				<button

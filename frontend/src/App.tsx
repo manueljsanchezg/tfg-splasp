@@ -12,6 +12,7 @@ import LoginPage from "./pages/LoginPage";
 import JoinSessionPage from "./pages/user/JoinSessionPage";
 import UserSessionPage from "./pages/user/SessionPage";
 import ScrollToTop from "./components/ScrollToTop";
+import AnalysisPage from "./pages/user/AnalysisPage";
 
 export default function App() {
 	const { isUserAuthenticated } = useAuth();
@@ -21,6 +22,7 @@ export default function App() {
 	let adminRoutes = <></>;
 	const alwaysRoutes = (
 		<>
+			<Route path="/analysis" element={<AnalysisPage />} />
 			<Route path="/sessions/join" element={<JoinSessionPage />} />
 			<Route
 				path="/sessions/:sessionId"

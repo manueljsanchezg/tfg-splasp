@@ -73,7 +73,6 @@ export const downloadProjectsCSVBySession = async (
 	const response = await api.get(`/sessions/${sessionId}/projects-csv`, {
 		responseType: "blob",
 	});
-	//const blob = new Blob([response.data], { type: 'text/csv' });
 	const url = URL.createObjectURL(response.data);
 	const link = document.createElement("a");
 	link.href = url;

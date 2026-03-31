@@ -1,42 +1,51 @@
 import { type ChangeEvent, useState } from "react";
-import { analyzeProjectAnonymous } from "../../service/project.service";
+import {
+	analyzeProject,
+	analyzeProjectAnonymous,
+} from "../../service/project.service";
 import type { ProjectMetrics } from "../../types/project";
+import { useAuth } from "../../hooks/useAuth";
 
 function AnalysisResult() {
+	const { isAnonymous } = useAuth();
+	const [projectUrl, setProjectUrl] = useState<string | null>(null);
 	const [projectFile, setProjectFile] = useState<File | null>(null);
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const [error, setError] = useState<string | null>(null);
-
 	const [projectMetrics, setProjectMetrics] = useState<ProjectMetrics | null>(
 		null,
 	);
 
 	const handleFile = (e: ChangeEvent<HTMLInputElement>) => {
+		setProjectUrl("");
 		const input = e.target as HTMLInputElement;
 		if (!input.files || input.files.length === 0) return;
 		setProjectFile(input.files[0]);
 	};
 
 	const handleAnalyze = async () => {
-		if (projectFile) {
-			setIsLoading(true);
-			setError(null);
-			try {
-				const result = await analyzeProjectAnonymous(projectFile);
-				setProjectMetrics((prev) => ({
-					...prev,
-					projectLevel: result.projectLevel,
-					duplicateScripts: result.duplicateScripts,
-					duplicationRatio: result.duplicationRatio,
-					blocks: result.blocks,
-				}));
-			} catch (error) {
-				setError(
-					error instanceof Error ? error.message : "Error analyzing project",
-				);
-			} finally {
-				setIsLoading(false);
-			}
+		if (!projectFile && !projectUrl) return;
+		setIsLoading(true);
+		setError(null);
+		setProjectMetrics(null);
+		try {
+			const result = isAnonymous
+				? await analyzeProjectAnonymous(projectFile, projectUrl)
+				: await analyzeProject(projectFile, projectUrl);
+
+			setProjectMetrics((prev) => ({
+				...prev,
+				projectLevel: result.projectLevel,
+				duplicateScripts: result.duplicateScripts,
+				duplicationRatio: result.duplicationRatio,
+				blocks: result.blocks,
+			}));
+		} catch (error) {
+			setError(
+				error instanceof Error ? error.message : "Error analyzing project",
+			);
+		} finally {
+			setIsLoading(false);
 		}
 	};
 
@@ -44,24 +53,40 @@ function AnalysisResult() {
 		<div>
 			<div className="flex flex-col items-center gap-8 w-full max-w-5xl">
 				<div className="flex flex-row gap-4 w-full justify-center m-8">
-					<input
-						type="file"
-						onChange={handleFile}
-						className="file-input file-input-bordered file-input-lg w-full"
-					/>
-					<button
-						type="button"
-						onClick={handleAnalyze}
-						className="btn btn-primary btn-lg px-10 text-xl shadow-md"
-						disabled={!projectFile || isLoading}
-					>
-						{isLoading ? (
-							<span className="loading loading-spinner loading-lg"></span>
-						) : (
-							"Analyze"
+					<div className="flex flex-col gap-4">
+						<p className="text-center text-2xl">
+							Enter the XML file or the project URL
+						</p>
+						<input
+							type="file"
+							onChange={handleFile}
+							className="file-input file-input-bordered file-input-lg w-full"
+						/>
+						<input
+							type="text"
+							className="input input-lg text-lg w-full"
+							value={projectUrl ?? ""}
+							onChange={(e) => {
+								setProjectFile(null);
+								setProjectUrl(e.target.value);
+							}}
+						/>
+						<button
+							type="button"
+							onClick={handleAnalyze}
+							className="btn btn-primary btn-lg px-10 text-xl shadow-md"
+							disabled={(!projectFile && !projectUrl) || isLoading}
+						>
+							{isLoading ? (
+								<span className="loading loading-spinner loading-lg"></span>
+							) : (
+								"Analyze"
+							)}
+						</button>
+						{error && (
+							<h3 className="text-center text-xl text-error">{error}</h3>
 						)}
-					</button>
-					{error && <h3>{error}</h3>}
+					</div>
 				</div>
 			</div>
 

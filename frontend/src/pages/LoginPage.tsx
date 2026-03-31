@@ -48,7 +48,7 @@ export default function LoginPage() {
 					<input
 						type="text"
 						placeholder="Your username"
-						className={`input input-bordered input-lg w-full text-lg ${errors.username ? "input-error" : ""}`}
+						className={`input input-lg w-full text-lg ${errors.username ? "input-error" : ""}`}
 						{...register("username", {
 							required: "Username is required",
 						})}

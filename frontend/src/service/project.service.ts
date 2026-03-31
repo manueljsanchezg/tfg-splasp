@@ -8,20 +8,47 @@ import type {
 import type { ApiResponse } from "../types/request";
 import { api } from "./api";
 
-export const analyzeProjectAnonymous = async (
-	project: File,
+export const analyzeProject = async (
+	project: File | null,
+	projectUrl: string | null,
 ): Promise<ProjectMetrics> => {
+	let url = "/projects/analyze";
 	const formData = new FormData();
-	formData.append("file", project);
-	const response = await api.post<ApiResponse<ProjectMetrics>>(
-		"/projects/analyze/anonymous",
-		formData,
-		{
-			headers: {
-				"Content-Type": "multipart/form-data",
-			},
+	if (projectUrl) {
+		url = url.concat(`?project_url=${projectUrl}`);
+	} else if (project) {
+		formData.append("file", project);
+	}
+
+	const response = await api.post<ApiResponse<ProjectMetrics>>(url, formData, {
+		headers: {
+			"Content-Type": "multipart/form-data",
 		},
-	);
+	});
+
+	if (!response.data.data) {
+		throw new Error("Invalid project analysis response");
+	}
+
+	return response.data.data;
+};
+
+export const analyzeProjectAnonymous = async (
+	project: File | null,
+	projectUrl: string | null,
+): Promise<ProjectMetrics> => {
+	let url = "/projects/analyze/anonymous";
+	const formData = new FormData();
+	if (projectUrl) {
+		url = url.concat(`?project_url=${projectUrl}`);
+	} else if (project) {
+		formData.append("file", project);
+	}
+	const response = await api.post<ApiResponse<ProjectMetrics>>(url, formData, {
+		headers: {
+			"Content-Type": "multipart/form-data",
+		},
+	});
 
 	if (!response.data.data) {
 		throw new Error("Invalid project analysis response");
@@ -31,12 +58,18 @@ export const analyzeProjectAnonymous = async (
 };
 
 export const analyzeBatchProjects = async (
-	zip: File,
 	sessionId: number,
+	zip: File | null,
+	projectsUrls: string | null,
 ): Promise<SavedBatchProjects> => {
 	const formData = new FormData();
-	formData.append("file", zip);
 	formData.append("sessionId", sessionId.toString());
+	if (zip) {
+		formData.append("file", zip);
+	}
+	if (projectsUrls) {
+		formData.append("projectsUrls", projectsUrls);
+	}
 	const response = await api.post<ApiResponse<SavedBatchProjects>>(
 		"/projects/analyze-batch",
 		formData,

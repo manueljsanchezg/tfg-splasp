@@ -21,9 +21,14 @@ function NavBar() {
 	let privateRoutes = <></>;
 	let adminRoutes = <></>;
 	const alwaysRoutes = (
-		<NavLink className={linkClass} to="/sessions/join">
-			Join Session
-		</NavLink>
+		<>
+			<NavLink className={linkClass} to="/analysis">
+				Analyze
+			</NavLink>
+			<NavLink className={linkClass} to="/sessions/join">
+				Join Session
+			</NavLink>
+		</>
 	);
 
 	if (!hasSessionAccess) {
