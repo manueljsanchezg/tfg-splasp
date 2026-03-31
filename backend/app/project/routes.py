@@ -109,7 +109,7 @@ async def analyze_batch_snap_project(
     )
 
     await service.persist_batch_projects(session_id, roots_list)
-    
+
     return ApiResponse(
         success=True,
         data={"message": "Projects saved succesfully", "total_saved": len(roots_list)},
