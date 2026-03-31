@@ -1,6 +1,3 @@
-import xml.etree.ElementTree as ET
-import zipfile
-from io import BytesIO
 from typing import List
 
 from fastapi import APIRouter, Form, HTTPException, UploadFile
@@ -18,8 +15,20 @@ from app.project.schemas import (
     ProjectRead,
     ProjectVersionRead,
 )
+from app.project.utils import (
+    get_content_from_project_url,
+    get_content_from_xml,
+    get_root_from_xml_content,
+    get_roots_from_projects_urls,
+    get_roots_from_zip,
+)
 
 router = APIRouter(prefix="/api/projects", tags=["projects"])
+
+
+@router.get("", response_model=List[ProjectRead])
+async def get_projects(service: ProjectServiceDep):
+    return await service.get_all()
 
 
 @router.get("/mine/anonymous", response_model=ApiResponse[ProjectRead])
@@ -33,25 +42,48 @@ async def get_my_anonymous_project(
     return ApiResponse(success=True, data=project)
 
 
+@router.post("/analyze", response_model=ApiResponse[AnalysisResultSchema])
+async def analyze_snap_project(
+    service: ProjectServiceDep, project_url: str = None, file: UploadFile = None
+):
+    if not project_url and not file:
+        raise HTTPException(status_code=400, detail="You need to upload a project or a URL")
+
+    filename, project_xml = (
+        await get_content_from_project_url(project_url)
+        if project_url
+        else await get_content_from_xml(file)
+    )
+
+    root = await get_root_from_xml_content(project_xml)
+
+    analysis = await service.persist_project(filename, root)
+
+    if analysis is None:
+        raise HTTPException(status_code=400, detail="Failure saving the result of the analysis")
+
+    return ApiResponse(success=True, data=analysis)
+
+
 @router.post("/analyze/anonymous", response_model=ApiResponse[AnalysisResultSchema])
 async def analyze_snap_project_anonymous(
-    file: UploadFile,
     anonymous_user: CurrentAnonymousDep,
     service: ProjectServiceDep,
+    project_url: str = None,
+    file: UploadFile = None,
 ):
-    if not file.filename or not file.filename.lower().endswith(".xml"):
-        raise HTTPException(status_code=400, detail="The file is not xml")
+    if not project_url and not file:
+        raise HTTPException(status_code=400, detail="You need to upload a project or a URL")
 
-    content = await file.read()
-
-    try:
-        root = ET.fromstring(content)
-    except ET.ParseError:
-        raise HTTPException(status_code=400, detail="The content is corrupted or malformed")
-
-    analysis = await service.persist_anonymous_project(
-        file.filename, anonymous_user.project_id, root
+    filename, project_xml = (
+        await get_content_from_project_url(project_url)
+        if project_url
+        else await get_content_from_xml(file)
     )
+
+    root = await get_root_from_xml_content(project_xml)
+
+    analysis = await service.persist_anonymous_project(filename, anonymous_user.project_id, root)
 
     if analysis is None:
         raise HTTPException(status_code=400, detail="Failure saving the result of the analysis")
@@ -61,23 +93,23 @@ async def analyze_snap_project_anonymous(
 
 @router.post("/analyze-batch", response_model=ApiResponse[dict[str, int | str]])
 async def analyze_batch_snap_project(
-    file: UploadFile,
     service: ProjectServiceDep,
     user: CurrentUserDep,
     session_id: int = Form(alias="sessionId"),
+    file: UploadFile = None,
+    projects_urls: str = Form(alias="projectsUrls", default=None),
 ):
-    content = await file.read()
-    roots_list = []
-    with zipfile.ZipFile(BytesIO(content)) as zip:
-        for snap_project in zip.namelist():
-            content = zip.read(snap_project)
-            try:
-                root = ET.fromstring(content)
-                roots_list.append((snap_project.split("/")[1], root))
-            except ET.ParseError:
-                raise HTTPException(status_code=400, detail="The content is corrupted or malformed")
+    if not projects_urls and not file:
+        raise HTTPException(status_code=400, detail="You need to upload a project or a URL")
+
+    roots_list = (
+        await get_roots_from_projects_urls(projects_urls)
+        if projects_urls
+        else await get_roots_from_zip(file)
+    )
 
     await service.persist_batch_projects(session_id, roots_list)
+    
     return ApiResponse(
         success=True,
         data={"message": "Projects saved succesfully", "total_saved": len(roots_list)},

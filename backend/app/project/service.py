@@ -39,6 +39,20 @@ class ProjectService(BaseService[Project, ProjectRepository]):
     async def find_projects_by_session(self, session_id: int) -> List[Project]:
         return await self.repository.find_by_session(session_id)
 
+    async def persist_project(self, filename: str, root: Element[str]):
+        new_project = Project(title=filename)
+
+        result = analyze_project(root)
+        analysis = result.to_json_dict()
+
+        new_project_with_analysis = await self._build_analysis_project(
+            new_project, filename, Result(**analysis)
+        )
+
+        await self.save(new_project_with_analysis)
+
+        return analysis
+
     async def persist_anonymous_project(self, filename: str, project_id: int, root: Element[str]):
         existing_project = await self.find_project_by_id_with_versions(project_id)
 
@@ -60,6 +74,7 @@ class ProjectService(BaseService[Project, ProjectRepository]):
         self, session_id: int, projects_roots_list: List[Tuple[str, Element[str]]]
     ):
         projects_list = []
+        print(projects_roots_list)
         for project_root in projects_roots_list:
             result = analyze_project(project_root[1])
             analysis = result.to_json_dict()
@@ -94,7 +109,6 @@ class ProjectService(BaseService[Project, ProjectRepository]):
             last_analysis = max(
                 project.project_versions, key=lambda p: p.version_number
             ).analysis_result
-            print(project)
             writer.writerow(
                 [
                     last_analysis.project_level,
