@@ -29,6 +29,15 @@ class ProjectRepository(BaseRepository[Project]):
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none()
 
+    async def find_by_id_with_versions(self, project_id):
+        stmt = (
+            select(Project)
+            .where(Project.id == project_id)
+            .options(selectinload(Project.project_versions))
+        )
+        result = await self.session.execute(stmt)
+        return result.scalar_one_or_none()
+
     async def find_by_session_id_with_analysis(self, session_id: int) -> List[Project]:
         stmt = (
             select(Project)

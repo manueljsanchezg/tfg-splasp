@@ -21,7 +21,7 @@ class Project(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=func.now())
     device_id: Mapped[Optional[str]] = mapped_column(nullable=True)
 
-    session_id: Mapped[int] = mapped_column(ForeignKey("sessions.id"), nullable=True)
+    session_id: Mapped[Optional[int]] = mapped_column(ForeignKey("sessions.id"), nullable=True)
 
     session: Mapped[Optional["Session"]] = relationship(back_populates="projects")
     project_versions: Mapped[List["ProjectVersion"]] = relationship(back_populates="project")
