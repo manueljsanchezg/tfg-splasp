@@ -30,7 +30,7 @@ async def login(login_req: LoginReq, auth_service: AuthServiceDep):
     return ApiResponse(success=True, data=AuthResponse(access_token=token))
 
 
-@router.post("/access-token", response_model=ApiResponse[Token])
+@router.post("/access-token", response_model=Token)
 async def get_acess_token(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()], auth_service: AuthServiceDep
 ):
