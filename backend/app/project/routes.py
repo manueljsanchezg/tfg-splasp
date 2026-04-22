@@ -10,10 +10,10 @@ from app.project.dependencies import (
     ProjectVersionServiceDep,
 )
 from app.project.schemas import (
-    AnalysisResultRead,
     AnalysisResultSchema,
     ProjectRead,
     ProjectVersionRead,
+    SavedAnalysisResultSchema,
 )
 from app.project.utils import (
     get_content_from_project_url,
@@ -124,7 +124,9 @@ async def get_project_versions(
     return ApiResponse(success=True, data=versions)
 
 
-@router.get("/versions/{version_id}/analysis", response_model=ApiResponse[AnalysisResultRead])
+@router.get(
+    "/versions/{version_id}/analysis", response_model=ApiResponse[SavedAnalysisResultSchema]
+)
 async def get_version_analysis(
     version_id: int, analysis_service: AnalysisResultServiceDep, user: CurrentUserDep
 ):

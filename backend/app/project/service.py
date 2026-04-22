@@ -1,12 +1,11 @@
 import csv
 from io import StringIO
-from typing import List, Optional
+from typing import List, Optional, Tuple
 from xml.etree.ElementTree import Element
 
-from sqlalchemy import Tuple
-
 from app.core.base_service import BaseService
-from app.core.splasp import analyze_project
+from app.core.splasp import AnalysisResult as SplaspAnalysisResult
+from app.core.splasp import BlockKey, BlockStats, analyze_project
 from app.project.models import (
     AnalysisResult,
     BlockAnalysis,
@@ -180,8 +179,96 @@ class AnalysisResultService(BaseService[AnalysisResult, AnalysisResultRepository
     def __init__(self, analysis_result_repo: AnalysisResultRepository):
         super().__init__(analysis_result_repo)
 
-    async def get_analysis_by_version(self, version_id: int) -> Optional[AnalysisResult]:
-        return await self.repository.find_by_version_id(version_id)
+    async def get_analysis_by_version(self, version_id: int) -> Optional[dict]:
+        analysis = await self.repository.find_by_version_id(version_id)
+
+        if analysis is None:
+            return None
+
+        duplication_ratio = (
+            (analysis.duplicate_scripts / analysis.total_scripts) * 100
+            if analysis.total_scripts > 0
+            else 0
+        )
+
+        return {
+            "id": analysis.id,
+            "feedback": self._build_feedback_from_saved_analysis(analysis),
+            "project_level": analysis.project_level,
+            "total_scripts": analysis.total_scripts,
+            "duplicate_scripts": analysis.duplicate_scripts,
+            "duplication_ratio": duplication_ratio,
+            "total_combinations": analysis.total_combinations,
+            "max_tangling": analysis.max_tangling,
+            "blocks": [
+                {
+                    "id": block.id,
+                    "owner": block.owner,
+                    "name": block.name,
+                    "level": block.level,
+                    "structural_changes": block.structural_changes,
+                    "definition_changes": block.definition_changes,
+                    "definition_level": block.definition_level,
+                    "feature_guarded_definition_changes": block.feature_guarded_definition_changes,
+                    "ast_pipeline_definition_changes": block.ast_pipeline_definition_changes,
+                }
+                for block in analysis.blocks_analysis
+            ],
+            "detected_features": [
+                {
+                    "id": feature.id,
+                    "name": feature.name,
+                    "is_dead": feature.is_dead,
+                    "scattering_count": feature.scattering_count,
+                }
+                for feature in analysis.detected_features
+            ],
+        }
+
+    def _build_feedback_from_saved_analysis(self, analysis: AnalysisResult) -> dict:
+        blocks = {
+            BlockKey(owner=block.owner, name=block.name): BlockStats(
+                level=block.level,
+                structural_changes=block.structural_changes,
+                definition_changes=block.definition_changes,
+                definition_level=block.definition_level,
+                feature_guarded_definition_changes=block.feature_guarded_definition_changes,
+                ast_pipeline_definition_changes=block.ast_pipeline_definition_changes,
+            )
+            for block in analysis.blocks_analysis
+        }
+
+        scattering_dict = {
+            feature.name: set(range(feature.scattering_count))
+            for feature in analysis.detected_features
+            if feature.scattering_count > 0
+        }
+        dead_features = {feature.name for feature in analysis.detected_features if feature.is_dead}
+
+        duplication_ratio = (
+            (analysis.duplicate_scripts / analysis.total_scripts) * 100
+            if analysis.total_scripts > 0
+            else 0
+        )
+
+        splasp_result = SplaspAnalysisResult(
+            project_level=analysis.project_level,
+            blocks=blocks,
+            total_scripts=analysis.total_scripts,
+            duplicate_scripts=analysis.duplicate_scripts,
+            duplication_ratio=duplication_ratio,
+            total_combinations=analysis.total_combinations,
+            tangling_dict={},
+            scattering_dict=scattering_dict,
+            dead_features=dead_features,
+        )
+        feedback = splasp_result.to_json_dict()["feedback"]
+
+        metrics = feedback.get("metrics", {})
+        metrics["max_tangling"] = analysis.max_tangling
+        feedback["metrics"] = metrics
+
+        return feedback
 
 
 class BlockAnalysisService(BaseService[BlockAnalysis, BlockAnalysisRepository]):
