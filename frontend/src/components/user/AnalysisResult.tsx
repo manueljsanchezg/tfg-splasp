@@ -124,7 +124,7 @@ function AnalysisResult() {
 									className="btn btn-outline btn-secondary"
 									onClick={() => setIsHintsModalOpen(true)}
 								>
-									Ver pistas
+									Show hints
 								</button>
 							</div>
 						)}
