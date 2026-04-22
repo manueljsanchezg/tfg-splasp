@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import AnalysisMetricsPanel from "../analysis/AnalysisMetricsPanel";
-import type { AnalysisFeedback, SavedAnalysisResult } from "../../types/project";
+import type {
+	AnalysisFeedback,
+	SavedAnalysisResult,
+} from "../../types/project";
 
 interface ProjectAnalysisModalProps {
 	activeVersionName: string;
@@ -36,7 +39,9 @@ function FeedbackPanel({ feedback }: { feedback: AnalysisFeedback }) {
 							))}
 						</ul>
 					) : (
-						<p className="text-base text-base-content/70">No strengths detected yet.</p>
+						<p className="text-base text-base-content/70">
+							No strengths detected yet.
+						</p>
 					)}
 				</div>
 
@@ -49,7 +54,9 @@ function FeedbackPanel({ feedback }: { feedback: AnalysisFeedback }) {
 							))}
 						</ul>
 					) : (
-						<p className="text-base text-base-content/70">No improvements suggested.</p>
+						<p className="text-base text-base-content/70">
+							No improvements suggested.
+						</p>
 					)}
 				</div>
 
@@ -57,12 +64,14 @@ function FeedbackPanel({ feedback }: { feedback: AnalysisFeedback }) {
 					<h3 className="font-bold text-warning mb-3">Alerts</h3>
 					{feedback.alerts.length > 0 ? (
 						<ul className="list-disc list-inside space-y-2 text-base leading-relaxed">
-							{feedback.alerts.map((item) => (
-								<li key={item}>{item}</li>
+							{feedback.alerts.map((alert) => (
+								<li key={alert}>{alert}</li>
 							))}
 						</ul>
 					) : (
-						<p className="text-base text-base-content/70">No alerts detected.</p>
+						<p className="text-base text-base-content/70">
+							No alerts detected.
+						</p>
 					)}
 				</div>
 			</div>
@@ -71,12 +80,14 @@ function FeedbackPanel({ feedback }: { feedback: AnalysisFeedback }) {
 				<h3 className="mb-3 text-2xl font-bold">Hints</h3>
 				{feedback.hints.length > 0 ? (
 					<ul className="list-disc list-inside space-y-2 text-base leading-relaxed">
-						{feedback.hints.map((hint, index) => (
-							<li key={`${hint}-${index}`}>{hint}</li>
+						{feedback.hints.map((hint) => (
+							<li key={hint}>{hint}</li>
 						))}
 					</ul>
 				) : (
-					<p className="text-base text-base-content/70">No hints available for this analysis.</p>
+					<p className="text-base text-base-content/70">
+						No hints available for this analysis.
+					</p>
 				)}
 			</div>
 		</div>
@@ -90,13 +101,15 @@ function ProjectAnalysisModal({
 	isOpen,
 	onClose,
 }: ProjectAnalysisModalProps) {
-	const [activeView, setActiveView] = useState<"metrics" | "feedback">("metrics");
+	const [activeView, setActiveView] = useState<"metrics" | "feedback">(
+		"metrics",
+	);
 
 	useEffect(() => {
 		if (isOpen) {
 			setActiveView("metrics");
 		}
-	}, [isOpen, selectedAnalysis?.id]);
+	}, [isOpen]);
 
 	const hasFeedback = Boolean(selectedAnalysis?.feedback);
 

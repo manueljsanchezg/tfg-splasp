@@ -13,14 +13,16 @@ function AnalysisMetricsPanel({
 	const feedbackMetrics = analysis.feedback?.metrics;
 	const projectLevel = feedbackMetrics?.projectLevel ?? analysis.projectLevel;
 	const totalScripts = feedbackMetrics?.totalScripts ?? analysis.totalScripts;
-	const duplicateScripts = feedbackMetrics?.duplicateScripts ?? analysis.duplicateScripts;
+	const duplicateScripts =
+		feedbackMetrics?.duplicateScripts ?? analysis.duplicateScripts;
 	const duplicationRatio =
 		feedbackMetrics?.duplicationRatio ??
 		analysis.duplicationRatio ??
 		(typeof totalScripts === "number" && totalScripts > 0
 			? (duplicateScripts / totalScripts) * 100
 			: 0);
-	const totalCombinations = feedbackMetrics?.totalCombinations ?? analysis.totalCombinations;
+	const totalCombinations =
+		feedbackMetrics?.totalCombinations ?? analysis.totalCombinations;
 	const maxTangling = feedbackMetrics?.maxTangling ?? analysis.maxTangling;
 	const blocks = analysis.blocks;
 	const detectedFeatures = analysis.detectedFeatures;
@@ -30,7 +32,10 @@ function AnalysisMetricsPanel({
 			<div className="grid w-full grid-cols-4 gap-4">
 				<MetricCard value={projectLevel} label="Project Level" />
 				<MetricCard value={duplicateScripts} label="Duplicate Scripts" />
-				<MetricCard value={`${duplicationRatio.toFixed(1)}%`} label="Duplication Ratio" />
+				<MetricCard
+					value={`${duplicationRatio.toFixed(1)}%`}
+					label="Duplication Ratio"
+				/>
 				{typeof totalCombinations === "number" && (
 					<MetricCard value={totalCombinations} label="Total Combinations" />
 				)}
@@ -39,10 +44,22 @@ function AnalysisMetricsPanel({
 				)}
 				{feedbackMetrics && (
 					<>
-						<MetricCard value={feedbackMetrics.totalModifiedBlocks} label="Modified Blocks" />
-						<MetricCard value={feedbackMetrics.featuresUsedCount} label="Used Features" />
-						<MetricCard value={feedbackMetrics.deadFeaturesCount} label="Dead Features" />
-						<MetricCard value={feedbackMetrics.maxScattering} label="Max Scattering" />
+						<MetricCard
+							value={feedbackMetrics.totalModifiedBlocks}
+							label="Modified Blocks"
+						/>
+						<MetricCard
+							value={feedbackMetrics.featuresUsedCount}
+							label="Used Features"
+						/>
+						<MetricCard
+							value={feedbackMetrics.deadFeaturesCount}
+							label="Dead Features"
+						/>
+						<MetricCard
+							value={feedbackMetrics.maxScattering}
+							label="Max Scattering"
+						/>
 					</>
 				)}
 			</div>
@@ -130,7 +147,9 @@ function AnalysisMetricsPanel({
 												{feature.isDead ? (
 													<div className="badge badge-error badge-lg">Dead</div>
 												) : (
-													<div className="badge badge-success badge-lg">Active</div>
+													<div className="badge badge-success badge-lg">
+														Active
+													</div>
 												)}
 											</td>
 											<td className="text-center text-2xl font-mono font-bold text-base-content/80">

@@ -13,10 +13,9 @@ function AnalysisResult() {
 	const [projectFile, setProjectFile] = useState<File | null>(null);
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const [error, setError] = useState<string | null>(null);
-	const [projectMetrics, setProjectMetrics] = useState<AnalysisResultData | null>(
-		null,
-	);
-	
+	const [projectMetrics, setProjectMetrics] =
+		useState<AnalysisResultData | null>(null);
+
 	const [isMetricsVisible, setIsMetricsVisible] = useState<boolean>(false);
 	const [isHintsModalOpen, setIsHintsModalOpen] = useState<boolean>(false);
 	const hintsModalRef = useRef<HTMLDialogElement>(null);
@@ -140,7 +139,9 @@ function AnalysisResult() {
 											))}
 										</ul>
 									) : (
-										<p className="text-sm text-base-content/70">No strengths detected yet.</p>
+										<p className="text-sm text-base-content/70">
+											No strengths detected yet.
+										</p>
 									)}
 								</div>
 
@@ -153,7 +154,9 @@ function AnalysisResult() {
 											))}
 										</ul>
 									) : (
-										<p className="text-sm text-base-content/70">No improvements suggested.</p>
+										<p className="text-sm text-base-content/70">
+											No improvements suggested.
+										</p>
 									)}
 								</div>
 
@@ -166,7 +169,9 @@ function AnalysisResult() {
 											))}
 										</ul>
 									) : (
-										<p className="text-sm text-base-content/70">No alerts detected.</p>
+										<p className="text-sm text-base-content/70">
+											No alerts detected.
+										</p>
 									)}
 								</div>
 							</div>
@@ -198,12 +203,14 @@ function AnalysisResult() {
 					<h3 className="font-bold text-2xl mb-4">Pistas</h3>
 					{feedback?.hints && feedback.hints.length > 0 ? (
 						<ul className="list-disc list-inside space-y-3 text-base leading-relaxed">
-							{feedback.hints.map((hint, index) => (
-								<li key={`${hint}-${index}`}>{hint}</li>
+							{feedback.hints.map((hint) => (
+								<li key={hint}>{hint}</li>
 							))}
 						</ul>
 					) : (
-						<p className="text-base-content/70">No hay pistas disponibles para este analisis.</p>
+						<p className="text-base-content/70">
+							No hay pistas disponibles para este analisis.
+						</p>
 					)}
 
 					<div className="modal-action">
