@@ -1,5 +1,6 @@
-import AnalysisMetricsView from "./AnalysisMetricsView";
-import type { SavedAnalysisResult } from "../../types/project";
+import { useEffect, useState } from "react";
+import AnalysisMetricsPanel from "../analysis/AnalysisMetricsPanel";
+import type { AnalysisFeedback, SavedAnalysisResult } from "../../types/project";
 
 interface ProjectAnalysisModalProps {
 	activeVersionName: string;
@@ -9,6 +10,79 @@ interface ProjectAnalysisModalProps {
 	onClose: () => void;
 }
 
+function FeedbackPanel({ feedback }: { feedback: AnalysisFeedback }) {
+	return (
+		<div className="w-full rounded border border-base-300 bg-base-100 p-5">
+			<div className="flex flex-wrap items-center gap-3 mb-4">
+				<h2 className="text-3xl font-bold">Feedback</h2>
+				{feedback.label && (
+					<div className="badge badge-primary badge-lg font-semibold">
+						{feedback.label}
+					</div>
+				)}
+			</div>
+
+			<p className="text-lg leading-relaxed text-base-content/90">
+				{feedback.summary}
+			</p>
+
+			<div className="mt-6 grid grid-cols-3 gap-4">
+				<div className="rounded border border-success/30 bg-success/10 p-3">
+					<h3 className="font-bold text-success mb-3">Strengths</h3>
+					{feedback.strengths.length > 0 ? (
+						<ul className="list-disc list-inside space-y-2 text-base leading-relaxed">
+							{feedback.strengths.map((item) => (
+								<li key={item}>{item}</li>
+							))}
+						</ul>
+					) : (
+						<p className="text-base text-base-content/70">No strengths detected yet.</p>
+					)}
+				</div>
+
+				<div className="rounded border border-info/30 bg-info/10 p-3">
+					<h3 className="font-bold text-info mb-3">To improve</h3>
+					{feedback.improvements.length > 0 ? (
+						<ul className="list-disc list-inside space-y-2 text-base leading-relaxed">
+							{feedback.improvements.map((item) => (
+								<li key={item}>{item}</li>
+							))}
+						</ul>
+					) : (
+						<p className="text-base text-base-content/70">No improvements suggested.</p>
+					)}
+				</div>
+
+				<div className="rounded border border-warning/30 bg-warning/10 p-3">
+					<h3 className="font-bold text-warning mb-3">Alerts</h3>
+					{feedback.alerts.length > 0 ? (
+						<ul className="list-disc list-inside space-y-2 text-base leading-relaxed">
+							{feedback.alerts.map((item) => (
+								<li key={item}>{item}</li>
+							))}
+						</ul>
+					) : (
+						<p className="text-base text-base-content/70">No alerts detected.</p>
+					)}
+				</div>
+			</div>
+
+			<div className="mt-6">
+				<h3 className="mb-3 text-2xl font-bold">Hints</h3>
+				{feedback.hints.length > 0 ? (
+					<ul className="list-disc list-inside space-y-2 text-base leading-relaxed">
+						{feedback.hints.map((hint, index) => (
+							<li key={`${hint}-${index}`}>{hint}</li>
+						))}
+					</ul>
+				) : (
+					<p className="text-base text-base-content/70">No hints available for this analysis.</p>
+				)}
+			</div>
+		</div>
+	);
+}
+
 function ProjectAnalysisModal({
 	activeVersionName,
 	selectedAnalysis,
@@ -16,30 +90,71 @@ function ProjectAnalysisModal({
 	isOpen,
 	onClose,
 }: ProjectAnalysisModalProps) {
+	const [activeView, setActiveView] = useState<"metrics" | "feedback">("metrics");
+
+	useEffect(() => {
+		if (isOpen) {
+			setActiveView("metrics");
+		}
+	}, [isOpen, selectedAnalysis?.id]);
+
+	const hasFeedback = Boolean(selectedAnalysis?.feedback);
+
 	return (
 		<dialog className={`modal ${isOpen ? "modal-open" : ""}`}>
-			<div className="modal-box w-11/12 max-w-7xl h-[90vh] flex flex-col p-0">
-				<div className="p-8 bg-base-200 flex justify-between items-center border-b border-base-300">
-					<h3 className="font-bold text-4xl">{activeVersionName}</h3>
+			<div className="modal-box flex h-[85vh] w-11/12 max-w-6xl flex-col p-0">
+				<div className="flex items-center justify-between border-b border-base-300 bg-base-200 p-4">
+					<h3 className="text-3xl font-bold">{activeVersionName}</h3>
 					<button
 						type="button"
-						className="btn btn-ghost btn-lg text-2xl"
+						className="btn btn-ghost btn-lg"
 						onClick={onClose}
 					>
 						X
 					</button>
 				</div>
 
-				<div className="p-8 overflow-y-auto flex-1 bg-base-100">
+				<div className="flex-1 overflow-y-auto bg-base-100 p-4">
 					{isLoadingAnalysis ? (
 						<div className="flex flex-col items-center justify-center h-full gap-4">
 							<span className="loading loading-spinner loading-lg text-primary"></span>
-							<span className="text-2xl font-medium text-base-content/70">
+							<span className="text-xl font-medium text-base-content/70">
 								Loading analysis...
 							</span>
 						</div>
 					) : selectedAnalysis ? (
-						<AnalysisMetricsView metrics={selectedAnalysis} />
+						<div className="flex flex-col gap-6">
+							<div className="join w-fit">
+								<button
+									type="button"
+									className={`btn join-item ${activeView === "metrics" ? "btn-primary" : "btn-outline"}`}
+									onClick={() => setActiveView("metrics")}
+								>
+									Metrics
+								</button>
+								<button
+									type="button"
+									className={`btn join-item ${activeView === "feedback" ? "btn-primary" : "btn-outline"}`}
+									onClick={() => setActiveView("feedback")}
+									disabled={!hasFeedback}
+								>
+									Feedback
+								</button>
+							</div>
+
+							{activeView === "metrics" ? (
+								<AnalysisMetricsPanel
+									analysis={selectedAnalysis}
+									showDetectedFeatures
+								/>
+							) : selectedAnalysis.feedback ? (
+								<FeedbackPanel feedback={selectedAnalysis.feedback} />
+							) : (
+								<div className="alert alert-info shadow-md">
+									<span>No feedback generated for this analysis.</span>
+								</div>
+							)}
+						</div>
 					) : null}
 				</div>
 			</div>
