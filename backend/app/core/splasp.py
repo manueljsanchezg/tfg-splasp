@@ -80,7 +80,9 @@ class AnalysisResult:
     dead_features: Set[str] = field(default_factory=set)
 
     def to_json_dict(self) -> dict:
+        feedback = _build_feefback(self)
         return {
+            "feedback": feedback,
             "project_level": self.project_level,
             "blocks": [
                 {
@@ -878,6 +880,298 @@ class ProjectAnalyzer:
             scattering_dict=scattering_dict,
             dead_features=dead_features,
         )
+
+
+def _safe_mean(values: list) -> float:
+    return sum(values) / len(values) if values else 0.0
+
+
+def _add_unique(feedback_list: list, item: str) -> None:
+    if item not in feedback_list:
+        feedback_list.append(item)
+
+
+def _base_template_by_level(level: int, result) -> dict:
+    n_blocks_total = len(result.blocks)
+    n_blocks_level_2 = sum(1 for block_stat in result.blocks.values() if block_stat.level == 2)
+    n_blocks_level_3 = sum(1 for block_stat in result.blocks.values() if block_stat.level >= 3)
+
+    if level == 0:
+        label = "Initial Level"
+        summary = (
+            "Your project doesn't use any metaprogramming yet. "
+            "As a next challenge, we suggest trying to change the visual structure of a block, "
+            "by modifying attributes like its color or the category it belongs to."
+        )
+    elif level == 1:
+        label = "Basic Level"
+        summary = (
+            f"You're on the right track! You've started applying basic variability to {n_blocks_total} block{'s' if n_blocks_total != 1 else ''}. "
+            f"Right now your project changes the external structure of some blocks, like their color. "
+            f"The next challenge is to make them change not just how they look, but also what they do."
+        )
+    elif level == 2:
+        label = "Intermediate Level"
+        summary = (
+            f"Excellent work! You're no longer just changing how blocks look, but also rewriting their behavior. "
+            f"You've applied intermediate variability to {n_blocks_level_2} block{'s' if n_blocks_level_2 != 1 else ''} "
+            f"out of the {n_blocks_total} you've modified. "
+            f"To reach the next level, try dismantling the blocks, modifying specific parts, and reassembling them."
+        )
+    elif level == 3:
+        label = "Advanced Level"
+        summary = (
+            f"Expert level reached! You are using advanced metaprogramming techniques in {n_blocks_level_3} block{'s' if n_blocks_level_3 != 1 else ''} "
+            f"out of the {n_blocks_total} you've modified. "
+            f"Your program is capable of dismantling the parts of a block, separating them to modify their content, and then rejoining them to "
+            f"change their behavior at runtime."
+        )
+    else:
+        label = "Unknown Level"
+        summary = "We could not analyze the variability level of your project."
+
+    return {
+        "label": label,
+        "summary": summary,
+        "strengths": [],
+        "improvements": [],
+        "hints": [],
+        "alerts": [],
+    }
+
+
+def _build_feefback(result: AnalysisResult) -> dict:
+    base = dict(_base_template_by_level(result.project_level, result))
+    strengths = list(base.get("strengths", []))
+    improvements = list(base.get("improvements", []))
+    hints = list(base.get("hints", []))
+    alerts = list(base.get("alerts", []))
+    total_structural = sum(st.structural_changes for st in result.blocks.values())
+    total_definition = sum(st.definition_changes for st in result.blocks.values())
+    total_feature_guarded = sum(
+        st.feature_guarded_definition_changes for st in result.blocks.values()
+    )
+    total_ast_pipeline = sum(st.ast_pipeline_definition_changes for st in result.blocks.values())
+    tangling_values = list(result.tangling_dict.values())
+    max_tangling = max(tangling_values) if tangling_values else 0
+    avg_tangling = _safe_mean(tangling_values)
+    scattering_sizes = [len(script_ids) for script_ids in result.scattering_dict.values()]
+    max_scattering = max(scattering_sizes) if scattering_sizes else 0
+    avg_scattering = _safe_mean(scattering_sizes)
+    dead_features_count = len(result.dead_features)
+    features_used_count = len(result.scattering_dict)
+
+    if result.project_level == 0:
+        _add_unique(
+            improvements,
+            "Take the leap into metaprogramming and try to make a block change its color or category. "
+            "You can try changing a block's color based on a global variable. ",
+        )
+        _add_unique(
+            hints,
+            "You can change your block's category using the block 'set [category] of block [your block] to (category)'",
+        )
+
+    elif result.project_level == 1:
+        _add_unique(
+            strengths,
+            f"You are already applying structural variability to {len(result.blocks)} block{'s' if len(result.blocks) != 1 else ''}.",
+        )
+        _add_unique(
+            improvements, "Your next challenge is to modify the internal behavior of some block"
+        )
+        _add_unique(
+            hints,
+            "Use the 'set [definition] of block [your block] to' block. In the white space, put the new "
+            "instructions and right-click on them to select 'ringify' (wrap in a gray ring).",
+        )
+
+    elif result.project_level == 2:
+        _add_unique(
+            strengths,
+            f"You are already rewriting complete blocks in {len(result.blocks)} place{'s' if len(result.blocks) != 1 else ''}, "
+            "which allows for much more powerful and dynamic variations in your game.",
+        )
+        _add_unique(
+            improvements,
+            "To reach the highest level (code surgery), avoid overwriting the whole block at once. "
+            "Learn to dismantle it, change only the exact instruction you need, and reassemble it.",
+        )
+        _add_unique(
+            hints,
+            "1) Read the code with 'definition of block'. 2) Insert the blocks into a list with 'split by [blocks]'. "
+            "3) Modify the blocks in the list. 4) Rejoin it with a 'join' block",
+        )
+
+    elif result.project_level >= 3:
+        _add_unique(
+            strengths,
+            f"You are applying advanced metaprogramming by modifying {total_ast_pipeline} definition{'s' if total_ast_pipeline != 1 else ''} ",
+        )
+        _add_unique(
+            improvements,
+            "The only improvement I can suggest is to keep expanding your project "
+            "by adding new blocks and using your metaprogramming skills",
+        )
+
+    if result.total_scripts == 0:
+        _add_unique(
+            alerts,
+            "No scripts detected in the project. Check that you have uploaded the correct .xml file.",
+        )
+
+    if result.duplication_ratio >= 40:
+        _add_unique(
+            alerts,
+            f"{result.duplication_ratio:.0f}% of your scripts are duplicated. "
+            "This makes the project hard to maintain; try extracting the repeated logic into a custom block",
+        )
+        _add_unique(
+            hints,
+            "Right-click the background and select 'Make a block'. Put the repeated code there "
+            "and use that new block instead of copy-pasting.",
+        )
+    elif result.duplication_ratio >= 20:
+        _add_unique(
+            improvements,
+            f"There is moderate duplication ({result.duplication_ratio:.0f}% of scripts). "
+            "Look for similar blocks and create a common base to reuse and reduce duplication.",
+        )
+    elif result.total_scripts > 0:
+        _add_unique(
+            strengths,
+            f"Very good, you have a low percentage of code duplication ({result.duplication_ratio:.0f}%)",
+        )
+
+    if total_definition > 0 and total_feature_guarded == 0:
+        _add_unique(
+            improvements,
+            "You are rewriting blocks, however, you aren't using any global variables; "
+            "try rewriting the blocks using global variables.",
+        )
+        _add_unique(
+            hints,
+            "Put your 'set definition of block' block inside an 'if <difficulty = 1> else' block "
+            "so the change depends on the user's decision.",
+        )
+    elif total_feature_guarded > 0:
+        _add_unique(
+            strengths,
+            f"Congratulations! You have {total_feature_guarded} block{'s' if total_feature_guarded != 1 else ''} whose behavior "
+            "changes according to what the user chooses.",
+        )
+
+    if total_ast_pipeline > 0:
+        _add_unique(
+            strengths,
+            f"You use the AST pipeline in {total_ast_pipeline} definition{'s' if total_ast_pipeline != 1 else ''}, so "
+            "your code is capable of modifying itself at runtime.",
+        )
+
+    if dead_features_count >= 3:
+        _add_unique(
+            alerts,
+            f"You have {dead_features_count} configuration global variable{'s' if dead_features_count != 1 else ''} "
+            f"that are not used in any script. Delete them or use them in your blocks.",
+        )
+
+    elif 0 < dead_features_count < 3:
+        _add_unique(
+            improvements,
+            f"You have {dead_features_count} configuration variable{'s' if dead_features_count != 1 else ''} "
+            f"that {'is' if dead_features_count == 1 else 'are'} not used in any script. "
+            "Delete them or use them in your blocks.",
+        )
+
+    if features_used_count > 0:
+        _add_unique(
+            strengths,
+            "All detected configuration variables are usable in the project.",
+        )
+
+    if result.project_level > 1:
+        if avg_tangling >= 3:
+            _add_unique(
+                alerts,
+                "Watch out for clutter! You have several global variables mixed in the same block. "
+                "Try to make each block handle only one thing.",
+            )
+
+        elif avg_tangling >= 2:
+            _add_unique(
+                improvements,
+                "Your code is a bit cluttered. "
+                "Try not to mix global variables in the same blocks. ",
+            )
+
+        elif tangling_values:
+            _add_unique(strengths, "Your code is very well organized!")
+
+    if result.project_level > 1:
+        if avg_scattering >= 5:
+            _add_unique(
+                alerts,
+                "Your code is too scattered. "
+                "If you want to change something for a single variable, you'll have to search in too many places at once.",
+            )
+            _add_unique(
+                hints,
+                "Try creating a single custom block that groups everything that variable does "
+                "instead of putting loose conditionals all over the game.",
+            )
+        elif avg_scattering >= 3:
+            _add_unique(
+                improvements,
+                "Your code is somewhat scattered. "
+                "It is recommended to group the logic of global variables to avoid modifying many blocks",
+            )
+        elif scattering_sizes:
+            _add_unique(
+                strengths,
+                "Your configurations are very well ordered; if you want to change something, you know perfectly well which script to go to.",
+            )
+
+    if result.total_combinations > 128:
+        _add_unique(
+            alerts,
+            f"Your project has many possible combinations, a total of ({result.total_combinations}). "
+            "Think carefully about whether you need that many options or if you can simplify the user settings.",
+        )
+    elif result.total_combinations > 32:
+        _add_unique(
+            improvements,
+            f"Your project has many possible combinations, a total of ({result.total_combinations}). "
+            "Think carefully about whether you need that many options or if you can simplify the user settings",
+        )
+
+    metrics = {
+        "project_level": result.project_level,
+        "total_scripts": result.total_scripts,
+        "duplicate_scripts": result.duplicate_scripts,
+        "duplication_ratio": round(result.duplication_ratio, 2),
+        "total_combinations": result.total_combinations,
+        "total_modified_blocks": len(result.blocks),
+        "total_structural_changes": total_structural,
+        "total_definition_changes": total_definition,
+        "feature_guarded_definition_changes": total_feature_guarded,
+        "ast_pipeline_definition_changes": total_ast_pipeline,
+        "features_used_count": features_used_count,
+        "dead_features_count": dead_features_count,
+        "max_tangling": max_tangling,
+        "avg_tangling": round(avg_tangling, 2),
+        "max_scattering": max_scattering,
+        "avg_scattering": round(avg_scattering, 2),
+    }
+
+    return {
+        "label": base.get("label", "Unknown Level"),
+        "summary": base.get("summary", "No summary available."),
+        "strengths": strengths,
+        "improvements": improvements,
+        "hints": hints,
+        "alerts": alerts,
+        "metrics": metrics,
+    }
 
 
 # ---------------------------------------------------------------------------
