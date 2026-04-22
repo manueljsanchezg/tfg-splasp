@@ -1,5 +1,5 @@
 import type {
-	ProjectMetrics,
+	AnalysisResult,
 	ProjectResponse,
 	ProjectVersionResponse,
 	SavedAnalysisResult,
@@ -11,7 +11,7 @@ import { api } from "./api";
 export const analyzeProject = async (
 	project: File | null,
 	projectUrl: string | null,
-): Promise<ProjectMetrics> => {
+): Promise<AnalysisResult> => {
 	let url = "/projects/analyze";
 	const formData = new FormData();
 	if (projectUrl) {
@@ -20,7 +20,7 @@ export const analyzeProject = async (
 		formData.append("file", project);
 	}
 
-	const response = await api.post<ApiResponse<ProjectMetrics>>(url, formData, {
+	const response = await api.post<ApiResponse<AnalysisResult>>(url, formData, {
 		headers: {
 			"Content-Type": "multipart/form-data",
 		},
@@ -36,7 +36,7 @@ export const analyzeProject = async (
 export const analyzeProjectAnonymous = async (
 	project: File | null,
 	projectUrl: string | null,
-): Promise<ProjectMetrics> => {
+): Promise<AnalysisResult> => {
 	let url = "/projects/analyze/anonymous";
 	const formData = new FormData();
 	if (projectUrl) {
@@ -44,7 +44,7 @@ export const analyzeProjectAnonymous = async (
 	} else if (project) {
 		formData.append("file", project);
 	}
-	const response = await api.post<ApiResponse<ProjectMetrics>>(url, formData, {
+	const response = await api.post<ApiResponse<AnalysisResult>>(url, formData, {
 		headers: {
 			"Content-Type": "multipart/form-data",
 		},

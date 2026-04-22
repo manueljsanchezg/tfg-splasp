@@ -3,8 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { joinSessionAnonymous } from "../../service/session.service";
 
-const DEVICE_ID_STORAGE_KEY = "splasp.deviceId";
-
 const generateDeviceId = (): string => {
 	if (typeof crypto !== "undefined" && crypto.randomUUID) {
 		return crypto.randomUUID();
@@ -14,14 +12,14 @@ const generateDeviceId = (): string => {
 };
 
 const getOrCreateDeviceId = (): string => {
-	const storedDeviceId = localStorage.getItem(DEVICE_ID_STORAGE_KEY);
+	const storedDeviceId = localStorage.getItem("deviceId");
 
 	if (storedDeviceId) {
 		return storedDeviceId;
 	}
 
 	const newDeviceId = generateDeviceId();
-	localStorage.setItem(DEVICE_ID_STORAGE_KEY, newDeviceId);
+	localStorage.setItem("deviceId", newDeviceId);
 	return newDeviceId;
 };
 
@@ -71,7 +69,7 @@ function JoinSessionPage() {
 	return (
 		<div className="flex flex-col items-center justify-center min-h-[60vh] gap-8">
 			<div className="flex flex-col items-center gap-2">
-				<h1 className="text-4xl font-bold">Join a Session</h1>
+				<h1 className="text-3xl font-bold">Join a Session</h1>
 				<p className="text-base-content/60">Enter the session code</p>
 			</div>
 
@@ -84,7 +82,7 @@ function JoinSessionPage() {
 					value={code}
 					onChange={(e) => setCode(e.target.value)}
 					placeholder="SESSION CODE"
-					className="input input-bordered input-lg w-full text-center tracking-widest font-mono"
+					className="input input-bordered w-full text-center"
 					maxLength={8}
 				/>
 
@@ -96,7 +94,7 @@ function JoinSessionPage() {
 
 				<button
 					type="submit"
-					className="btn btn-primary btn-lg"
+					className="btn btn-primary"
 					disabled={!code.trim() || isLoading}
 				>
 					{isLoading ? (

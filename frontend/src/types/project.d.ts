@@ -10,11 +10,52 @@ export interface Block {
 	astPipelineDefinitionChanges: number;
 }
 
-export interface ProjectMetrics {
+export interface AnalysisFeedback {
+	label: string;
+	summary: string;
+	strengths: string[];
+	improvements: string[];
+	hints: string[];
+	alerts: string[];
+	metrics: AnalysisFeedbackMetrics;
+}
+
+export interface AnalysisFeedbackMetrics {
 	projectLevel: number;
+	totalScripts: number;
 	duplicateScripts: number;
 	duplicationRatio: number;
+	totalCombinations: number;
+	totalModifiedBlocks: number;
+	totalStructuralChanges: number;
+	totalDefinitionChanges: number;
+	featureGuardedDefinitionChanges: number;
+	astPipelineDefinitionChanges: number;
+	featuresUsedCount: number;
+	deadFeaturesCount: number;
+	unknownEventsCount: number;
+	maxTangling: number;
+	avgTangling: number;
+	maxScattering: number;
+	avgScattering: number;
+}
+
+interface AnalysisBase {
+	id?: number;
+	feedback?: AnalysisFeedback;
+	projectLevel: number;
+	totalScripts?: number;
+	duplicateScripts: number;
+	duplicationRatio?: number;
+	totalCombinations?: number;
+	tanglingDict?: Record<string, number>;
+	maxTangling?: number;
 	blocks: Block[];
+	detectedFeatures?: DetectedFeature[];
+}
+
+export interface AnalysisResult extends AnalysisBase {
+	isSaved: false;
 }
 
 export interface SavedBatchProjects {
@@ -44,13 +85,9 @@ export interface DetectedFeature {
 	scatteringCount: number;
 }
 
-export interface SavedAnalysisResult {
+export interface SavedAnalysisResult extends AnalysisBase {
 	id: number;
-	projectLevel: number;
-	totalScripts: number;
-	duplicateScripts: number;
-	totalCombinations: number;
-	maxTangling: number;
-	blocksAnalysis: Block[];
-	detectedFeatures: DetectedFeature[];
+	isSaved: true;
 }
+
+export type AnalysisMetricsSource = AnalysisResult | SavedAnalysisResult;

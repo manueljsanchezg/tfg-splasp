@@ -1,9 +1,10 @@
-import { type ChangeEvent, useState } from "react";
+import { type ChangeEvent, useEffect, useRef, useState } from "react";
 import {
 	analyzeProject,
 	analyzeProjectAnonymous,
 } from "../../service/project.service";
-import type { ProjectMetrics } from "../../types/project";
+import AnalysisMetricsPanel from "../analysis/AnalysisMetricsPanel";
+import type { AnalysisResult as AnalysisResultData } from "../../types/project";
 import { useAuth } from "../../hooks/useAuth";
 
 function AnalysisResult() {
@@ -12,9 +13,22 @@ function AnalysisResult() {
 	const [projectFile, setProjectFile] = useState<File | null>(null);
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const [error, setError] = useState<string | null>(null);
-	const [projectMetrics, setProjectMetrics] = useState<ProjectMetrics | null>(
+	const [projectMetrics, setProjectMetrics] = useState<AnalysisResultData | null>(
 		null,
 	);
+	
+	const [isMetricsVisible, setIsMetricsVisible] = useState<boolean>(false);
+	const [isHintsModalOpen, setIsHintsModalOpen] = useState<boolean>(false);
+	const hintsModalRef = useRef<HTMLDialogElement>(null);
+	const feedback = projectMetrics?.feedback;
+
+	useEffect(() => {
+		if (isHintsModalOpen) {
+			hintsModalRef.current?.showModal();
+		} else {
+			hintsModalRef.current?.close();
+		}
+	}, [isHintsModalOpen]);
 
 	const handleFile = (e: ChangeEvent<HTMLInputElement>) => {
 		setProjectUrl("");
@@ -28,18 +42,14 @@ function AnalysisResult() {
 		setIsLoading(true);
 		setError(null);
 		setProjectMetrics(null);
+		setIsMetricsVisible(false);
+		setIsHintsModalOpen(false);
 		try {
 			const result = isAnonymous
 				? await analyzeProjectAnonymous(projectFile, projectUrl)
 				: await analyzeProject(projectFile, projectUrl);
 
-			setProjectMetrics((prev) => ({
-				...prev,
-				projectLevel: result.projectLevel,
-				duplicateScripts: result.duplicateScripts,
-				duplicationRatio: result.duplicationRatio,
-				blocks: result.blocks,
-			}));
+			setProjectMetrics(result);
 		} catch (error) {
 			setError(
 				error instanceof Error ? error.message : "Error analyzing project",
@@ -50,21 +60,21 @@ function AnalysisResult() {
 	};
 
 	return (
-		<div>
-			<div className="flex flex-col items-center gap-8 w-full max-w-5xl">
-				<div className="flex flex-row gap-4 w-full justify-center m-8">
+		<div className="w-full">
+			<div className="mx-auto flex w-full max-w-5xl flex-col items-center gap-8">
+				<div className="m-8 flex w-full flex-row justify-center gap-4">
 					<div className="flex flex-col gap-4">
-						<p className="text-center text-2xl">
+						<p className="text-center text-xl">
 							Enter the XML file or the project URL
 						</p>
 						<input
 							type="file"
 							onChange={handleFile}
-							className="file-input file-input-bordered file-input-lg w-full"
+							className="file-input file-input-bordered w-full"
 						/>
 						<input
 							type="text"
-							className="input input-lg text-lg w-full"
+							className="input w-full"
 							value={projectUrl ?? ""}
 							onChange={(e) => {
 								setProjectFile(null);
@@ -74,7 +84,7 @@ function AnalysisResult() {
 						<button
 							type="button"
 							onClick={handleAnalyze}
-							className="btn btn-primary btn-lg px-10 text-xl shadow-md"
+							className="btn btn-primary px-8"
 							disabled={(!projectFile && !projectUrl) || isLoading}
 						>
 							{isLoading ? (
@@ -91,133 +101,127 @@ function AnalysisResult() {
 			</div>
 
 			{projectMetrics !== null && (
-				<div className="flex flex-col items-center w-full gap-12 animate-fade-in max-w-400">
-					<div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full">
-						<div className="flex flex-col items-center justify-center bg-base-100 p-8 rounded-2xl shadow-xl border-2 border-base-300">
-							<span className="text-7xl font-black text-primary mb-2">
-								{projectMetrics.projectLevel}
-							</span>
-							<span className="text-xl font-bold text-base-content/70 uppercase tracking-widest">
-								Project Level
-							</span>
+				<div className="mx-auto flex w-full max-w-6xl flex-col items-center gap-8">
+					<div className="w-full rounded border border-base-300 bg-base-100 p-5">
+						<div className="flex flex-wrap items-center gap-3 mb-4">
+							<h2 className="text-2xl font-bold">Feedback</h2>
+							{feedback?.label && (
+								<div className="badge badge-primary font-semibold">
+									{feedback.label}
+								</div>
+							)}
 						</div>
 
-						<div className="flex flex-col items-center justify-center bg-base-100 p-8 rounded-2xl shadow-xl border-2 border-base-300">
-							<span className="text-7xl font-black text-base-content mb-2">
-								{projectMetrics.duplicateScripts}
-							</span>
-							<span className="text-xl font-bold text-base-content/70 uppercase tracking-widest text-center">
-								Duplicate Scripts
-							</span>
-						</div>
+						<p className="text-base leading-relaxed text-base-content/90">
+							{feedback?.summary ??
+								"The analysis has finished. You can now review the metrics behind it."}
+						</p>
 
-						<div className="flex flex-col items-center justify-center bg-base-100 p-8 rounded-2xl shadow-xl border-2 border-base-300">
-							<span className="text-7xl font-black text-accent mb-2">
-								{(projectMetrics.duplicationRatio ?? 0).toFixed(1)}%
-							</span>
-							<span className="text-xl font-bold text-base-content/70 uppercase tracking-widest">
-								Duplication Ratio
-							</span>
-						</div>
+						{feedback && (
+							<div className="mt-6">
+								<button
+									type="button"
+									className="btn btn-outline btn-secondary"
+									onClick={() => setIsHintsModalOpen(true)}
+								>
+									Ver pistas
+								</button>
+							</div>
+						)}
+
+						{feedback && (
+							<div className="mt-6 grid grid-cols-3 gap-4">
+								<div className="rounded border border-success/30 bg-success/10 p-3">
+									<h3 className="font-bold text-success mb-3">Strengths</h3>
+									{feedback.strengths.length > 0 ? (
+										<ul className="list-disc list-inside space-y-2 text-sm leading-relaxed">
+											{feedback.strengths.map((item) => (
+												<li key={item}>{item}</li>
+											))}
+										</ul>
+									) : (
+										<p className="text-sm text-base-content/70">No strengths detected yet.</p>
+									)}
+								</div>
+
+								<div className="rounded border border-info/30 bg-info/10 p-3">
+									<h3 className="font-bold text-info mb-3">To improve</h3>
+									{feedback.improvements.length > 0 ? (
+										<ul className="list-disc list-inside space-y-2 text-sm leading-relaxed">
+											{feedback.improvements.map((item) => (
+												<li key={item}>{item}</li>
+											))}
+										</ul>
+									) : (
+										<p className="text-sm text-base-content/70">No improvements suggested.</p>
+									)}
+								</div>
+
+								<div className="rounded border border-warning/30 bg-warning/10 p-3">
+									<h3 className="font-bold text-warning mb-3">Alerts</h3>
+									{feedback.alerts.length > 0 ? (
+										<ul className="list-disc list-inside space-y-2 text-sm leading-relaxed">
+											{feedback.alerts.map((item) => (
+												<li key={item}>{item}</li>
+											))}
+										</ul>
+									) : (
+										<p className="text-sm text-base-content/70">No alerts detected.</p>
+									)}
+								</div>
+							</div>
+						)}
 					</div>
 
-					<div className="w-full border-t-2 border-base-300/50 my-4"></div>
-
-					<div className="w-full bg-base-100 rounded-xl shadow-2xl border-2 border-base-300 overflow-hidden">
-						<div className="overflow-x-auto">
-							<table className="table table-lg w-full">
-								<thead className="bg-base-300 text-base-content text-lg uppercase tracking-wider">
-									<tr>
-										<th className="pl-8 py-6 font-bold">Block / Owner</th>
-										<th className="text-center font-bold">Level</th>
-										<th className="text-center font-bold">
-											Structural
-											<br />
-											Changes
-										</th>
-										<th className="text-center font-bold">
-											Definition
-											<br />
-											Changes
-										</th>
-										<th className="text-center font-bold">
-											Definition
-											<br />
-											Level
-										</th>
-										<th className="text-center font-bold">
-											Feature
-											<br />
-											Guarded
-										</th>
-										<th className="pr-8 text-center font-bold">
-											AST
-											<br />
-											Pipeline
-										</th>
-									</tr>
-								</thead>
-
-								<tbody className="bg-base-100">
-									{projectMetrics.blocks.map((block) => (
-										<tr
-											key={block.id}
-											className="hover:bg-base-200 transition-colors border-b border-base-200"
-										>
-											<td className="pl-8 py-6">
-												<div className="flex flex-col gap-1">
-													<span className="font-bold text-2xl text-base-content">
-														{block.name}
-													</span>
-													<span className="text-lg text-base-content/50 font-medium">
-														{block.owner}
-													</span>
-												</div>
-											</td>
-
-											<td className="text-center">
-												<div className="badge badge-neutral badge-lg h-8 px-4 font-mono text-lg font-bold">
-													{block.level}
-												</div>
-											</td>
-
-											<td className="text-center">
-												<span className="font-mono text-2xl font-bold text-base-content/80">
-													{block.structuralChanges}
-												</span>
-											</td>
-
-											<td className="text-center">
-												<span className="font-mono text-2xl font-bold text-base-content/80">
-													{block.definitionChanges}
-												</span>
-											</td>
-
-											<td className="text-center">
-												<span className="font-mono text-2xl font-bold text-base-content/80">
-													{block.definitionLevel}
-												</span>
-											</td>
-
-											<td className="text-center">
-												<span className="font-mono text-2xl font-bold text-base-content/80">
-													{block.featureGuardedDefinitionChanges}
-												</span>
-											</td>
-
-											<td className="pr-8 text-center">
-												<span className="font-mono text-2xl font-bold text-base-content/80">
-													{block.astPipelineDefinitionChanges}
-												</span>
-											</td>
-										</tr>
-									))}
-								</tbody>
-							</table>
-						</div>
+					<div className="w-full flex justify-center">
+						<button
+							type="button"
+							className="btn btn-outline btn-primary"
+							onClick={() => setIsMetricsVisible((prev) => !prev)}
+						>
+							{isMetricsVisible ? "Hide metrics" : "View analysis metrics"}
+						</button>
 					</div>
+
+					{isMetricsVisible && (
+						<AnalysisMetricsPanel analysis={projectMetrics} />
+					)}
 				</div>
 			)}
+
+			<dialog
+				ref={hintsModalRef}
+				className="modal"
+				onClose={() => setIsHintsModalOpen(false)}
+			>
+				<div className="modal-box max-w-3xl">
+					<h3 className="font-bold text-2xl mb-4">Pistas</h3>
+					{feedback?.hints && feedback.hints.length > 0 ? (
+						<ul className="list-disc list-inside space-y-3 text-base leading-relaxed">
+							{feedback.hints.map((hint, index) => (
+								<li key={`${hint}-${index}`}>{hint}</li>
+							))}
+						</ul>
+					) : (
+						<p className="text-base-content/70">No hay pistas disponibles para este analisis.</p>
+					)}
+
+					<div className="modal-action">
+						<button
+							type="button"
+							className="btn btn-primary"
+							onClick={() => setIsHintsModalOpen(false)}
+						>
+							Cerrar
+						</button>
+					</div>
+				</div>
+				<form method="dialog" className="modal-backdrop">
+					<button type="button" onClick={() => setIsHintsModalOpen(false)}>
+						close
+					</button>
+				</form>
+			</dialog>
 		</div>
 	);
 }
