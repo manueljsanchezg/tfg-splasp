@@ -48,6 +48,9 @@ function NavBar() {
 				<NavLink className={linkClass} to="/">
 					Home
 				</NavLink>
+				<NavLink className={linkClass} to="/projects">
+					Projects
+				</NavLink>
 				<NavLink className={linkClass} to="/sessions">
 					Sessions
 				</NavLink>

@@ -5,7 +5,7 @@ import type {
 	ProjectVersionResponse,
 } from "../../types/project";
 
-const formatDate = (dateString: string | undefined | null) => {
+export const formatDate = (dateString: string | undefined | null) => {
 	if (!dateString) return "N/A";
 	const date = new Date(dateString);
 	return Number.isNaN(date.getTime()) ? "N/A" : date.toLocaleDateString();
@@ -14,9 +14,13 @@ const formatDate = (dateString: string | undefined | null) => {
 function ProjectRow({
 	project,
 	onViewAnalysis,
+	onAddVersionId,
+	selectedVersionIds,
 }: {
 	project: ProjectResponse;
 	onViewAnalysis: (v: ProjectVersionResponse, title: string) => void;
+	onAddVersionId: (versionId: number) => void;
+	selectedVersionIds: number[];
 }) {
 	const [isExpanded, setIsExpanded] = useState(false);
 	const [versions, setVersions] = useState<ProjectVersionResponse[] | null>(
@@ -74,9 +78,17 @@ function ProjectRow({
 										className="card bg-base-100 shadow-sm border border-base-300 w-72"
 									>
 										<div className="card-body p-6">
-											<h5 className="font-bold text-2xl mb-1">
-												Version {version.versionNumber}
-											</h5>
+											<div className="flex flex-row items-center justify-between">
+												<h5 className="font-bold text-2xl mb-1">
+													Version {version.versionNumber}
+												</h5>
+												<input
+													className="checkbox"
+													type="checkbox"
+													checked={selectedVersionIds.includes(version.id)}
+													onChange={() => onAddVersionId(version.id)}
+												/>
+											</div>
 											<p className="text-lg text-base-content/60 mb-4">
 												{formatDate(version.uploadedAt)}
 											</p>

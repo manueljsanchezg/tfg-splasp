@@ -24,7 +24,7 @@ function AnalysisMetricsPanel({
 	const totalCombinations =
 		feedbackMetrics?.totalCombinations ?? analysis.totalCombinations;
 	const maxTangling = feedbackMetrics?.maxTangling ?? analysis.maxTangling;
-	const blocks = analysis.blocks;
+	const blocks = analysis.blocksAnalysis;
 	const detectedFeatures = analysis.detectedFeatures;
 
 	return (

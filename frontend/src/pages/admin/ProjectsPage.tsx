@@ -1,35 +1,27 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import ProjectRow from "../../components/admin/ProjectRow";
-import {
-	getAnalysisByVersionsIds,
-	getVersionAnalysis,
-} from "../../service/project.service";
-import {
-	downloadProjectsCSVBySession,
-	getProjectsBySession,
-} from "../../service/session.service";
 import type {
 	ProjectResponse,
 	ProjectVersionResponse,
 	SavedAnalysisResult,
 } from "../../types/project";
-import UploadZipModal from "../../components/admin/UploadZipUrlsModal";
+import {
+	getAnalysisByVersionsIds,
+	getProjects,
+	getVersionAnalysis,
+} from "../../service/project.service";
+import ProjectRow from "../../components/admin/ProjectRow";
 import ProjectAnalysisModal from "../../components/admin/ProjectAnalysisModal";
 import ComparisonModal from "../../components/admin/ComparisonModal";
 
-function SessionInfoPage() {
-	const { sessionId } = useParams<{ sessionId: string }>();
-	const navigate = useNavigate();
+function ProjectsPage() {
 	const [projects, setProjects] = useState<ProjectResponse[]>([]);
 	const [isLoadingProjects, setIsLoadingProjects] = useState(true);
-	const [isZipModalOpen, setIsZipModalOpen] = useState(false);
+	const [error, setError] = useState<string | null>(null);
 	const [isAnalysisModalOpen, setIsAnalysisModalOpen] = useState(false);
 	const [activeVersionName, setActiveVersionName] = useState("");
 	const [selectedAnalysis, setSelectedAnalysis] =
 		useState<SavedAnalysisResult | null>(null);
 	const [isLoadingAnalysis, setIsLoadingAnalysis] = useState(false);
-	const [error, setError] = useState<string | null>(null);
 	const [selectedVersionIds, setSelectedVersionIds] = useState<number[]>([]);
 	const [selectedAnalyses, setSelectedAnalyses] = useState<
 		SavedAnalysisResult[]
@@ -49,7 +41,8 @@ function SessionInfoPage() {
 		setIsLoadingProjects(true);
 		setError(null);
 		try {
-			const data = await getProjectsBySession(Number(sessionId));
+			const data = await getProjects();
+			console.log(data);
 			setProjects(data);
 		} catch (error) {
 			setError(
@@ -62,9 +55,8 @@ function SessionInfoPage() {
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: pass
 	useEffect(() => {
-		if (!sessionId) return;
 		fetchProjects();
-	}, [sessionId]);
+	}, []);
 
 	const handleOpenAnaylisisModal = async (
 		version: ProjectVersionResponse,
@@ -111,10 +103,13 @@ function SessionInfoPage() {
 	};
 
 	return (
-		<div className="flex flex-col gap-6 w-full px-8 py-6 max-w-7xl ">
+		<div className="flex flex-col gap-6 w-full px-8 py-6 max-w-7xl">
+			{error && (
+				<div className="alert alert-error shadow-lg">
+					<span>{error}</span>
+				</div>
+			)}
 			<div className="flex items-center justify-between mb-4">
-				<h1 className="text-5xl font-black">Session: {sessionId}</h1>
-
 				<div className="flex items-center gap-3">
 					<button
 						type="button"
@@ -128,40 +123,7 @@ function SessionInfoPage() {
 						{selectedVersionIds.length} selected
 					</span>
 				</div>
-
-				<button
-					type="button"
-					className="btn btn-lg btn-primary"
-					onClick={() => setIsZipModalOpen(true)}
-				>
-					Upload projects
-				</button>
-
-				<button
-					type="button"
-					className="btn btn-lg btn-primary"
-					onClick={async () => {
-						if (!sessionId) return;
-						await downloadProjectsCSVBySession(Number(sessionId));
-					}}
-				>
-					Download csv
-				</button>
-
-				<button
-					type="button"
-					className="btn btn-outline btn-lg text-xl"
-					onClick={() => navigate("/sessions")}
-				>
-					Back to Sessions
-				</button>
 			</div>
-
-			{error && (
-				<div className="alert alert-error shadow-lg">
-					<span>{error}</span>
-				</div>
-			)}
 
 			<div className="bg-base-100 rounded-xl shadow-lg border border-base-300 overflow-hidden">
 				<table className="table table-lg w-full">
@@ -199,13 +161,6 @@ function SessionInfoPage() {
 				</table>
 			</div>
 
-			<UploadZipModal
-				sessionId={Number(sessionId)}
-				isOpen={isZipModalOpen}
-				onClose={() => setIsZipModalOpen(false)}
-				onSuccess={fetchProjects}
-			/>
-
 			<ProjectAnalysisModal
 				isOpen={isAnalysisModalOpen}
 				activeVersionName={activeVersionName}
@@ -224,4 +179,4 @@ function SessionInfoPage() {
 	);
 }
 
-export default SessionInfoPage;
+export default ProjectsPage;

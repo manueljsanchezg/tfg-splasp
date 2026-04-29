@@ -13,6 +13,7 @@ import JoinSessionPage from "./pages/user/JoinSessionPage";
 import UserSessionPage from "./pages/user/SessionPage";
 import ScrollToTop from "./components/ScrollToTop";
 import AnalysisPage from "./pages/user/AnalysisPage";
+import ProjectsPage from "./pages/admin/ProjectsPage";
 
 export default function App() {
 	const { isUserAuthenticated } = useAuth();
@@ -47,6 +48,15 @@ export default function App() {
 		privateRoutes = <Route path="/" element={<HomePage />} />;
 		adminRoutes = (
 			<>
+				<Route
+					path="/projects"
+					element={
+						<AdminRoute>
+							<ProjectsPage />
+						</AdminRoute>
+					}
+				/>
+
 				<Route
 					path="/sessions"
 					element={
