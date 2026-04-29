@@ -29,7 +29,7 @@ class ProjectRepository(BaseRepository[Project]):
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none()
 
-    async def find_by_id_with_versions(self, project_id):
+    async def find_by_id_with_versions(self, project_id: int) -> Optional[Project]:
         stmt = (
             select(Project)
             .where(Project.id == project_id)
@@ -37,6 +37,15 @@ class ProjectRepository(BaseRepository[Project]):
         )
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none()
+
+    async def find_with_versions(self) -> List[Project]:
+        stmt = (
+            select(Project)
+            .where(Project.project_versions.any())
+            .options(selectinload(Project.project_versions))
+        )
+        result = await self.session.execute(stmt)
+        return result.scalars().unique().all()
 
     async def find_by_session_id_with_analysis(self, session_id: int) -> List[Project]:
         stmt = (
@@ -54,7 +63,7 @@ class ProjectRepository(BaseRepository[Project]):
         result = await self.session.execute(stmt)
         return result.scalars().all()
 
-    async def find_by_session_with_analysis(self, session_id: int) -> list[Project]:
+    async def find_by_session_with_analysis(self, session_id: int) -> List[Project]:
         stmt = (
             select(Project)
             .where(Project.session_id == session_id)
@@ -87,7 +96,7 @@ class ProjectVersionRepository(BaseRepository[ProjectVersion]):
     async def find_by_project_id(self, project_id: int) -> List[ProjectVersion]:
         stmt = select(ProjectVersion).where(ProjectVersion.project_id == project_id)
         result = await self.session.execute(stmt)
-        return list(result.scalars().all())
+        return result.scalars().all()
 
 
 class AnalysisResultRepository(BaseRepository[AnalysisResult]):
@@ -105,6 +114,18 @@ class AnalysisResultRepository(BaseRepository[AnalysisResult]):
         )
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none()
+
+    async def find_by_versions_ids(self, versions_ids: List[int]) -> List[AnalysisResult]:
+        stmt = (
+            select(AnalysisResult)
+            .where(AnalysisResult.project_versions_id.in_(versions_ids))
+            .options(
+                selectinload(AnalysisResult.blocks_analysis),
+                selectinload(AnalysisResult.detected_features),
+            )
+        )
+        result = await self.session.execute(stmt)
+        return result.scalars().all()
 
 
 class BlockAnalysisRepository(BaseRepository[BlockAnalysis]):

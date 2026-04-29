@@ -20,12 +20,17 @@ from app.project.repository import (
     ProjectRepository,
     ProjectVersionRepository,
 )
-from app.project.schemas import Result
+from app.project.schemas import Result, SavedAnalysisResultSchema
 
 
 class ProjectService(BaseService[Project, ProjectRepository]):
     def __init__(self, project_repo: ProjectRepository):
         super().__init__(project_repo)
+
+    def _normalize_analysis_payload(self, analysis: dict) -> dict:
+        if "blocks_analysis" not in analysis and "blocks" in analysis:
+            analysis["blocks_analysis"] = analysis.pop("blocks")
+        return analysis
 
     async def find_project_by_device_id_and_session(
         self, device_id: str, session_id: int
@@ -35,6 +40,18 @@ class ProjectService(BaseService[Project, ProjectRepository]):
     async def find_project_by_id_with_versions(self, project_id: int) -> Optional[Project]:
         return await self.repository.find_by_id_with_versions(project_id)
 
+    async def find_projects_with_versions(self) -> List[Project]:
+        projects = await self.repository.find_with_versions()
+
+        for project in projects:
+            if project.project_versions:
+                latest_version = max(
+                    project.project_versions, key=lambda version: version.version_number
+                )
+                project.project_versions = [latest_version]
+
+        return projects
+
     async def find_projects_by_session(self, session_id: int) -> List[Project]:
         return await self.repository.find_by_session(session_id)
 
@@ -42,7 +59,7 @@ class ProjectService(BaseService[Project, ProjectRepository]):
         new_project = Project(title=filename)
 
         result = analyze_project(root)
-        analysis = result.to_json_dict()
+        analysis = self._normalize_analysis_payload(result.to_json_dict())
 
         new_project_with_analysis = await self._build_analysis_project(
             new_project, filename, Result(**analysis)
@@ -59,7 +76,7 @@ class ProjectService(BaseService[Project, ProjectRepository]):
             return None
 
         result = analyze_project(root)
-        analysis = result.to_json_dict()
+        analysis = self._normalize_analysis_payload(result.to_json_dict())
 
         existing_project = await self._build_analysis_project(
             existing_project, filename, Result(**analysis)
@@ -76,7 +93,7 @@ class ProjectService(BaseService[Project, ProjectRepository]):
         print(projects_roots_list)
         for project_root in projects_roots_list:
             result = analyze_project(project_root[1])
-            analysis = result.to_json_dict()
+            analysis = self._normalize_analysis_payload(result.to_json_dict())
             new_project = Project(title=project_root[0], session_id=session_id)
             new_project_with_analysis = await self._build_analysis_project(
                 new_project, project_root[0], Result(**analysis)
@@ -134,7 +151,7 @@ class ProjectService(BaseService[Project, ProjectRepository]):
                 feature_guarded_definition_changes=b.feature_guarded_definition_changes,
                 ast_pipeline_definition_changes=b.ast_pipeline_definition_changes,
             )
-            for b in result.blocks
+            for b in result.blocks_analysis
         ]
 
         new_features = [
@@ -174,6 +191,11 @@ class ProjectVersionService(BaseService[ProjectVersion, ProjectVersionRepository
     async def get_versions_by_project(self, project_id: int) -> List[ProjectVersion]:
         return await self.repository.find_by_project_id(project_id)
 
+    async def get_versions_with_analysis_by_project_ids(
+        self, project_ids: List[int]
+    ) -> List[ProjectVersion]:
+        return await self.repository.find_by_project_ids_with_analysis(project_ids)
+
 
 class AnalysisResultService(BaseService[AnalysisResult, AnalysisResultRepository]):
     def __init__(self, analysis_result_repo: AnalysisResultRepository):
@@ -191,39 +213,26 @@ class AnalysisResultService(BaseService[AnalysisResult, AnalysisResultRepository
             else 0
         )
 
-        return {
-            "id": analysis.id,
-            "feedback": self._build_feedback_from_saved_analysis(analysis),
-            "project_level": analysis.project_level,
-            "total_scripts": analysis.total_scripts,
-            "duplicate_scripts": analysis.duplicate_scripts,
-            "duplication_ratio": duplication_ratio,
-            "total_combinations": analysis.total_combinations,
-            "max_tangling": analysis.max_tangling,
-            "blocks": [
-                {
-                    "id": block.id,
-                    "owner": block.owner,
-                    "name": block.name,
-                    "level": block.level,
-                    "structural_changes": block.structural_changes,
-                    "definition_changes": block.definition_changes,
-                    "definition_level": block.definition_level,
-                    "feature_guarded_definition_changes": block.feature_guarded_definition_changes,
-                    "ast_pipeline_definition_changes": block.ast_pipeline_definition_changes,
-                }
-                for block in analysis.blocks_analysis
-            ],
-            "detected_features": [
-                {
-                    "id": feature.id,
-                    "name": feature.name,
-                    "is_dead": feature.is_dead,
-                    "scattering_count": feature.scattering_count,
-                }
-                for feature in analysis.detected_features
-            ],
-        }
+        analysis.duplication_ratio = duplication_ratio
+        analysis.feedback = self._build_feedback_from_saved_analysis(analysis)
+
+        return analysis
+
+    async def find_analysis_by_versions_ids(
+        self, versions_ids: List[int]
+    ) -> List[SavedAnalysisResultSchema]:
+        analysis_list = await self.repository.find_by_versions_ids(versions_ids)
+
+        for analysis in analysis_list:
+            duplication_ratio = (
+                (analysis.duplicate_scripts / analysis.total_scripts) * 100
+                if analysis.total_scripts > 0
+                else 0
+            )
+            analysis.duplication_ratio = duplication_ratio
+            analysis.feedback = self._build_feedback_from_saved_analysis(analysis)
+
+        return analysis_list
 
     def _build_feedback_from_saved_analysis(self, analysis: AnalysisResult) -> dict:
         blocks = {
