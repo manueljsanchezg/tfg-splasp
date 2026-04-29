@@ -8,6 +8,39 @@ import type {
 import type { ApiResponse } from "../types/request";
 import { api } from "./api";
 
+export const getProjects = async (): Promise<ProjectResponse[]> => {
+	const response = await api.get<ApiResponse<ProjectResponse[]>>(
+		"/projects/latest-versions",
+	);
+	console.log(response.data);
+	if (!response.data.data) {
+		throw new Error("Error fetching projects");
+	}
+
+	return response.data.data;
+};
+
+export const getAnalysisByVersionsIds = async (
+	versionsIds: number[],
+): Promise<SavedAnalysisResult[]> => {
+	const params = new URLSearchParams();
+	versionsIds.forEach((id) => {
+		params.append("versions_ids", id.toString());
+	});
+	const response = await api.get<ApiResponse<SavedAnalysisResult[]>>(
+		"/projects/selected-versions/analysis",
+		{
+			params: params,
+		},
+	);
+	console.log(response.data.data);
+	if (!response.data.data) {
+		throw new Error("Error fetching analysis versions");
+	}
+
+	return response.data.data;
+};
+
 export const analyzeProject = async (
 	project: File | null,
 	projectUrl: string | null,

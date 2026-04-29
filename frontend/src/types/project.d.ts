@@ -1,4 +1,4 @@
-export interface Block {
+export interface BlockAnalysis {
 	id?: number;
 	owner: string;
 	name: string;
@@ -50,7 +50,7 @@ interface AnalysisBase {
 	totalCombinations?: number;
 	tanglingDict?: Record<string, number>;
 	maxTangling?: number;
-	blocks: Block[];
+	blocksAnalysis: BlockAnalysis[];
 	detectedFeatures?: DetectedFeature[];
 }
 
@@ -69,6 +69,7 @@ export interface ProjectResponse {
 	createdAt: string;
 	userId: number;
 	sessionId: number;
+	projectVersions?: ProjectVersionResponse[];
 }
 
 export interface ProjectVersionResponse {
