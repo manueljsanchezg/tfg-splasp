@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 from app.core.base_model_camel import BaseModelCamel
 
@@ -15,9 +15,51 @@ class Block(BaseModelCamel):
     ast_pipeline_definition_changes: int
 
 
+class ProjectRead(BaseModelCamel):
+    id: int
+    title: str
+    created_at: datetime
+    session_id: int
+    device_id: str | None = None
+
+
+class ProjectWithLatestVersion(ProjectRead):
+    project_versions: List[ProjectVersionRead]
+
+
+class ProjectVersionRead(BaseModelCamel):
+    id: int
+    version_number: int
+    uploaded_at: datetime
+    project_id: int
+
+
+class BlockAnalysisRead(BaseModelCamel):
+    id: Optional[int] = None
+    owner: str
+    name: str
+    level: int
+    structural_changes: int
+    definition_changes: int
+    definition_level: int
+    feature_guarded_definition_changes: int
+    ast_pipeline_definition_changes: int
+
+
+class DetectedFeatureRead(BaseModelCamel):
+    id: int
+    name: str
+    is_dead: bool
+    scattering_count: int
+
+
+class ProjectWithAnalysis(ProjectRead):
+    project_version: List[ProjectVersionRead]
+
+
 class Result(BaseModelCamel):
     project_level: int
-    blocks: List[Block]
+    blocks_analysis: List[BlockAnalysisRead]
     total_scripts: int
     duplicate_scripts: int
     total_combinations: int
@@ -59,7 +101,7 @@ class AnalysisResultSchema(BaseModelCamel):
     is_saved: bool = False
     feedback: AnalysisFeedback
     project_level: int
-    blocks: List[Block]
+    blocks_analysis: List[BlockAnalysisRead]
     total_scripts: int
     duplicate_scripts: int
     duplication_ratio: float
@@ -69,49 +111,15 @@ class AnalysisResultSchema(BaseModelCamel):
     dead_features: List[str]
 
 
-class ProjectRead(BaseModelCamel):
-    id: int
-    title: str
-    created_at: datetime
-    session_id: int
-    device_id: str | None = None
-
-
-class ProjectVersionRead(BaseModelCamel):
-    id: int
-    version_number: int
-    uploaded_at: datetime
-    project_id: int
-
-
-class BlockAnalysisRead(BaseModelCamel):
-    id: int
-    owner: str
-    name: str
-    level: int
-    structural_changes: int
-    definition_changes: int
-    definition_level: int
-    feature_guarded_definition_changes: int
-    ast_pipeline_definition_changes: int
-
-
-class DetectedFeatureRead(BaseModelCamel):
-    id: int
-    name: str
-    is_dead: bool
-    scattering_count: int
-
-
 class SavedAnalysisResultSchema(BaseModelCamel):
     id: int
     is_saved: bool = True
-    feedback: AnalysisFeedback
+    feedback: Optional[AnalysisFeedback]
     project_level: int
     total_scripts: int
     duplicate_scripts: int
     duplication_ratio: float
     total_combinations: int
     max_tangling: int
-    blocks: List[BlockAnalysisRead]
+    blocks_analysis: List[BlockAnalysisRead]
     detected_features: List[DetectedFeatureRead]

@@ -1,6 +1,6 @@
 from typing import List
 
-from fastapi import APIRouter, Form, HTTPException, UploadFile
+from fastapi import APIRouter, Form, HTTPException, Query, UploadFile
 
 from app.auth.dependencies import CurrentAnonymousDep, CurrentUserDep
 from app.core.api_response import ApiResponse
@@ -13,6 +13,7 @@ from app.project.schemas import (
     AnalysisResultSchema,
     ProjectRead,
     ProjectVersionRead,
+    ProjectWithLatestVersion,
     SavedAnalysisResultSchema,
 )
 from app.project.utils import (
@@ -26,9 +27,30 @@ from app.project.utils import (
 router = APIRouter(prefix="/api/projects", tags=["projects"])
 
 
-@router.get("", response_model=List[ProjectRead])
+"""@router.get("", response_model=List[ProjectRead])
 async def get_projects(service: ProjectServiceDep):
-    return await service.get_all()
+    return await service.get_all()"""
+
+
+@router.get("/latest-versions", response_model=ApiResponse[List[ProjectWithLatestVersion]])
+async def get_projects_with_versions(
+    # user: CurrentUserDep,
+    service: ProjectServiceDep,
+):
+    projects = await service.find_projects_with_versions()
+    return ApiResponse(success=True, data=projects)
+
+
+@router.get(
+    "/selected-versions/analysis", response_model=ApiResponse[List[SavedAnalysisResultSchema]]
+)
+async def get_project_analysis_by_versions_ids(
+    # user: CurrentUserDep,
+    service: AnalysisResultServiceDep,
+    versions_ids: List[int] = Query(...),
+):
+    analysis = await service.find_analysis_by_versions_ids(versions_ids)
+    return ApiResponse(success=True, data=analysis)
 
 
 @router.get("/mine/anonymous", response_model=ApiResponse[ProjectRead])
