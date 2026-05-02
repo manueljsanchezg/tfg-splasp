@@ -4,6 +4,7 @@ import type {
 	CloseSessionResponse,
 	JoinAnonymousSessionRequest,
 	JoinAnonymousSessionResponse,
+	SessionAnalysisStats,
 	SessionData,
 	SessionResponse,
 } from "../types/session";
@@ -81,4 +82,25 @@ export const downloadProjectsCSVBySession = async (
 	link.click();
 	document.body.removeChild(link);
 	URL.revokeObjectURL(url);
+};
+
+export const getSessionsAnalysesByVersionsIds = async (
+	sessionsIds: number[],
+): Promise<SessionAnalysisStats[]> => {
+	const params = new URLSearchParams();
+	sessionsIds.forEach((id) => {
+		params.append("sessions_ids", id.toString());
+	});
+	const response = await api.get<ApiResponse<SessionAnalysisStats[]>>(
+		"/sessions/analysis-stats",
+		{
+			params: params,
+		},
+	);
+	console.log(response.data.data);
+	if (!response.data.data) {
+		throw new Error("Error fetching analysis versions");
+	}
+
+	return response.data.data;
 };

@@ -27,3 +27,13 @@ export interface JoinAnonymousSessionResponse {
 export interface CloseSessionResponse {
 	message: string;
 }
+
+export interface SessionAnalysisStats {
+	sessionId: int;
+	sessionName: str;
+	avgProjectLevel: float;
+	avgTotalScripts: float;
+	avgDuplicateScripts: float;
+	avgTotalCombinations: float;
+	avgMaxTangling: float;
+}

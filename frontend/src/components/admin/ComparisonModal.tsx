@@ -1,3 +1,4 @@
+// ComparisonModal.tsx
 import { useEffect, useMemo, useState } from "react";
 import {
 	Bar,
@@ -9,51 +10,50 @@ import {
 	XAxis,
 	YAxis,
 } from "recharts";
-import type { SavedAnalysisResult } from "../../types/project";
-
-interface ComparisonModalProps {
-	isOpen: boolean;
-	analyses: SavedAnalysisResult[];
-	isLoading: boolean;
-	onClose: () => void;
-}
+import type { ChartEntry } from "../../types/chart";
 
 type MetricKey =
 	| "projectLevel"
-	| "duplicateScripts"
 	| "duplicationRatio"
 	| "totalCombinations"
 	| "maxTangling";
 
 const metricOptions: Array<{ key: MetricKey; label: string }> = [
 	{ key: "projectLevel", label: "Project level" },
-	{ key: "duplicateScripts", label: "Duplicate scripts" },
 	{ key: "duplicationRatio", label: "Duplication ratio" },
 	{ key: "totalCombinations", label: "Total combinations" },
 	{ key: "maxTangling", label: "Max tangling" },
 ];
 
+interface ComparisonModalProps {
+	isOpen: boolean;
+	metrics: ChartEntry[];
+	isLoading: boolean;
+	onClose: () => void;
+}
+
 function ComparisonModal({
 	isOpen,
-	analyses,
+	metrics,
 	isLoading,
 	onClose,
 }: ComparisonModalProps) {
 	const [activeMetric, setActiveMetric] = useState<MetricKey>("projectLevel");
 
 	useEffect(() => {
-		if (isOpen) {
-			setActiveMetric("projectLevel");
-		}
+		if (isOpen) setActiveMetric("projectLevel");
 	}, [isOpen]);
 
+	const useAvgLabels = metrics.some((e) => e.isAveraged);
+
+	const activeLabel = useMemo(() => {
+		const base = metricOptions.find((o) => o.key === activeMetric)?.label ?? "";
+		return useAvgLabels ? `Avg ${base}` : base;
+	}, [activeMetric, useAvgLabels]);
+
 	const chartData = useMemo(
-		() =>
-			analyses.map((analysis, index) => ({
-				name: `Analysis ${analysis.id ?? index + 1}`,
-				value: analysis[activeMetric] ?? 0,
-			})),
-		[analyses, activeMetric],
+		() => metrics.map((e) => ({ name: e.name, value: e[activeMetric] })),
+		[metrics, activeMetric],
 	);
 
 	return (
@@ -63,7 +63,7 @@ function ComparisonModal({
 					<div>
 						<h3 className="text-3xl font-bold">Comparison</h3>
 						<p className="text-base text-base-content/70">
-							{analyses.length} versions selected
+							{metrics.length} versions selected
 						</p>
 					</div>
 					<button
@@ -78,26 +78,26 @@ function ComparisonModal({
 				<div className="flex-1 overflow-y-auto bg-base-100 p-4">
 					{isLoading ? (
 						<div className="flex flex-col items-center justify-center h-full gap-4">
-							<span className="loading loading-spinner loading-lg text-primary"></span>
+							<span className="loading loading-spinner loading-lg text-primary" />
 							<span className="text-xl font-medium text-base-content/70">
 								Loading comparison...
 							</span>
 						</div>
-					) : analyses.length === 0 ? (
+					) : metrics.length === 0 ? (
 						<div className="alert alert-info shadow-md">
 							<span>No analyses loaded yet.</span>
 						</div>
 					) : (
 						<div className="flex flex-col gap-6">
 							<div className="join w-fit">
-								{metricOptions.map((metric) => (
+								{metricOptions.map(({ key, label }) => (
 									<button
 										type="button"
-										key={metric.key}
-										className={`btn join-item ${activeMetric === metric.key ? "btn-primary" : "btn-outline"}`}
-										onClick={() => setActiveMetric(metric.key)}
+										key={key}
+										className={`btn join-item ${activeMetric === key ? "btn-primary" : "btn-outline"}`}
+										onClick={() => setActiveMetric(key)}
 									>
-										{metric.label}
+										{useAvgLabels ? `Avg ${label}` : label}
 									</button>
 								))}
 							</div>
@@ -113,15 +113,7 @@ function ComparisonModal({
 										<YAxis />
 										<Tooltip />
 										<Legend />
-										<Bar
-											dataKey="value"
-											name={
-												metricOptions.find(
-													(metric) => metric.key === activeMetric,
-												)?.label
-											}
-											fill="#2563eb"
-										/>
+										<Bar dataKey="value" name={activeLabel} fill="#2563eb" />
 									</BarChart>
 								</ResponsiveContainer>
 							</div>
