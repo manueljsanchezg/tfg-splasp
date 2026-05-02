@@ -27,3 +27,13 @@ class AnonymousTokenResponse(BaseModelCamel):
     access_token: str
     project_id: int
     session_id: int
+
+
+class SessionAnalysisStats(BaseModelCamel):
+    session_id: int
+    session_name: str
+    avg_project_level: float
+    avg_total_scripts: float
+    avg_duplicate_scripts: float
+    avg_total_combinations: float
+    avg_max_tangling: float

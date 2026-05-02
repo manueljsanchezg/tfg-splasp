@@ -1,13 +1,14 @@
 import secrets
 import string
 from datetime import datetime, timedelta, timezone
-from typing import Optional, Tuple
+from typing import List, Optional, Tuple
 
 from app.core.base_service import BaseService
 from app.project.models import Project
 from app.project.service import ProjectService
 from app.session.models import Session
 from app.session.repository import SessionRepository
+from app.session.schemas import SessionAnalysisStats
 from app.user.service import UserService
 from app.utils import generate_jwt
 
@@ -67,6 +68,12 @@ class SessionService(BaseService[Session, SessionRepository]):
 
     async def get_csv_project_by_session_id(self, session_id: int):
         return await self.project_sevice.generate_projects_csv_by_session(session_id)
+
+    async def get_analyses_stats_by_sessions_ids(
+        self, sessions_ids: List[int]
+    ) -> List[SessionAnalysisStats]:
+        rows = await self.repository.get_all_with_analyses_by_sessions_ids(sessions_ids)
+        return [SessionAnalysisStats(**row._mapping) for row in rows]
 
     def _generate_code(self, size: int) -> str:
         alphabet = string.ascii_letters + string.digits

@@ -49,8 +49,8 @@ async def get_project_analysis_by_versions_ids(
     service: AnalysisResultServiceDep,
     versions_ids: List[int] = Query(...),
 ):
-    analysis = await service.find_analysis_by_versions_ids(versions_ids)
-    return ApiResponse(success=True, data=analysis)
+    analyses = await service.find_analysis_by_versions_ids(versions_ids)
+    return ApiResponse(success=True, data=analyses)
 
 
 @router.get("/mine/anonymous", response_model=ApiResponse[ProjectRead])

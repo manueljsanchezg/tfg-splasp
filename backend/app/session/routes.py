@@ -1,6 +1,6 @@
 from typing import List
 
-from fastapi import APIRouter, HTTPException, Response
+from fastapi import APIRouter, HTTPException, Query, Response
 
 from app.auth.dependencies import CurrentUserDep
 from app.core.api_response import ApiResponse
@@ -11,6 +11,7 @@ from app.session.schemas import (
     CreateSession,
     JoinAnonymousSession,
     ReadSession,
+    SessionAnalysisStats,
 )
 
 router = APIRouter(prefix="/api/sessions", tags=["sessions"])
@@ -79,3 +80,16 @@ async def get_projects_analysis_csv_by_session_id(
         media_type="text/csv",
         headers={"Content-Disposition": "attachment; filename=projects.csv"},
     )
+
+
+@router.get("/analysis-stats", response_model=ApiResponse[List[SessionAnalysisStats]])
+async def get_sessions_analysis_stats(
+    service: SessionServiceDep,
+    sessions_ids: List[int] = Query(...),
+):
+    print(sessions_ids)
+    stats = await service.get_analyses_stats_by_sessions_ids(sessions_ids)
+    return ApiResponse(success=True, data=stats)
+
+
+
