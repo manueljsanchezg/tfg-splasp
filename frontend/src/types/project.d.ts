@@ -68,7 +68,7 @@ export interface ProjectResponse {
 	title: string;
 	createdAt: string;
 	userId: number;
-	sessionId: number;
+	sessionId?: number | null;
 	projectVersions?: ProjectVersionResponse[];
 }
 

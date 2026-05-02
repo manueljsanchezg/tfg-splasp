@@ -19,7 +19,7 @@ class ProjectRead(BaseModelCamel):
     id: int
     title: str
     created_at: datetime
-    session_id: int
+    session_id: int | None = None
     device_id: str | None = None
 
 
