@@ -2,8 +2,17 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ConfirmModal from "../../components/ConfirmModal";
 import CreateSessionModal from "../../components/admin/CreateSessionModal";
-import { closeSession, getAllSessions } from "../../service/session.service";
-import type { SessionResponse } from "../../types/session";
+import {
+	closeSession,
+	getAllSessions,
+	getSessionsAnalysesByVersionsIds,
+} from "../../service/session.service";
+import type {
+	SessionAnalysisStats,
+	SessionResponse,
+} from "../../types/session";
+import ComparisonModal from "../../components/admin/ComparisonModal";
+import { sessionStatsToChartEntry } from "../../utils/analysisAdapter";
 
 function SessionPage() {
 	const navigate = useNavigate();
@@ -14,6 +23,18 @@ function SessionPage() {
 	const [sessionToDeactivate, setSessionToDeactivate] = useState<number | null>(
 		null,
 	);
+	const [selectedSessionsIds, setSelectedSessionsIds] = useState<number[]>([]);
+	const [selectedAnalyses, setSelectedAnalyses] = useState<
+		SessionAnalysisStats[]
+	>([]);
+	const [isLoadingComparison, setIsLoadingComparison] = useState(false);
+	const [isComparisonModalOpen, setIsComparisonModalOpen] = useState(false);
+
+	const addId = (id: number) => {
+		setSelectedSessionsIds((prev) =>
+			prev.includes(id) ? prev.filter((v) => v !== id) : [...prev, id],
+		);
+	};
 
 	const getSessions = async () => {
 		try {
@@ -56,19 +77,57 @@ function SessionPage() {
 		getSessions();
 	}, []);
 
+	const handleLoadSelectedAnalyses = async () => {
+		if (selectedSessionsIds.length === 0) return;
+		setIsLoadingComparison(true);
+		try {
+			const data = await getSessionsAnalysesByVersionsIds(selectedSessionsIds);
+			console.log(data);
+			setSelectedAnalyses(data);
+		} catch (error) {
+			setError(
+				error instanceof Error ? error.message : "Error loading comparison",
+			);
+		} finally {
+			setIsLoadingComparison(false);
+		}
+	};
+
+	const handleOpenComparisonModal = async () => {
+		if (selectedSessionsIds.length === 0) return;
+		setError(null);
+		setIsComparisonModalOpen(true);
+		await handleLoadSelectedAnalyses();
+	};
+
 	return (
 		<div className="flex flex-col gap-4 w-full px-4 py-4">
 			<div className="flex flex-col justify-between items-center gap-4">
 				<h1 className="text-5xl font-black text-base-content">
 					Sessions Management
 				</h1>
-				<button
-					type="button"
-					onClick={() => setIsModalOpen(true)}
-					className="btn btn-primary btn-lg text-2xl px-8 m-10"
-				>
-					Create Session
-				</button>
+
+				<div className="flex items-center gap-3">
+					<button
+						type="button"
+						onClick={() => setIsModalOpen(true)}
+						className="btn btn-primary btn-lg text-2xl px-8 m-10"
+					>
+						Create Session
+					</button>
+
+					<button
+						type="button"
+						className="btn btn-lg btn-primary"
+						onClick={handleOpenComparisonModal}
+						disabled={selectedSessionsIds.length === 0}
+					>
+						Compare selected
+					</button>
+					<span className="text-base text-base-content/70">
+						{selectedSessionsIds.length} selected
+					</span>
+				</div>
 			</div>
 
 			<CreateSessionModal
@@ -161,6 +220,12 @@ function SessionPage() {
 												>
 													View
 												</button>
+												<input
+													className="checkbox"
+													type="checkbox"
+													checked={selectedSessionsIds.includes(session.id)}
+													onChange={() => addId(session.id)}
+												/>
 												{session.isActive && (
 													<button
 														type="button"
@@ -193,6 +258,13 @@ function SessionPage() {
 					</p>
 				</div>
 			)}
+
+			<ComparisonModal
+				isOpen={isComparisonModalOpen}
+				metrics={selectedAnalyses.map(sessionStatsToChartEntry)}
+				isLoading={isLoadingComparison}
+				onClose={() => setIsComparisonModalOpen(false)}
+			/>
 		</div>
 	);
 }

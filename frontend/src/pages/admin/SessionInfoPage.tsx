@@ -17,6 +17,7 @@ import type {
 import UploadZipModal from "../../components/admin/UploadZipUrlsModal";
 import ProjectAnalysisModal from "../../components/admin/ProjectAnalysisModal";
 import ComparisonModal from "../../components/admin/ComparisonModal";
+import { savedAnalysisToChartEntry } from "../../utils/analysisAdapter";
 
 function SessionInfoPage() {
 	const { sessionId } = useParams<{ sessionId: string }>();
@@ -216,7 +217,7 @@ function SessionInfoPage() {
 
 			<ComparisonModal
 				isOpen={isComparisonModalOpen}
-				analyses={selectedAnalyses}
+				metrics={selectedAnalyses.map(savedAnalysisToChartEntry)}
 				isLoading={isLoadingComparison}
 				onClose={() => setIsComparisonModalOpen(false)}
 			/>

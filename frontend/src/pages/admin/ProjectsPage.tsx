@@ -12,6 +12,7 @@ import {
 import ProjectRow from "../../components/admin/ProjectRow";
 import ProjectAnalysisModal from "../../components/admin/ProjectAnalysisModal";
 import ComparisonModal from "../../components/admin/ComparisonModal";
+import { savedAnalysisToChartEntry } from "../../utils/analysisAdapter";
 
 function ProjectsPage() {
 	const [projects, setProjects] = useState<ProjectResponse[]>([]);
@@ -171,7 +172,7 @@ function ProjectsPage() {
 
 			<ComparisonModal
 				isOpen={isComparisonModalOpen}
-				analyses={selectedAnalyses}
+				metrics={selectedAnalyses.map(savedAnalysisToChartEntry)}
 				isLoading={isLoadingComparison}
 				onClose={() => setIsComparisonModalOpen(false)}
 			/>
