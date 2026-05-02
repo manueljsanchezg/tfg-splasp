@@ -90,6 +90,3 @@ async def get_sessions_analysis_stats(
     print(sessions_ids)
     stats = await service.get_analyses_stats_by_sessions_ids(sessions_ids)
     return ApiResponse(success=True, data=stats)
-
-
-
