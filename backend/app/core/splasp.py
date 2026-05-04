@@ -994,7 +994,7 @@ def _build_feefback(result: AnalysisResult) -> dict:
         )
         _add_unique(
             improvements,
-            "To reach the highest level (code surgery), avoid overwriting the whole block at once. "
+            "To reach the highest level, avoid overwriting the whole block at once. "
             "Learn to dismantle it, change only the exact instruction you need, and reassemble it.",
         )
         _add_unique(

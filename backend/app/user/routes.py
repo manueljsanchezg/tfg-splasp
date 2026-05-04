@@ -2,6 +2,7 @@ from typing import List
 
 from fastapi import APIRouter, HTTPException
 
+from app.auth.dependencies import CurrentUserDep
 from app.core.api_response import ApiResponse
 from app.user.dependencies import UserServiceDep
 from app.user.models import User
@@ -12,13 +13,13 @@ router = APIRouter(prefix="/api/users", tags=["users"])
 
 
 @router.get("/", response_model=ApiResponse[List[ReadUser]])
-async def get_users(service: UserServiceDep):
+async def get_users(service: UserServiceDep, current_user: CurrentUserDep):
     users = await service.get_all()
     return ApiResponse(success=True, data=users)
 
 
 @router.get("/{user_id}", response_model=ApiResponse[ReadUser])
-async def get_user(user_id: int, service: UserServiceDep):
+async def get_user(user_id: int, service: UserServiceDep, current_user: CurrentUserDep):
     user = await service.get_by_id(user_id)
 
     if not user:
@@ -28,7 +29,7 @@ async def get_user(user_id: int, service: UserServiceDep):
 
 
 @router.post("/", response_model=ApiResponse[ReadUser])
-async def create_user(user: CreateOrUpdateUser, service: UserServiceDep):
+async def create_user(user: CreateOrUpdateUser, service: UserServiceDep, current_user: CurrentUserDep):
     existing_username = await service.get_by_username(user.username)
 
     if existing_username:
@@ -42,7 +43,7 @@ async def create_user(user: CreateOrUpdateUser, service: UserServiceDep):
 
 
 @router.put("/{user_id}", response_model=ApiResponse[ReadUser])
-async def update_user(user_id: int, user: CreateOrUpdateUser, service: UserServiceDep):
+async def update_user(user_id: int, user: CreateOrUpdateUser, service: UserServiceDep, current_user: CurrentUserDep):
     existing_user = await service.get_by_id(user_id)
 
     if not existing_user:
@@ -59,7 +60,7 @@ async def update_user(user_id: int, user: CreateOrUpdateUser, service: UserServi
 
 
 @router.delete("/{user_id}", response_model=ApiResponse[dict[str, str]])
-async def delete_user(user_id: int, service: UserServiceDep):
+async def delete_user(user_id: int, service: UserServiceDep, current_user: CurrentUserDep):
     res = await service.delete_by_id(user_id)
 
     if res == 0:
