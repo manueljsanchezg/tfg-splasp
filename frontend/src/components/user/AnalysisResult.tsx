@@ -209,7 +209,7 @@ function AnalysisResult() {
 						</ul>
 					) : (
 						<p className="text-base-content/70">
-							No hay pistas disponibles para este analisis.
+							No hints available for this analysis.
 						</p>
 					)}
 
@@ -219,7 +219,7 @@ function AnalysisResult() {
 							className="btn btn-primary"
 							onClick={() => setIsHintsModalOpen(false)}
 						>
-							Cerrar
+							Close
 						</button>
 					</div>
 				</div>

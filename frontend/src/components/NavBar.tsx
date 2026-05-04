@@ -22,40 +22,29 @@ function NavBar() {
 	let adminRoutes = <></>;
 	const alwaysRoutes = (
 		<>
+			<NavLink className={linkClass} to="/">
+				Home
+			</NavLink>
 			<NavLink className={linkClass} to="/analysis">
 				Analyze
-			</NavLink>
-			<NavLink className={linkClass} to="/sessions/join">
-				Join Session
 			</NavLink>
 		</>
 	);
 
 	if (!hasSessionAccess) {
 		publicRoutes = (
-			<>
-				<NavLink className={linkClass} to="/">
-					Home
-				</NavLink>
-				<NavLink className={linkClass} to="/login">
-					Login
-				</NavLink>
-			</>
+			<NavLink className={linkClass} to="/sessions/join">
+				Join Session
+			</NavLink>
 		);
 	} else if (isUserAuthenticated) {
 		adminRoutes = (
 			<>
-				<NavLink className={linkClass} to="/">
-					Home
-				</NavLink>
 				<NavLink className={linkClass} to="/projects">
 					Projects
 				</NavLink>
 				<NavLink className={linkClass} to="/sessions">
 					Sessions
-				</NavLink>
-				<NavLink className={linkClass} to="/users">
-					Users
 				</NavLink>
 			</>
 		);
@@ -94,8 +83,8 @@ function NavBar() {
 					to="/"
 					className="flex items-center gap-2 transition-transform hover:scale-105"
 				>
-					<span className="text-4xl font-black text-[#009BA6] tracking-tight">
-						SPLASP<span className="text-base-content">.</span>
+					<span className="text-4xl font-black">
+						SPLASP<span className="text-primary">!</span>
 					</span>
 				</NavLink>
 

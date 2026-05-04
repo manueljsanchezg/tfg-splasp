@@ -6,7 +6,6 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import { useAuth } from "./hooks/useAuth";
 import SessionInfoPage from "./pages/admin/SessionInfoPage";
 import SessionPage from "./pages/admin/SessionsPage";
-import UsersPage from "./pages/admin/UsersPage";
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import JoinSessionPage from "./pages/user/JoinSessionPage";
@@ -70,14 +69,6 @@ export default function App() {
 					element={
 						<AdminRoute>
 							<SessionInfoPage />
-						</AdminRoute>
-					}
-				/>
-				<Route
-					path="/users"
-					element={
-						<AdminRoute>
-							<UsersPage />
 						</AdminRoute>
 					}
 				/>
