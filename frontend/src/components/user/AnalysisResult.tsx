@@ -200,7 +200,7 @@ function AnalysisResult() {
 				onClose={() => setIsHintsModalOpen(false)}
 			>
 				<div className="modal-box max-w-3xl">
-					<h3 className="font-bold text-2xl mb-4">Pistas</h3>
+					<h3 className="font-bold text-2xl mb-4">Hints</h3>
 					{feedback?.hints && feedback.hints.length > 0 ? (
 						<ul className="list-disc list-inside space-y-3 text-base leading-relaxed">
 							{feedback.hints.map((hint) => (
