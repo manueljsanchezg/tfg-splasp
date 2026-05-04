@@ -29,7 +29,9 @@ async def get_user(user_id: int, service: UserServiceDep, current_user: CurrentU
 
 
 @router.post("/", response_model=ApiResponse[ReadUser])
-async def create_user(user: CreateOrUpdateUser, service: UserServiceDep, current_user: CurrentUserDep):
+async def create_user(
+    user: CreateOrUpdateUser, service: UserServiceDep, current_user: CurrentUserDep
+):
     existing_username = await service.get_by_username(user.username)
 
     if existing_username:
@@ -43,7 +45,9 @@ async def create_user(user: CreateOrUpdateUser, service: UserServiceDep, current
 
 
 @router.put("/{user_id}", response_model=ApiResponse[ReadUser])
-async def update_user(user_id: int, user: CreateOrUpdateUser, service: UserServiceDep, current_user: CurrentUserDep):
+async def update_user(
+    user_id: int, user: CreateOrUpdateUser, service: UserServiceDep, current_user: CurrentUserDep
+):
     existing_user = await service.get_by_id(user_id)
 
     if not existing_user:
