@@ -40,23 +40,34 @@ export interface AnalysisFeedbackMetrics {
 	avgScattering: number;
 }
 
-interface AnalysisBase {
-	id?: number;
-	feedback?: AnalysisFeedback;
+interface AnalysisResultBase {
+	feedback: AnalysisFeedback;
 	projectLevel: number;
-	totalScripts?: number;
+	totalScripts: number;
 	duplicateScripts: number;
-	duplicationRatio?: number;
-	totalCombinations?: number;
-	tanglingDict?: Record<string, number>;
-	maxTangling?: number;
+	duplicationRatio: number;
+	totalCombinations: number;
 	blocksAnalysis: BlockAnalysis[];
+	maxTangling?: number;
 	detectedFeatures?: DetectedFeature[];
 }
 
-export interface AnalysisResult extends AnalysisBase {
+export interface AnalysisResult extends AnalysisResultBase {
 	isSaved: false;
+	tanglingDict: Record<string, number>;
+	scatteringDict: Record<string, number[]>;
+	deadFeatures: string[];
 }
+
+export interface SavedAnalysisResult extends AnalysisResultBase {
+	id: number;
+	isSaved: true;
+	feedback: AnalysisFeedback;
+	maxTangling: number;
+	detectedFeatures: DetectedFeature[];
+}
+
+export type AnalysisMetricsSource = AnalysisResult | SavedAnalysisResult;
 
 export interface SavedBatchProjects {
 	message: string;
@@ -85,10 +96,3 @@ export interface DetectedFeature {
 	isDead: boolean;
 	scatteringCount: number;
 }
-
-export interface SavedAnalysisResult extends AnalysisBase {
-	id: number;
-	isSaved: true;
-}
-
-export type AnalysisMetricsSource = AnalysisResult | SavedAnalysisResult;

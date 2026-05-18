@@ -84,7 +84,7 @@ class AnalysisResult:
         return {
             "feedback": feedback,
             "project_level": self.project_level,
-            "blocks": [
+            "blocks_analysis": [
                 {
                     "owner": k.owner,
                     "name": k.name,

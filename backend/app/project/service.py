@@ -20,17 +20,12 @@ from app.project.repository import (
     ProjectRepository,
     ProjectVersionRepository,
 )
-from app.project.schemas import Result, SavedAnalysisResultSchema
+from app.project.schemas import SavedAnalysisResultSchema
 
 
 class ProjectService(BaseService[Project, ProjectRepository]):
     def __init__(self, project_repo: ProjectRepository):
         super().__init__(project_repo)
-
-    def _normalize_analysis_payload(self, analysis: dict) -> dict:
-        if "blocks_analysis" not in analysis and "blocks" in analysis:
-            analysis["blocks_analysis"] = analysis.pop("blocks")
-        return analysis
 
     async def find_project_by_device_id_and_session(
         self, device_id: str, session_id: int
@@ -59,15 +54,14 @@ class ProjectService(BaseService[Project, ProjectRepository]):
         new_project = Project(title=filename)
 
         result = analyze_project(root)
-        analysis = self._normalize_analysis_payload(result.to_json_dict())
 
         new_project_with_analysis = await self._build_analysis_project(
-            new_project, filename, Result(**analysis)
+            new_project, filename, result
         )
 
         await self.save(new_project_with_analysis)
 
-        return analysis
+        return result.to_json_dict()
 
     async def persist_anonymous_project(self, filename: str, project_id: int, root: Element[str]):
         existing_project = await self.find_project_by_id_with_versions(project_id)
@@ -76,27 +70,24 @@ class ProjectService(BaseService[Project, ProjectRepository]):
             return None
 
         result = analyze_project(root)
-        analysis = self._normalize_analysis_payload(result.to_json_dict())
 
         existing_project = await self._build_analysis_project(
-            existing_project, filename, Result(**analysis)
+            existing_project, filename, result
         )
 
         await self.save(existing_project)
 
-        return analysis
+        return result.to_json_dict()
 
     async def persist_batch_projects(
         self, session_id: int, projects_roots_list: List[Tuple[str, Element[str]]]
     ):
         projects_list = []
-        print(projects_roots_list)
         for project_root in projects_roots_list:
             result = analyze_project(project_root[1])
-            analysis = self._normalize_analysis_payload(result.to_json_dict())
             new_project = Project(title=project_root[0], session_id=session_id)
             new_project_with_analysis = await self._build_analysis_project(
-                new_project, project_root[0], Result(**analysis)
+                new_project, project_root[0], result
             )
             projects_list.append(new_project_with_analysis)
         await self.repository.save_batch(projects_list)
@@ -139,19 +130,21 @@ class ProjectService(BaseService[Project, ProjectRepository]):
 
         return projects_csv.getvalue()
 
-    async def _build_analysis_project(self, project: Project, filename: str, result: Result):
+    async def _build_analysis_project(
+        self, project: Project, filename: str, result: SplaspAnalysisResult
+    ):
         new_blocks = [
             BlockAnalysis(
-                owner=b.owner,
-                name=b.name,
-                level=b.level,
-                structural_changes=b.structural_changes,
-                definition_changes=b.definition_changes,
-                definition_level=b.definition_level,
-                feature_guarded_definition_changes=b.feature_guarded_definition_changes,
-                ast_pipeline_definition_changes=b.ast_pipeline_definition_changes,
+                owner=key.owner,
+                name=key.name,
+                level=stats.level,
+                structural_changes=stats.structural_changes,
+                definition_changes=stats.definition_changes,
+                definition_level=stats.definition_level,
+                feature_guarded_definition_changes=stats.feature_guarded_definition_changes,
+                ast_pipeline_definition_changes=stats.ast_pipeline_definition_changes,
             )
-            for b in result.blocks_analysis
+            for key, stats in result.blocks.items()
         ]
 
         new_features = [

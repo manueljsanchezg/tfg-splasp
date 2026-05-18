@@ -57,17 +57,6 @@ class ProjectWithAnalysis(ProjectRead):
     project_version: List[ProjectVersionRead]
 
 
-class Result(BaseModelCamel):
-    project_level: int
-    blocks_analysis: List[BlockAnalysisRead]
-    total_scripts: int
-    duplicate_scripts: int
-    total_combinations: int
-    tangling_dict: Dict[int, int]
-    scattering_dict: Dict[str, List[int]]
-    dead_features: List[str]
-
-
 class AnalysisFeedbackMetrics(BaseModelCamel):
     project_level: int
     total_scripts: int
@@ -97,8 +86,7 @@ class AnalysisFeedback(BaseModelCamel):
     metrics: AnalysisFeedbackMetrics
 
 
-class AnalysisResultSchema(BaseModelCamel):
-    is_saved: bool = False
+class AnalysisResultBase(BaseModelCamel):
     feedback: AnalysisFeedback
     project_level: int
     blocks_analysis: List[BlockAnalysisRead]
@@ -106,20 +94,18 @@ class AnalysisResultSchema(BaseModelCamel):
     duplicate_scripts: int
     duplication_ratio: float
     total_combinations: int
+
+
+class AnalysisResultSchema(AnalysisResultBase):
+    is_saved: bool = False
     tangling_dict: Dict[int, int]
     scattering_dict: Dict[str, List[int]]
     dead_features: List[str]
 
 
-class SavedAnalysisResultSchema(BaseModelCamel):
+class SavedAnalysisResultSchema(AnalysisResultBase):
     id: int
     is_saved: bool = True
-    feedback: Optional[AnalysisFeedback]
-    project_level: int
-    total_scripts: int
-    duplicate_scripts: int
-    duplication_ratio: float
-    total_combinations: int
+    feedback: Optional[AnalysisFeedback] = None
     max_tangling: int
-    blocks_analysis: List[BlockAnalysisRead]
     detected_features: List[DetectedFeatureRead]

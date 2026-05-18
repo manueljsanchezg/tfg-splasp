@@ -16,11 +16,7 @@ function AnalysisMetricsPanel({
 	const duplicateScripts =
 		feedbackMetrics?.duplicateScripts ?? analysis.duplicateScripts;
 	const duplicationRatio =
-		feedbackMetrics?.duplicationRatio ??
-		analysis.duplicationRatio ??
-		(typeof totalScripts === "number" && totalScripts > 0
-			? (duplicateScripts / totalScripts) * 100
-			: 0);
+		feedbackMetrics?.duplicationRatio ?? analysis.duplicationRatio;
 	const totalCombinations =
 		feedbackMetrics?.totalCombinations ?? analysis.totalCombinations;
 	const maxTangling = feedbackMetrics?.maxTangling ?? analysis.maxTangling;

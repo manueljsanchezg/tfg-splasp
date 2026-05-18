@@ -8,9 +8,9 @@ export const savedAnalysisToChartEntry = (
 ): ChartEntry => ({
 	name: `Analysis ${analysis.id ?? index + 1}`,
 	projectLevel: analysis.projectLevel,
-	duplicationRatio: analysis.duplicationRatio ?? 0,
-	totalCombinations: analysis.totalCombinations ?? 0,
-	maxTangling: analysis.maxTangling ?? 0,
+	duplicationRatio: analysis.duplicationRatio,
+	totalCombinations: analysis.totalCombinations,
+	maxTangling: analysis.maxTangling,
 	isAveraged: false,
 });
 
