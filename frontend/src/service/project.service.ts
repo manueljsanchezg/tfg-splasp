@@ -44,8 +44,9 @@ export const getAnalysisByVersionsIds = async (
 export const analyzeProject = async (
 	project: File | null,
 	projectUrl: string | null,
+	isAnonymous: boolean = false,
 ): Promise<AnalysisResult> => {
-	let url = "/projects/analyze";
+	let url = isAnonymous ? "/projects/analyze/anonymous" : "/projects/analyze";
 	const formData = new FormData();
 	if (projectUrl) {
 		url = url.concat(`?project_url=${projectUrl}`);
@@ -53,30 +54,6 @@ export const analyzeProject = async (
 		formData.append("file", project);
 	}
 
-	const response = await api.post<ApiResponse<AnalysisResult>>(url, formData, {
-		headers: {
-			"Content-Type": "multipart/form-data",
-		},
-	});
-
-	if (!response.data.data) {
-		throw new Error("Invalid project analysis response");
-	}
-
-	return response.data.data;
-};
-
-export const analyzeProjectAnonymous = async (
-	project: File | null,
-	projectUrl: string | null,
-): Promise<AnalysisResult> => {
-	let url = "/projects/analyze/anonymous";
-	const formData = new FormData();
-	if (projectUrl) {
-		url = url.concat(`?project_url=${projectUrl}`);
-	} else if (project) {
-		formData.append("file", project);
-	}
 	const response = await api.post<ApiResponse<AnalysisResult>>(url, formData, {
 		headers: {
 			"Content-Type": "multipart/form-data",

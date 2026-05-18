@@ -1,8 +1,5 @@
 import { type ChangeEvent, useEffect, useRef, useState } from "react";
-import {
-	analyzeProject,
-	analyzeProjectAnonymous,
-} from "../../service/project.service";
+import { analyzeProject } from "../../service/project.service";
 import AnalysisMetricsPanel from "../analysis/AnalysisMetricsPanel";
 import FeedbackPanel from "../analysis/FeedbackPanel";
 import type { AnalysisResult as AnalysisResultData } from "../../types/project";
@@ -45,9 +42,7 @@ function AnalysisResult() {
 		setIsMetricsVisible(false);
 		setIsHintsModalOpen(false);
 		try {
-			const result = isAnonymous
-				? await analyzeProjectAnonymous(projectFile, projectUrl)
-				: await analyzeProject(projectFile, projectUrl);
+			const result = await analyzeProject(projectFile, projectUrl, isAnonymous);
 
 			setProjectMetrics(result);
 		} catch (error) {
