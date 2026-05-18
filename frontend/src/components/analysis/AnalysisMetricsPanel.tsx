@@ -19,26 +19,12 @@ function AnalysisMetricsPanel({
 	const blocks = analysis.blocksAnalysis;
 	const detectedFeatures = analysis.detectedFeatures;
 
-	let maxTangling = analysis.maxTangling;
-	let featuresUsedCount = 0;
-	let deadFeaturesCount = 0;
-	let maxScattering = 0;
-
-	if (analysis.isSaved) {
-		featuresUsedCount = detectedFeatures ? detectedFeatures.filter((f) => !f.isDead).length : 0;
-		deadFeaturesCount = detectedFeatures ? detectedFeatures.filter((f) => f.isDead).length : 0;
-		maxScattering = detectedFeatures && detectedFeatures.length > 0 
-			? Math.max(...detectedFeatures.map((f) => f.scatteringCount)) 
-			: 0;
-	} else {
-		maxTangling = Object.keys(analysis.tanglingDict).length > 0 
-			? Math.max(...Object.values(analysis.tanglingDict)) 
-			: 0;
-		featuresUsedCount = Object.keys(analysis.scatteringDict).length;
-		deadFeaturesCount = analysis.deadFeatures.length;
-		const scatteringSizes = Object.values(analysis.scatteringDict).map((arr) => arr.length);
-		maxScattering = scatteringSizes.length > 0 ? Math.max(...scatteringSizes) : 0;
-	}
+	const maxTangling = analysis.maxTangling;
+	const featuresUsedCount = detectedFeatures.filter((f) => !f.isDead).length;
+	const deadFeaturesCount = detectedFeatures.filter((f) => f.isDead).length;
+	const maxScattering = detectedFeatures.length > 0 
+		? Math.max(...detectedFeatures.map((f) => f.scatteringCount)) 
+		: 0;
 
 	return (
 		<div className="flex w-full flex-col gap-8">
@@ -133,7 +119,6 @@ function AnalysisMetricsPanel({
 			</div>
 
 			{showDetectedFeatures &&
-				detectedFeatures &&
 				detectedFeatures.length > 0 && (
 					<div className="mb-6 w-full">
 						<h3 className="mb-4 text-3xl font-bold">Detected Features</h3>

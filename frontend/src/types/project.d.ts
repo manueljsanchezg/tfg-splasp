@@ -33,8 +33,8 @@ interface AnalysisResultBase {
 	duplicationRatio: number;
 	totalCombinations: number;
 	blocksAnalysis: BlockAnalysis[];
-	maxTangling?: number;
-	detectedFeatures?: DetectedFeature[];
+	maxTangling: number;
+	detectedFeatures: DetectedFeature[];
 }
 
 export interface AnalysisResult extends AnalysisResultBase {
@@ -47,9 +47,6 @@ export interface AnalysisResult extends AnalysisResultBase {
 export interface SavedAnalysisResult extends AnalysisResultBase {
 	id: number;
 	isSaved: true;
-	feedback: AnalysisFeedback;
-	maxTangling: number;
-	detectedFeatures: DetectedFeature[];
 }
 
 export type AnalysisMetricsSource = AnalysisResult | SavedAnalysisResult;
@@ -76,7 +73,7 @@ export interface ProjectVersionResponse {
 }
 
 export interface DetectedFeature {
-	id: number;
+	id?: number;
 	name: string;
 	isDead: boolean;
 	scatteringCount: number;

@@ -47,7 +47,7 @@ class BlockAnalysisRead(BaseModelCamel):
 
 
 class DetectedFeatureRead(BaseModelCamel):
-    id: int
+    id: Optional[int] = None
     name: str
     is_dead: bool
     scattering_count: int
@@ -80,6 +80,8 @@ class AnalysisResultBase(BaseModelCamel):
     duplicate_scripts: int
     duplication_ratio: float
     total_combinations: int
+    max_tangling: int
+    detected_features: List[DetectedFeatureRead]
 
 
 class AnalysisResultSchema(AnalysisResultBase):
@@ -93,5 +95,3 @@ class SavedAnalysisResultSchema(AnalysisResultBase):
     id: int
     is_saved: bool = True
     feedback: Optional[AnalysisFeedback] = None
-    max_tangling: int
-    detected_features: List[DetectedFeatureRead]

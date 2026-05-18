@@ -81,6 +81,16 @@ class AnalysisResult:
 
     def to_json_dict(self) -> dict:
         feedback = _build_feedback(self)
+        max_tangling = max(self.tangling_dict.values()) if self.tangling_dict else 0
+        detected_features = [
+            {
+                "name": feature,
+                "is_dead": feature in self.dead_features,
+                "scattering_count": len(script_list),
+            }
+            for feature, script_list in self.scattering_dict.items()
+        ]
+
         return {
             "feedback": feedback,
             "project_level": self.project_level,
@@ -105,6 +115,8 @@ class AnalysisResult:
             "tangling_dict": self.tangling_dict,
             "scattering_dict": self.scattering_dict,
             "dead_features": self.dead_features,
+            "max_tangling": max_tangling,
+            "detected_features": detected_features,
         }
 
 
