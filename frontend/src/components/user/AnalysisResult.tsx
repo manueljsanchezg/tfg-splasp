@@ -4,6 +4,7 @@ import {
 	analyzeProjectAnonymous,
 } from "../../service/project.service";
 import AnalysisMetricsPanel from "../analysis/AnalysisMetricsPanel";
+import FeedbackPanel from "../analysis/FeedbackPanel";
 import type { AnalysisResult as AnalysisResultData } from "../../types/project";
 import { useAuth } from "../../hooks/useAuth";
 
@@ -101,23 +102,11 @@ function AnalysisResult() {
 
 			{projectMetrics !== null && (
 				<div className="mx-auto flex w-full max-w-6xl flex-col items-center gap-8">
-					<div className="w-full rounded border border-base-300 bg-base-100 p-5">
-						<div className="flex flex-wrap items-center gap-3 mb-4">
-							<h2 className="text-2xl font-bold">Feedback</h2>
-							{feedback?.label && (
-								<div className="badge badge-primary font-semibold">
-									{feedback.label}
-								</div>
-							)}
-						</div>
-
-						<p className="text-base leading-relaxed text-base-content/90">
-							{feedback?.summary ??
-								"The analysis has finished. You can now review the metrics behind it."}
-						</p>
-
-						{feedback && (
-							<div className="mt-6">
+					{feedback ? (
+						<FeedbackPanel
+							feedback={feedback}
+							showHints={false}
+							actions={
 								<button
 									type="button"
 									className="btn btn-outline btn-secondary"
@@ -125,58 +114,18 @@ function AnalysisResult() {
 								>
 									Show hints
 								</button>
+							}
+						/>
+					) : (
+						<div className="w-full rounded border border-base-300 bg-base-100 p-5">
+							<div className="mb-4 flex flex-wrap items-center gap-3">
+								<h2 className="text-2xl font-bold">Feedback</h2>
 							</div>
-						)}
-
-						{feedback && (
-							<div className="mt-6 grid grid-cols-3 gap-4">
-								<div className="rounded border border-success/30 bg-success/10 p-3">
-									<h3 className="font-bold text-success mb-3">Strengths</h3>
-									{feedback.strengths.length > 0 ? (
-										<ul className="list-disc list-inside space-y-2 text-sm leading-relaxed">
-											{feedback.strengths.map((item) => (
-												<li key={item}>{item}</li>
-											))}
-										</ul>
-									) : (
-										<p className="text-sm text-base-content/70">
-											No strengths detected yet.
-										</p>
-									)}
-								</div>
-
-								<div className="rounded border border-info/30 bg-info/10 p-3">
-									<h3 className="font-bold text-info mb-3">To improve</h3>
-									{feedback.improvements.length > 0 ? (
-										<ul className="list-disc list-inside space-y-2 text-sm leading-relaxed">
-											{feedback.improvements.map((item) => (
-												<li key={item}>{item}</li>
-											))}
-										</ul>
-									) : (
-										<p className="text-sm text-base-content/70">
-											No improvements suggested.
-										</p>
-									)}
-								</div>
-
-								<div className="rounded border border-warning/30 bg-warning/10 p-3">
-									<h3 className="font-bold text-warning mb-3">Alerts</h3>
-									{feedback.alerts.length > 0 ? (
-										<ul className="list-disc list-inside space-y-2 text-sm leading-relaxed">
-											{feedback.alerts.map((item) => (
-												<li key={item}>{item}</li>
-											))}
-										</ul>
-									) : (
-										<p className="text-sm text-base-content/70">
-											No alerts detected.
-										</p>
-									)}
-								</div>
-							</div>
-						)}
-					</div>
+							<p className="text-base leading-relaxed text-base-content/90">
+								The analysis has finished. You can now review the metrics behind it.
+							</p>
+						</div>
+					)}
 
 					<div className="w-full flex justify-center">
 						<button
