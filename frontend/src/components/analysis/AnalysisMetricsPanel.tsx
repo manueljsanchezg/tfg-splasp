@@ -11,17 +11,34 @@ function AnalysisMetricsPanel({
 	showDetectedFeatures = false,
 }: AnalysisMetricsPanelProps) {
 	const feedbackMetrics = analysis.feedback?.metrics;
-	const projectLevel = feedbackMetrics?.projectLevel ?? analysis.projectLevel;
-	const totalScripts = feedbackMetrics?.totalScripts ?? analysis.totalScripts;
-	const duplicateScripts =
-		feedbackMetrics?.duplicateScripts ?? analysis.duplicateScripts;
-	const duplicationRatio =
-		feedbackMetrics?.duplicationRatio ?? analysis.duplicationRatio;
-	const totalCombinations =
-		feedbackMetrics?.totalCombinations ?? analysis.totalCombinations;
-	const maxTangling = feedbackMetrics?.maxTangling ?? analysis.maxTangling;
+	const projectLevel = analysis.projectLevel;
+	const totalScripts = analysis.totalScripts;
+	const duplicateScripts = analysis.duplicateScripts;
+	const duplicationRatio = analysis.duplicationRatio;
+	const totalCombinations = analysis.totalCombinations;
 	const blocks = analysis.blocksAnalysis;
 	const detectedFeatures = analysis.detectedFeatures;
+
+	let maxTangling = analysis.maxTangling;
+	let featuresUsedCount = 0;
+	let deadFeaturesCount = 0;
+	let maxScattering = 0;
+
+	if (analysis.isSaved) {
+		featuresUsedCount = detectedFeatures ? detectedFeatures.filter((f) => !f.isDead).length : 0;
+		deadFeaturesCount = detectedFeatures ? detectedFeatures.filter((f) => f.isDead).length : 0;
+		maxScattering = detectedFeatures && detectedFeatures.length > 0 
+			? Math.max(...detectedFeatures.map((f) => f.scatteringCount)) 
+			: 0;
+	} else {
+		maxTangling = Object.keys(analysis.tanglingDict).length > 0 
+			? Math.max(...Object.values(analysis.tanglingDict)) 
+			: 0;
+		featuresUsedCount = Object.keys(analysis.scatteringDict).length;
+		deadFeaturesCount = analysis.deadFeatures.length;
+		const scatteringSizes = Object.values(analysis.scatteringDict).map((arr) => arr.length);
+		maxScattering = scatteringSizes.length > 0 ? Math.max(...scatteringSizes) : 0;
+	}
 
 	return (
 		<div className="flex w-full flex-col gap-8">
@@ -38,26 +55,23 @@ function AnalysisMetricsPanel({
 				{typeof maxTangling === "number" && (
 					<MetricCard value={maxTangling} label="Max Tangling" />
 				)}
-				{feedbackMetrics && (
-					<>
-						<MetricCard
-							value={feedbackMetrics.totalModifiedBlocks}
-							label="Modified Blocks"
-						/>
-						<MetricCard
-							value={feedbackMetrics.featuresUsedCount}
-							label="Used Features"
-						/>
-						<MetricCard
-							value={feedbackMetrics.deadFeaturesCount}
-							label="Dead Features"
-						/>
-						<MetricCard
-							value={feedbackMetrics.maxScattering}
-							label="Max Scattering"
-						/>
-					</>
-				)}
+
+				<MetricCard
+					value={blocks.length}
+					label="Modified Blocks"
+				/>
+				<MetricCard
+					value={featuresUsedCount}
+					label="Used Features"
+				/>
+				<MetricCard
+					value={deadFeaturesCount}
+					label="Dead Features"
+				/>
+				<MetricCard
+					value={maxScattering}
+					label="Max Scattering"
+				/>
 			</div>
 
 			<div className="w-full">

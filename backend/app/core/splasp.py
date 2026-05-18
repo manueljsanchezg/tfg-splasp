@@ -80,7 +80,7 @@ class AnalysisResult:
     dead_features: Set[str] = field(default_factory=set)
 
     def to_json_dict(self) -> dict:
-        feedback = _build_feefback(self)
+        feedback = _build_feedback(self)
         return {
             "feedback": feedback,
             "project_level": self.project_level,
@@ -940,7 +940,7 @@ def _base_template_by_level(level: int, result) -> dict:
     }
 
 
-def _build_feefback(result: AnalysisResult) -> dict:
+def _build_feedback(result: AnalysisResult) -> dict:
     base = dict(_base_template_by_level(result.project_level, result))
     strengths = list(base.get("strengths", []))
     improvements = list(base.get("improvements", []))
@@ -1145,21 +1145,7 @@ def _build_feefback(result: AnalysisResult) -> dict:
         )
 
     metrics = {
-        "project_level": result.project_level,
-        "total_scripts": result.total_scripts,
-        "duplicate_scripts": result.duplicate_scripts,
-        "duplication_ratio": round(result.duplication_ratio, 2),
-        "total_combinations": result.total_combinations,
-        "total_modified_blocks": len(result.blocks),
-        "total_structural_changes": total_structural,
-        "total_definition_changes": total_definition,
-        "feature_guarded_definition_changes": total_feature_guarded,
-        "ast_pipeline_definition_changes": total_ast_pipeline,
-        "features_used_count": features_used_count,
-        "dead_features_count": dead_features_count,
-        "max_tangling": max_tangling,
         "avg_tangling": round(avg_tangling, 2),
-        "max_scattering": max_scattering,
         "avg_scattering": round(avg_scattering, 2),
     }
 

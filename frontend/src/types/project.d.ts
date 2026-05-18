@@ -21,22 +21,7 @@ export interface AnalysisFeedback {
 }
 
 export interface AnalysisFeedbackMetrics {
-	projectLevel: number;
-	totalScripts: number;
-	duplicateScripts: number;
-	duplicationRatio: number;
-	totalCombinations: number;
-	totalModifiedBlocks: number;
-	totalStructuralChanges: number;
-	totalDefinitionChanges: number;
-	featureGuardedDefinitionChanges: number;
-	astPipelineDefinitionChanges: number;
-	featuresUsedCount: number;
-	deadFeaturesCount: number;
-	unknownEventsCount: number;
-	maxTangling: number;
 	avgTangling: number;
-	maxScattering: number;
 	avgScattering: number;
 }
 

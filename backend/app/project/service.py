@@ -200,10 +200,8 @@ class AnalysisResultService(BaseService[AnalysisResult, AnalysisResultRepository
         if analysis is None:
             return None
 
-        duplication_ratio = (
-            (analysis.duplicate_scripts / analysis.total_scripts) * 100
-            if analysis.total_scripts > 0
-            else 0
+        duplication_ratio = self._calculate_duplication_ratio(
+            analysis.total_scripts, analysis.duplicate_scripts
         )
 
         analysis.duplication_ratio = duplication_ratio
@@ -217,15 +215,16 @@ class AnalysisResultService(BaseService[AnalysisResult, AnalysisResultRepository
         analysis_list = await self.repository.find_by_versions_ids(versions_ids)
 
         for analysis in analysis_list:
-            duplication_ratio = (
-                (analysis.duplicate_scripts / analysis.total_scripts) * 100
-                if analysis.total_scripts > 0
-                else 0
+            duplication_ratio = self._calculate_duplication_ratio(
+                analysis.total_scripts, analysis.duplicate_scripts
             )
             analysis.duplication_ratio = duplication_ratio
             analysis.feedback = self._build_feedback_from_saved_analysis(analysis)
 
         return analysis_list
+
+    def _calculate_duplication_ratio(self, total_scripts: int, duplicate_scripts: int) -> float:
+        return (duplicate_scripts / total_scripts) * 100 if total_scripts > 0 else 0.0
 
     def _build_feedback_from_saved_analysis(self, analysis: AnalysisResult) -> dict:
         blocks = {
@@ -247,10 +246,8 @@ class AnalysisResultService(BaseService[AnalysisResult, AnalysisResultRepository
         }
         dead_features = {feature.name for feature in analysis.detected_features if feature.is_dead}
 
-        duplication_ratio = (
-            (analysis.duplicate_scripts / analysis.total_scripts) * 100
-            if analysis.total_scripts > 0
-            else 0
+        duplication_ratio = self._calculate_duplication_ratio(
+            analysis.total_scripts, analysis.duplicate_scripts
         )
 
         splasp_result = SplaspAnalysisResult(

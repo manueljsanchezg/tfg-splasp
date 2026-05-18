@@ -58,21 +58,7 @@ class ProjectWithAnalysis(ProjectRead):
 
 
 class AnalysisFeedbackMetrics(BaseModelCamel):
-    project_level: int
-    total_scripts: int
-    duplicate_scripts: int
-    duplication_ratio: float
-    total_combinations: int
-    total_modified_blocks: int
-    total_structural_changes: int
-    total_definition_changes: int
-    feature_guarded_definition_changes: int
-    ast_pipeline_definition_changes: int
-    features_used_count: int
-    dead_features_count: int
-    max_tangling: int
     avg_tangling: float
-    max_scattering: int
     avg_scattering: float
 
 
