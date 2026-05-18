@@ -63,22 +63,6 @@ class ProjectRepository(BaseRepository[Project]):
         result = await self.session.execute(stmt)
         return result.scalars().all()
 
-    async def find_by_session_with_analysis(self, session_id: int) -> List[Project]:
-        stmt = (
-            select(Project)
-            .where(Project.session_id == session_id)
-            .options(
-                selectinload(Project.project_versions)
-                .selectinload(ProjectVersion.analysis_result)
-                .options(
-                    selectinload(AnalysisResult.blocks_analysis),
-                    selectinload(AnalysisResult.detected_features),
-                )
-            )
-        )
-        result = await self.session.execute(stmt)
-        return result.scalars().unique().all()
-
     async def find_by_session(self, session_id: int) -> List[Project]:
         stmt = select(Project).where(Project.session_id == session_id)
         result = await self.session.execute(stmt)
