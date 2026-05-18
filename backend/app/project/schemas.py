@@ -4,15 +4,6 @@ from typing import Dict, List, Optional
 from app.core.base_model_camel import BaseModelCamel
 
 
-class Block(BaseModelCamel):
-    owner: str
-    name: str
-    level: int
-    structural_changes: int
-    definition_changes: int
-    definition_level: int
-    feature_guarded_definition_changes: int
-    ast_pipeline_definition_changes: int
 
 
 class ProjectRead(BaseModelCamel):
