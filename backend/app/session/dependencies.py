@@ -2,6 +2,7 @@ from typing import Annotated
 
 from fastapi import Depends
 
+from app.analysis.dependencies import AnalysisServiceDep
 from app.db import SessionDep
 from app.project.dependencies import ProjectServiceDep
 from app.session.repository import SessionRepository
@@ -16,9 +17,10 @@ def get_session_repository(session: SessionDep):
 def get_session_service(
     user_service: UserServiceDep,
     project_service: ProjectServiceDep,
+    analysis_service: AnalysisServiceDep,
     session_repo: SessionRepository = Depends(get_session_repository),
 ):
-    return SessionService(session_repo, user_service, project_service)
+    return SessionService(session_repo, user_service, project_service, analysis_service)
 
 
 SessionServiceDep = Annotated[SessionService, Depends(get_session_service)]

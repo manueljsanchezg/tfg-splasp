@@ -3,8 +3,8 @@ import string
 from datetime import datetime, timedelta, timezone
 from typing import List, Optional, Tuple
 
+from app.analysis.service import AnalysisService
 from app.core.base_service import BaseService
-from app.project.models import Project
 from app.project.service import ProjectService
 from app.session.models import Session
 from app.session.repository import SessionRepository
@@ -19,10 +19,12 @@ class SessionService(BaseService[Session, SessionRepository]):
         session_repo: SessionRepository,
         user_service: UserService,
         project_service: ProjectService,
+        analysis_service: AnalysisService,
     ):
         super().__init__(session_repo)
         self.user_service = user_service
-        self.project_sevice = project_service
+        self.project_service = project_service
+        self.analysis_service = analysis_service
 
     async def create(self, name: str, start_date: datetime, end_date: datetime):
         start_date = start_date.astimezone(timezone.utc)
@@ -40,19 +42,18 @@ class SessionService(BaseService[Session, SessionRepository]):
         if not session or not session.is_active or session.end_date < datetime.now(timezone.utc):
             return None
 
-        existing_project = await self.project_sevice.find_project_by_device_id_and_session(
+        existing_project_id = await self.project_service.get_project_id_by_device_id_and_session(
             device_id, session.id
         )
 
-        if existing_project:
-            token = self._generate_anonymous_token(existing_project.id, session.id, device_id)
-            return token, existing_project.id, session.id
+        if existing_project_id:
+            token = self._generate_anonymous_token(existing_project_id, session.id, device_id)
+            return token, existing_project_id, session.id
 
-        new_project = Project(title="dump", device_id=device_id, session_id=session.id)
-        saved_project = await self.project_sevice.save(new_project)
+        new_project_id = await self.project_service.create_dump_project(device_id, session.id)
 
-        token = self._generate_anonymous_token(saved_project.id, session.id, device_id)
-        return token, saved_project.id, session.id
+        token = self._generate_anonymous_token(new_project_id, session.id, device_id)
+        return token, new_project_id, session.id
 
     async def close(self, session_id: int) -> Optional[bool]:
         session = await self.repository.get_by_id(session_id)
@@ -64,16 +65,25 @@ class SessionService(BaseService[Session, SessionRepository]):
         return True
 
     async def get_projects_by_session_id(self, session_id: int):
-        return await self.project_sevice.find_projects_by_session(session_id)
+        return await self.project_service.find_projects_by_session(session_id)
 
     async def get_csv_project_by_session_id(self, session_id: int):
-        return await self.project_sevice.generate_projects_csv_by_session(session_id)
+        return await self.analysis_service.generate_csv_by_session(session_id)
 
     async def get_analyses_stats_by_sessions_ids(
         self, sessions_ids: List[int]
     ) -> List[SessionAnalysisStats]:
-        rows = await self.repository.get_all_with_analyses_by_sessions_ids(sessions_ids)
-        return [SessionAnalysisStats(**row._mapping) for row in rows]
+        result = []
+        for session_id in sessions_ids:
+            session = await self.repository.get_by_id(session_id)
+            if not session:
+                continue
+            stats = await self.analysis_service.get_session_stats(session_id)
+            if stats:
+                stats["session_name"] = session.name
+                stats["session_id"] = session.id
+                result.append(SessionAnalysisStats(**stats))
+        return result
 
     def _generate_code(self, size: int) -> str:
         alphabet = string.ascii_letters + string.digits

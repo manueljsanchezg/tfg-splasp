@@ -958,17 +958,14 @@ def _build_feedback(result: AnalysisResult) -> dict:
     improvements = list(base.get("improvements", []))
     hints = list(base.get("hints", []))
     alerts = list(base.get("alerts", []))
-    total_structural = sum(st.structural_changes for st in result.blocks.values())
     total_definition = sum(st.definition_changes for st in result.blocks.values())
     total_feature_guarded = sum(
         st.feature_guarded_definition_changes for st in result.blocks.values()
     )
     total_ast_pipeline = sum(st.ast_pipeline_definition_changes for st in result.blocks.values())
     tangling_values = list(result.tangling_dict.values())
-    max_tangling = max(tangling_values) if tangling_values else 0
     avg_tangling = _safe_mean(tangling_values)
     scattering_sizes = [len(script_ids) for script_ids in result.scattering_dict.values()]
-    max_scattering = max(scattering_sizes) if scattering_sizes else 0
     avg_scattering = _safe_mean(scattering_sizes)
     dead_features_count = len(result.dead_features)
     features_used_count = len(result.scattering_dict)
