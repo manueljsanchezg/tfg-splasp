@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
+from app.analysis.routes import router as analysis_routes
 from app.auth.routes import router as auth_routes
 from app.core.api_response import ApiResponse
 from app.env import CORS_ORIGINS
@@ -39,6 +40,7 @@ app.include_router(user_routes)
 app.include_router(auth_routes)
 app.include_router(session_routes)
 app.include_router(project_routes)
+app.include_router(analysis_routes)
 
 
 @app.get("/health", response_model=ApiResponse[dict[str, str]])
