@@ -1,4 +1,4 @@
-import type { AnalysisMetricsSource } from "../../types/project";
+import type { AnalysisMetricsSource } from "../../types/analysis";
 import MetricCard from "./MetricCard";
 
 interface AnalysisMetricsPanelProps {
@@ -10,9 +10,7 @@ function AnalysisMetricsPanel({
 	analysis,
 	showDetectedFeatures = false,
 }: AnalysisMetricsPanelProps) {
-	const feedbackMetrics = analysis.feedback?.metrics;
 	const projectLevel = analysis.projectLevel;
-	const totalScripts = analysis.totalScripts;
 	const duplicateScripts = analysis.duplicateScripts;
 	const duplicationRatio = analysis.duplicationRatio;
 	const totalCombinations = analysis.totalCombinations;
@@ -22,9 +20,10 @@ function AnalysisMetricsPanel({
 	const maxTangling = analysis.maxTangling;
 	const featuresUsedCount = detectedFeatures.filter((f) => !f.isDead).length;
 	const deadFeaturesCount = detectedFeatures.filter((f) => f.isDead).length;
-	const maxScattering = detectedFeatures.length > 0 
-		? Math.max(...detectedFeatures.map((f) => f.scatteringCount)) 
-		: 0;
+	const maxScattering =
+		detectedFeatures.length > 0
+			? Math.max(...detectedFeatures.map((f) => f.scatteringCount))
+			: 0;
 
 	return (
 		<div className="flex w-full flex-col gap-8">
@@ -42,22 +41,10 @@ function AnalysisMetricsPanel({
 					<MetricCard value={maxTangling} label="Max Tangling" />
 				)}
 
-				<MetricCard
-					value={blocks.length}
-					label="Modified Blocks"
-				/>
-				<MetricCard
-					value={featuresUsedCount}
-					label="Used Features"
-				/>
-				<MetricCard
-					value={deadFeaturesCount}
-					label="Dead Features"
-				/>
-				<MetricCard
-					value={maxScattering}
-					label="Max Scattering"
-				/>
+				<MetricCard value={blocks.length} label="Modified Blocks" />
+				<MetricCard value={featuresUsedCount} label="Used Features" />
+				<MetricCard value={deadFeaturesCount} label="Dead Features" />
+				<MetricCard value={maxScattering} label="Max Scattering" />
 			</div>
 
 			<div className="w-full">
@@ -118,45 +105,44 @@ function AnalysisMetricsPanel({
 				</div>
 			</div>
 
-			{showDetectedFeatures &&
-				detectedFeatures.length > 0 && (
-					<div className="mb-6 w-full">
-						<h3 className="mb-4 text-3xl font-bold">Detected Features</h3>
-						<div className="overflow-hidden rounded border border-base-300 bg-base-100 shadow">
-							<table className="table w-full">
-								<thead className="bg-base-300 text-base-content text-base">
-									<tr>
-										<th>Feature Name</th>
-										<th className="text-center">Status</th>
-										<th className="text-center">Scattering Count</th>
+			{showDetectedFeatures && detectedFeatures.length > 0 && (
+				<div className="mb-6 w-full">
+					<h3 className="mb-4 text-3xl font-bold">Detected Features</h3>
+					<div className="overflow-hidden rounded border border-base-300 bg-base-100 shadow">
+						<table className="table w-full">
+							<thead className="bg-base-300 text-base-content text-base">
+								<tr>
+									<th>Feature Name</th>
+									<th className="text-center">Status</th>
+									<th className="text-center">Scattering Count</th>
+								</tr>
+							</thead>
+							<tbody className="bg-base-100">
+								{detectedFeatures.map((feature) => (
+									<tr
+										key={feature.id}
+										className="hover:bg-base-200 border-b border-base-200"
+									>
+										<td className="text-lg font-bold">{feature.name}</td>
+										<td className="text-center">
+											{feature.isDead ? (
+												<div className="badge badge-error badge-lg">Dead</div>
+											) : (
+												<div className="badge badge-success badge-lg">
+													Active
+												</div>
+											)}
+										</td>
+										<td className="text-center text-2xl font-mono font-bold text-base-content/80">
+											{feature.scatteringCount}
+										</td>
 									</tr>
-								</thead>
-								<tbody className="bg-base-100">
-									{detectedFeatures.map((feature) => (
-										<tr
-											key={feature.id}
-											className="hover:bg-base-200 border-b border-base-200"
-										>
-											<td className="text-lg font-bold">{feature.name}</td>
-											<td className="text-center">
-												{feature.isDead ? (
-													<div className="badge badge-error badge-lg">Dead</div>
-												) : (
-													<div className="badge badge-success badge-lg">
-														Active
-													</div>
-												)}
-											</td>
-											<td className="text-center text-2xl font-mono font-bold text-base-content/80">
-												{feature.scatteringCount}
-											</td>
-										</tr>
-									))}
-								</tbody>
-							</table>
-						</div>
+								))}
+							</tbody>
+						</table>
 					</div>
-				)}
+				</div>
+			)}
 		</div>
 	);
 }

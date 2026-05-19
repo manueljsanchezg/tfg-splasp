@@ -4,7 +4,7 @@ import ProjectRow from "../../components/admin/ProjectRow";
 import {
 	getAnalysisByVersionsIds,
 	getVersionAnalysis,
-} from "../../service/project.service";
+} from "../../service/analysis.service";
 import {
 	downloadProjectsCSVBySession,
 	getProjectsBySession,
@@ -12,8 +12,8 @@ import {
 import type {
 	ProjectResponse,
 	ProjectVersionResponse,
-	SavedAnalysisResult,
 } from "../../types/project";
+import type { SavedAnalysisResult } from "../../types/analysis";
 import UploadZipModal from "../../components/admin/UploadZipUrlsModal";
 import ProjectAnalysisModal from "../../components/admin/ProjectAnalysisModal";
 import ComparisonModal from "../../components/admin/ComparisonModal";

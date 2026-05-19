@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import type { AnalysisFeedback } from "../../types/project";
+import type { AnalysisFeedback } from "../../types/analysis";
 
 interface FeedbackPanelProps {
 	feedback: AnalysisFeedback;

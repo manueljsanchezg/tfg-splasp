@@ -2,13 +2,13 @@ import { useEffect, useState } from "react";
 import type {
 	ProjectResponse,
 	ProjectVersionResponse,
-	SavedAnalysisResult,
 } from "../../types/project";
+import type { SavedAnalysisResult } from "../../types/analysis";
+import { getProjects } from "../../service/project.service";
 import {
 	getAnalysisByVersionsIds,
-	getProjects,
 	getVersionAnalysis,
-} from "../../service/project.service";
+} from "../../service/analysis.service";
 import ProjectRow from "../../components/admin/ProjectRow";
 import ProjectAnalysisModal from "../../components/admin/ProjectAnalysisModal";
 import ComparisonModal from "../../components/admin/ComparisonModal";

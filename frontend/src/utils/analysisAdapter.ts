@@ -1,4 +1,4 @@
-import type { SavedAnalysisResult } from "../types/project";
+import type { SavedAnalysisResult } from "../types/analysis";
 import type { SessionAnalysisStats } from "../types/session";
 import type { ChartEntry } from "../types/chart";
 

@@ -1,8 +1,8 @@
 import { type ChangeEvent, useEffect, useRef, useState } from "react";
-import { analyzeProject } from "../../service/project.service";
+import { analyzeProject } from "../../service/analysis.service";
 import AnalysisMetricsPanel from "../analysis/AnalysisMetricsPanel";
 import FeedbackPanel from "../analysis/FeedbackPanel";
-import type { AnalysisResult as AnalysisResultData } from "../../types/project";
+import type { AnalysisResult as AnalysisResultData } from "../../types/analysis";
 import { useAuth } from "../../hooks/useAuth";
 
 function AnalysisResult() {
@@ -117,7 +117,8 @@ function AnalysisResult() {
 								<h2 className="text-2xl font-bold">Feedback</h2>
 							</div>
 							<p className="text-base leading-relaxed text-base-content/90">
-								The analysis has finished. You can now review the metrics behind it.
+								The analysis has finished. You can now review the metrics behind
+								it.
 							</p>
 						</div>
 					)}

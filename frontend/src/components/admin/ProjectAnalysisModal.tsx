@@ -1,9 +1,6 @@
 import { useEffect, useState } from "react";
 import AnalysisMetricsPanel from "../analysis/AnalysisMetricsPanel";
-import type {
-	AnalysisFeedback,
-	SavedAnalysisResult,
-} from "../../types/project";
+import type { SavedAnalysisResult } from "../../types/analysis";
 
 interface ProjectAnalysisModalProps {
 	activeVersionName: string;

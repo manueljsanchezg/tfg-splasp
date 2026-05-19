@@ -1,5 +1,5 @@
 import { useState, type ChangeEvent } from "react";
-import { analyzeBatchProjects } from "../../service/project.service";
+import { analyzeBatchProjects } from "../../service/analysis.service";
 
 interface UploadZipModalProps {
 	sessionId: number;
