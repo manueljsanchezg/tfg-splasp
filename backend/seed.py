@@ -13,7 +13,7 @@ from app.project.models import (
 )
 from app.session.models import Session
 from app.user.models import User
-from app.utils import hash_password
+from app.auth.utils import hash_password
 
 
 projects = [

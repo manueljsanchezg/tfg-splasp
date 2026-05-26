@@ -3,11 +3,11 @@ from typing import List
 from fastapi import APIRouter, HTTPException
 
 from app.auth.dependencies import CurrentUserDep
+from app.auth.utils import hash_password
 from app.core.api_response import ApiResponse
 from app.user.dependencies import UserServiceDep
 from app.user.models import User
 from app.user.schemas import CreateOrUpdateUser, ReadUser
-from app.utils import hash_password
 
 router = APIRouter(prefix="/api/users", tags=["users"])
 

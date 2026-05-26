@@ -6,9 +6,9 @@ from fastapi.security import OAuth2PasswordBearer
 from jwt import ExpiredSignatureError, InvalidTokenError
 
 from app.auth.service import AuthService
+from app.auth.utils import verify_jwt
 from app.user.dependencies import UserServiceDep
 from app.user.models import User
-from app.utils import verify_jwt
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/access-token")
 

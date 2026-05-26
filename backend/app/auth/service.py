@@ -1,9 +1,9 @@
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
+from app.auth.utils import generate_jwt, hash_password, verify_password
 from app.user.models import User
 from app.user.service import UserService
-from app.utils import generate_jwt, hash_password, verify_password
 
 
 class AuthService:

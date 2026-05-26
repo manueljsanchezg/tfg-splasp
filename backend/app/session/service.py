@@ -4,13 +4,13 @@ from datetime import datetime, timedelta, timezone
 from typing import List, Optional, Tuple
 
 from app.analysis.service import AnalysisService
+from app.auth.utils import generate_jwt
 from app.core.base_service import BaseService
 from app.project.service import ProjectService
 from app.session.models import Session
 from app.session.repository import SessionRepository
 from app.session.schemas import SessionAnalysisStats
 from app.user.service import UserService
-from app.utils import generate_jwt
 
 
 class SessionService(BaseService[Session, SessionRepository]):
