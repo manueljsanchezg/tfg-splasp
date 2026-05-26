@@ -3,9 +3,7 @@ import type { ApiResponse } from "../types/request";
 import { api } from "./api";
 
 export const getProjects = async (): Promise<ProjectResponse[]> => {
-	const response = await api.get<ApiResponse<ProjectResponse[]>>(
-		"/projects",
-	);
+	const response = await api.get<ApiResponse<ProjectResponse[]>>("/projects");
 	console.log(response.data);
 	if (!response.data.data) {
 		throw new Error("Error fetching projects");
@@ -15,9 +13,7 @@ export const getProjects = async (): Promise<ProjectResponse[]> => {
 };
 
 export const getMyAnonymousProject = async (): Promise<ProjectResponse> => {
-	const response = await api.get<ApiResponse<ProjectResponse>>(
-		"/projects/me",
-	);
+	const response = await api.get<ApiResponse<ProjectResponse>>("/projects/me");
 
 	if (!response.data.data) {
 		throw new Error("Invalid project response");
