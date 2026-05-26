@@ -10,7 +10,7 @@ from app.project.schemas import ProjectRead, ProjectVersionRead, ProjectWithLate
 router = APIRouter(prefix="/api/projects", tags=["projects"])
 
 
-@router.get("/latest-versions", response_model=ApiResponse[List[ProjectWithLatestVersion]])
+@router.get("", response_model=ApiResponse[List[ProjectWithLatestVersion]])
 async def get_projects_with_versions(
     service: ProjectServiceDep,
 ):
@@ -18,7 +18,7 @@ async def get_projects_with_versions(
     return ApiResponse(success=True, data=projects)
 
 
-@router.get("/mine/anonymous", response_model=ApiResponse[ProjectRead])
+@router.get("/me", response_model=ApiResponse[ProjectRead])
 async def get_my_anonymous_project(
     anonymous: CurrentAnonymousDep,
     service: ProjectServiceDep,

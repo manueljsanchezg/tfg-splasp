@@ -63,10 +63,7 @@ async def get_projects_by_session(session_id: int, service: SessionServiceDep):
     return ApiResponse(success=True, data=projects)
 
 
-@router.get(
-    "/{session_id}/projects-csv",
-    response_class=Response,
-)
+@router.get("/{session_id}/projects/export", response_class=Response)
 async def get_projects_analysis_csv_by_session_id(
     session_id: int, service: SessionServiceDep, user: CurrentUserDep
 ):
@@ -82,7 +79,7 @@ async def get_projects_analysis_csv_by_session_id(
     )
 
 
-@router.get("/analysis-stats", response_model=ApiResponse[List[SessionAnalysisStats]])
+@router.get("/stats", response_model=ApiResponse[List[SessionAnalysisStats]])
 async def get_sessions_analysis_stats(
     service: SessionServiceDep,
     sessions_ids: List[int] = Query(...),

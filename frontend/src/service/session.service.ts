@@ -71,7 +71,7 @@ export const getProjectsBySession = async (
 export const downloadProjectsCSVBySession = async (
 	sessionId: number,
 ): Promise<void> => {
-	const response = await api.get(`/sessions/${sessionId}/projects-csv`, {
+	const response = await api.get(`/sessions/${sessionId}/projects/export`, {
 		responseType: "blob",
 	});
 	const url = URL.createObjectURL(response.data);
@@ -92,7 +92,7 @@ export const getSessionsAnalysesByVersionsIds = async (
 		params.append("sessions_ids", id.toString());
 	});
 	const response = await api.get<ApiResponse<SessionAnalysisStats[]>>(
-		"/sessions/analysis-stats",
+		"/sessions/stats",
 		{
 			params: params,
 		},

@@ -14,10 +14,10 @@ from app.analysis.utils import (
 from app.auth.dependencies import CurrentAnonymousDep, CurrentUserDep
 from app.core.api_response import ApiResponse
 
-router = APIRouter(prefix="/api/analysis", tags=["analysis"])
+router = APIRouter(prefix="/api/analyses", tags=["analyses"])
 
 
-@router.post("/analyze", response_model=ApiResponse[AnalysisResultSchema])
+@router.post("", response_model=ApiResponse[AnalysisResultSchema])
 async def analyze_snap_project(
     service: AnalysisServiceDep, project_url: str = None, file: UploadFile = None
 ):
@@ -40,7 +40,7 @@ async def analyze_snap_project(
     return ApiResponse(success=True, data=analysis)
 
 
-@router.post("/analyze/anonymous", response_model=ApiResponse[AnalysisResultSchema])
+@router.post("/anonymous", response_model=ApiResponse[AnalysisResultSchema])
 async def analyze_snap_project_anonymous(
     anonymous_user: CurrentAnonymousDep,
     service: AnalysisServiceDep,
@@ -68,11 +68,11 @@ async def analyze_snap_project_anonymous(
     return ApiResponse(success=True, data=analysis)
 
 
-@router.post("/analyze-batch", response_model=ApiResponse[dict[str, int | str]])
+@router.post("/sessions/{session_id}", response_model=ApiResponse[dict[str, int | str]])
 async def analyze_batch_snap_project(
     service: AnalysisServiceDep,
     user: CurrentUserDep,
-    session_id: int = Form(alias="sessionId"),
+    session_id: int,
     file: UploadFile = None,
     projects_urls: str = Form(alias="projectsUrls", default=None),
 ):
@@ -93,7 +93,7 @@ async def analyze_batch_snap_project(
     )
 
 
-@router.get("/selected-versions", response_model=ApiResponse[List[SavedAnalysisResultSchema]])
+@router.get("", response_model=ApiResponse[List[SavedAnalysisResultSchema]])
 async def get_project_analysis_by_versions_ids(
     # user: CurrentUserDep,
     service: AnalysisResultServiceDep,
@@ -103,7 +103,7 @@ async def get_project_analysis_by_versions_ids(
     return ApiResponse(success=True, data=analyses)
 
 
-@router.get("/versions/{version_id}", response_model=ApiResponse[SavedAnalysisResultSchema])
+@router.get("/{version_id}", response_model=ApiResponse[SavedAnalysisResultSchema])
 async def get_version_analysis(
     version_id: int, analysis_service: AnalysisResultServiceDep, user: CurrentUserDep
 ):

@@ -14,7 +14,7 @@ export const getAnalysisByVersionsIds = async (
 		params.append("versions_ids", id.toString());
 	});
 	const response = await api.get<ApiResponse<SavedAnalysisResult[]>>(
-		"/analysis/selected-versions",
+		"/analyses",
 		{
 			params: params,
 		},
@@ -32,7 +32,7 @@ export const analyzeProject = async (
 	projectUrl: string | null,
 	isAnonymous: boolean = false,
 ): Promise<AnalysisResult> => {
-	let url = isAnonymous ? "/analysis/analyze/anonymous" : "/analysis/analyze";
+	let url = isAnonymous ? "/analyses/anonymous" : "/analyses";
 	const formData = new FormData();
 	if (projectUrl) {
 		url = url.concat(`?project_url=${projectUrl}`);
@@ -59,7 +59,6 @@ export const analyzeBatchProjects = async (
 	projectsUrls: string | null,
 ): Promise<SavedBatchProjects> => {
 	const formData = new FormData();
-	formData.append("sessionId", sessionId.toString());
 	if (zip) {
 		formData.append("file", zip);
 	}
@@ -67,7 +66,7 @@ export const analyzeBatchProjects = async (
 		formData.append("projectsUrls", projectsUrls);
 	}
 	const response = await api.post<ApiResponse<SavedBatchProjects>>(
-		"/analysis/analyze-batch",
+		`/analyses/sessions/${sessionId}`,
 		formData,
 		{
 			headers: {
@@ -87,7 +86,7 @@ export const getVersionAnalysis = async (
 	versionId: number,
 ): Promise<SavedAnalysisResult> => {
 	const response = await api.get<ApiResponse<SavedAnalysisResult>>(
-		`/analysis/versions/${versionId}`,
+		`/analyses/${versionId}`,
 	);
 
 	if (!response.data.data) {

@@ -12,7 +12,7 @@ from app.user.schemas import CreateOrUpdateUser, ReadUser
 router = APIRouter(prefix="/api/users", tags=["users"])
 
 
-@router.get("/", response_model=ApiResponse[List[ReadUser]])
+@router.get("", response_model=ApiResponse[List[ReadUser]])
 async def get_users(service: UserServiceDep, current_user: CurrentUserDep):
     users = await service.get_all()
     return ApiResponse(success=True, data=users)
@@ -28,7 +28,7 @@ async def get_user(user_id: int, service: UserServiceDep, current_user: CurrentU
     return ApiResponse(success=True, data=user)
 
 
-@router.post("/", response_model=ApiResponse[ReadUser])
+@router.post("", response_model=ApiResponse[ReadUser])
 async def create_user(
     user: CreateOrUpdateUser, service: UserServiceDep, current_user: CurrentUserDep
 ):

@@ -4,7 +4,7 @@ import { api } from "./api";
 
 export const getProjects = async (): Promise<ProjectResponse[]> => {
 	const response = await api.get<ApiResponse<ProjectResponse[]>>(
-		"/projects/latest-versions",
+		"/projects",
 	);
 	console.log(response.data);
 	if (!response.data.data) {
@@ -16,7 +16,7 @@ export const getProjects = async (): Promise<ProjectResponse[]> => {
 
 export const getMyAnonymousProject = async (): Promise<ProjectResponse> => {
 	const response = await api.get<ApiResponse<ProjectResponse>>(
-		"/projects/mine/anonymous",
+		"/projects/me",
 	);
 
 	if (!response.data.data) {
