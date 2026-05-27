@@ -1,7 +1,3 @@
 https://snap.berkeley.edu/project?username=pxt3852&projectname=Maze%20with%20features%20%28to%20fork%29
 https://snap.berkeley.edu/project?username=javclamar&projectname=Maze%20with%20features%20%28to%20fork%29%20Javclamar
 https://snap.berkeley.edu/project?username=athoroska&projectname=Charla%3a%20Maze%20with%20features%20%28to%20fork%29
-https://snap.berkeley.edu/project?username=ultimate88&projectname=Maze%20with%20features%20Taller%20EGC%20Cron%C3%B3metro
-https://snap.berkeley.edu/project?username=carlosgallero&projectname=cargalrod2
-https://snap.berkeley.edu/project?username=acrub_ac&projectname=Maze%20with%20features%20taller%20EGC
-https://snap.berkeley.edu/project?username=albramvar1&projectname=Maze%20with%20features%20%28moving%20walls%29

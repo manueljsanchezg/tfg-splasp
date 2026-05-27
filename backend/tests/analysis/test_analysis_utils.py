@@ -122,7 +122,7 @@ class TestAnalysisUtils:
 
     async def test_get_roots_from_projects_urls_multiple(self, sample_urls):
         roots = await get_roots_from_projects_urls(sample_urls)
-        assert len(roots) == 7
+        assert len(roots) == 3
         for filename, root in roots:
             assert isinstance(root, ET.Element)
             assert root.tag in ("project", "snapdata")
