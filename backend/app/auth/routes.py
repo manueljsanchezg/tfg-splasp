@@ -10,15 +10,6 @@ from app.core.api_response import ApiResponse
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
 
-@router.post("/register", response_model=ApiResponse[AuthResponse])
-async def register(login_req: LoginReq, auth_service: AuthServiceDep):
-    auth_result = await auth_service.register_user(login_req.username, login_req.password)
-    if auth_result is None:
-        raise HTTPException(status_code=400, detail="Username already exists")
-    token = auth_result
-
-    return ApiResponse(success=True, data=AuthResponse(access_token=token))
-
 
 @router.post("/login", response_model=ApiResponse[AuthResponse])
 async def login(login_req: LoginReq, auth_service: AuthServiceDep):
