@@ -12,5 +12,9 @@ wheels/
 # Secrets and environment variables
 .env
 
+# Test
+.coverage
+
 # Test db
 *.db
+*.sqlite
