@@ -12,40 +12,42 @@ async def _create_test_user(username: str, password: str):
         await session.commit()
 
 
-async def test_login_success(async_client: AsyncClient):
-    await _create_test_user("test_user", "test_password")
 
-    response = await async_client.post(
-        "/api/auth/login",
-        json={"username": "test_user", "password": "test_password"},
-    )
-    assert response.status_code == 200
-    data = response.json()
-    assert data["success"] is True
-    assert "accessToken" in data["data"]
+class TestAuthAPI:
+    async def test_login_success(self, async_client: AsyncClient):
+        await _create_test_user("test_user", "test_password")
 
-
-async def test_login_invalid_credentials(async_client: AsyncClient):
-    await _create_test_user("test_user", "test_password")
-
-    response = await async_client.post(
-        "/api/auth/login",
-        json={"username": "test_user", "password": "wrongpassword"},
-    )
-    assert response.status_code == 400
-    data = response.json()
-    assert data["success"] is False
-    assert data["error"] == "Invalid credentials"
+        response = await async_client.post(
+            "/api/auth/login",
+            json={"username": "test_user", "password": "test_password"},
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["success"] is True
+        assert "accessToken" in data["data"]
 
 
-async def test_access_token_success(async_client: AsyncClient):
-    await _create_test_user("test_user", "test_password")
+    async def test_login_invalid_credentials(self, async_client: AsyncClient):
+        await _create_test_user("test_user", "test_password")
 
-    response = await async_client.post(
-        "/api/auth/access-token",
-        data={"username": "test_user", "password": "test_password"},
-    )
-    assert response.status_code == 200
-    data = response.json()
-    assert "access_token" in data
-    assert data["token_type"] == "bearer"
+        response = await async_client.post(
+            "/api/auth/login",
+            json={"username": "test_user", "password": "wrongpassword"},
+        )
+        assert response.status_code == 400
+        data = response.json()
+        assert data["success"] is False
+        assert data["error"] == "Invalid credentials"
+
+
+    async def test_access_token_success(self, async_client: AsyncClient):
+        await _create_test_user("test_user", "test_password")
+
+        response = await async_client.post(
+            "/api/auth/access-token",
+            data={"username": "test_user", "password": "test_password"},
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert "access_token" in data
+        assert data["token_type"] == "bearer"
