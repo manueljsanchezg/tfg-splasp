@@ -43,7 +43,11 @@ class SessionService(BaseService[Session, SessionRepository]):
             return None
 
         now = datetime.now(timezone.utc)
-        end_date = session.end_date.replace(tzinfo=timezone.utc) if session.end_date.tzinfo is None else session.end_date
+        end_date = (
+            session.end_date.replace(tzinfo=timezone.utc)
+            if session.end_date.tzinfo is None
+            else session.end_date
+        )
         if not session.is_active or end_date < now:
             return None
 

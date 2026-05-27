@@ -10,7 +10,6 @@ from app.core.api_response import ApiResponse
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
 
-
 @router.post("/login", response_model=ApiResponse[AuthResponse])
 async def login(login_req: LoginReq, auth_service: AuthServiceDep):
     auth_result = await auth_service.login_user(login_req.username, login_req.password)

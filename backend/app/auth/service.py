@@ -25,5 +25,3 @@ class AuthService:
         token = generate_jwt(payload)
 
         return token
-
-
