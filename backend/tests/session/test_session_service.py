@@ -2,8 +2,6 @@ import string
 from datetime import datetime, timedelta, timezone
 from unittest.mock import AsyncMock, MagicMock
 
-import pytest
-
 from app.auth.utils import verify_jwt
 from app.session.models import Session
 from app.session.service import SessionService
@@ -65,7 +63,9 @@ class TestSessionService:
         assert len(codes) > 1
 
     def test_anonymous_token_is_valid_jwt(self):
-        token = self.service._generate_anonymous_token(project_id=1, session_id=2, device_id="dev-abc")
+        token = self.service._generate_anonymous_token(
+            project_id=1, session_id=2, device_id="dev-abc"
+        )
         assert len(token.split(".")) == 3
 
     def test_anonymous_token_contains_type_anonymous(self):
@@ -73,7 +73,9 @@ class TestSessionService:
         assert verify_jwt(token)["type"] == "anonymous"
 
     def test_anonymous_token_contains_correct_ids(self):
-        token = self.service._generate_anonymous_token(project_id=42, session_id=7, device_id="device-xyz")
+        token = self.service._generate_anonymous_token(
+            project_id=42, session_id=7, device_id="device-xyz"
+        )
         decoded = verify_jwt(token)
         assert decoded["project_id"] == 42
         assert decoded["session_id"] == 7
@@ -99,8 +101,12 @@ class TestSessionService:
         assert result is None
 
     async def test_join_existing_project_returns_token_and_ids(self):
-        service, _, project_service, _ = _make_service(session=_make_session(sid=5), existing_project_id=10)
-        token, project_id, session_id = await service.join_anonymous(code="ABCD1234", device_id="dev-1")
+        service, _, project_service, _ = _make_service(
+            session=_make_session(sid=5), existing_project_id=10
+        )
+        token, project_id, session_id = await service.join_anonymous(
+            code="ABCD1234", device_id="dev-1"
+        )
         assert project_id == 10
         assert session_id == 5
         assert isinstance(token, str)
@@ -110,7 +116,9 @@ class TestSessionService:
         service, _, project_service, _ = _make_service(
             session=_make_session(sid=3), existing_project_id=None, new_project_id=77
         )
-        token, project_id, session_id = await service.join_anonymous(code="ABCD1234", device_id="dev-new")
+        token, project_id, session_id = await service.join_anonymous(
+            code="ABCD1234", device_id="dev-new"
+        )
         assert project_id == 77
         assert session_id == 3
         project_service.create_dump_project.assert_called_once()

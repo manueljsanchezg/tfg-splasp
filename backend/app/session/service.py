@@ -39,7 +39,12 @@ class SessionService(BaseService[Session, SessionRepository]):
     async def join_anonymous(self, code: str, device_id: str) -> Optional[Tuple[str, int, int]]:
         session = await self.repository.get_by_code(code)
 
-        if not session or not session.is_active or session.end_date < datetime.now(timezone.utc):
+        if not session:
+            return None
+
+        now = datetime.now(timezone.utc)
+        end_date = session.end_date.replace(tzinfo=timezone.utc) if session.end_date.tzinfo is None else session.end_date
+        if not session.is_active or end_date < now:
             return None
 
         existing_project_id = await self.project_service.get_project_id_by_device_id_and_session(

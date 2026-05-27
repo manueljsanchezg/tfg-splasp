@@ -44,7 +44,10 @@ class TestAnalysisUtils:
         with pytest.raises(HTTPException) as exc_info:
             await get_root_from_xml_content(b"<project><unclosed>")
         assert exc_info.value.status_code == 400
-        assert "corrupted" in exc_info.value.detail.lower() or "malformed" in exc_info.value.detail.lower()
+        assert (
+            "corrupted" in exc_info.value.detail.lower()
+            or "malformed" in exc_info.value.detail.lower()
+        )
 
     async def test_empty_bytes_raises_400(self):
         with pytest.raises(HTTPException) as exc_info:

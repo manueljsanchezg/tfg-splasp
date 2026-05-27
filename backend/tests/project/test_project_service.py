@@ -1,7 +1,5 @@
 from unittest.mock import AsyncMock, MagicMock
 
-import pytest
-
 from app.project.models import Project, ProjectVersion
 from app.project.service import ProjectService
 
@@ -86,7 +84,9 @@ class TestProjectService:
 
     async def test_find_with_versions_multiple_projects_each_keeps_latest(self):
         p1 = _make_project(pid=1, versions=[_make_version(1, 1), _make_version(2, 2)])
-        p2 = _make_project(pid=2, versions=[_make_version(1, 3), _make_version(3, 4), _make_version(2, 5)])
+        p2 = _make_project(
+            pid=2, versions=[_make_version(1, 3), _make_version(3, 4), _make_version(2, 5)]
+        )
         self.repo.find_with_versions = AsyncMock(return_value=[p1, p2])
         result = await self.service.find_projects_with_versions()
         assert result[0].project_versions[0].version_number == 2

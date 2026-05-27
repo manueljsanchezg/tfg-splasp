@@ -87,7 +87,9 @@ class TestAnalysisService:
     async def test_returns_analysis_with_duplication_ratio(self):
         analysis = _make_analysis_result(total_scripts=10, duplicate_scripts=2)
         self.analysis_result_repo.find_by_version_id = AsyncMock(return_value=analysis)
-        with patch.object(self.analysis_result_service, "_build_feedback_from_saved_analysis", return_value={}):
+        with patch.object(
+            self.analysis_result_service, "_build_feedback_from_saved_analysis", return_value={}
+        ):
             result = await self.analysis_result_service.get_analysis_by_version(version_id=1)
         assert result is analysis
         assert result.duplication_ratio == pytest.approx(20.0)
@@ -185,12 +187,18 @@ class TestAnalysisService:
         proj2 = MagicMock(spec=Project)
         proj2.project_versions = [version2]
         a1 = _make_analysis_result(
-            project_level=1, total_scripts=10, duplicate_scripts=2,
-            total_combinations=4, max_tangling=3,
+            project_level=1,
+            total_scripts=10,
+            duplicate_scripts=2,
+            total_combinations=4,
+            max_tangling=3,
         )
         a2 = _make_analysis_result(
-            project_level=3, total_scripts=20, duplicate_scripts=4,
-            total_combinations=8, max_tangling=5,
+            project_level=3,
+            total_scripts=20,
+            duplicate_scripts=4,
+            total_combinations=8,
+            max_tangling=5,
         )
         self.project_service.find_projects_by_session = AsyncMock(return_value=[proj1, proj2])
         self.analysis_repo.find_by_versions_ids = AsyncMock(return_value=[a1, a2])
@@ -212,8 +220,11 @@ class TestAnalysisService:
         project = MagicMock(spec=Project)
         project.project_versions = [old_version, new_version]
         analysis = _make_analysis_result(
-            project_level=2, total_scripts=5, duplicate_scripts=0,
-            total_combinations=2, max_tangling=1,
+            project_level=2,
+            total_scripts=5,
+            duplicate_scripts=0,
+            total_combinations=2,
+            max_tangling=1,
         )
         self.project_service.find_projects_by_session = AsyncMock(return_value=[project])
         self.analysis_repo.find_by_versions_ids = AsyncMock(return_value=[analysis])

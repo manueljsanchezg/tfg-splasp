@@ -1,7 +1,5 @@
 from unittest.mock import AsyncMock, MagicMock
 
-import pytest
-
 from app.user.models import User
 from app.user.service import UserService
 
@@ -20,25 +18,25 @@ class TestUserService:
         self.service = UserService(user_repo=self.repo)
 
     async def test_existing_user_returns_user(self):
-        user = _make_user(uid=1, username="alice")
+        user = _make_user(uid=1, username="test_user_1")
         self.repo.get_by_username = AsyncMock(return_value=user)
-        result = await self.service.get_by_username("alice")
+        result = await self.service.get_by_username("test_user_1")
         assert result is user
-        assert result.username == "alice"
+        assert result.username == "test_user_1"
 
     async def test_non_existing_user_returns_none(self):
         self.repo.get_by_username = AsyncMock(return_value=None)
-        result = await self.service.get_by_username("ghost")
+        result = await self.service.get_by_username("test_user_not_found")
         assert result is None
 
     async def test_calls_repo_with_correct_username(self):
         self.repo.get_by_username = AsyncMock(return_value=None)
-        await self.service.get_by_username("bob")
-        self.repo.get_by_username.assert_called_once_with("bob")
+        await self.service.get_by_username("test_user_2")
+        self.repo.get_by_username.assert_called_once_with("test_user_2")
 
     async def test_returns_correct_user_object(self):
-        user = _make_user(uid=42, username="carol")
+        user = _make_user(uid=42, username="test_user_3")
         self.repo.get_by_username = AsyncMock(return_value=user)
-        result = await self.service.get_by_username("carol")
+        result = await self.service.get_by_username("test_user_3")
         assert result.id == 42
-        assert result.username == "carol"
+        assert result.username == "test_user_3"
