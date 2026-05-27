@@ -18,11 +18,6 @@ async def _get_auth_token(async_client: AsyncClient, username="test_user") -> st
 
 
 async def test_analyze_snap_project_file(async_client: AsyncClient, sample_xml_bytes: bytes):
-    # This endpoint doesn't strictly require authentication based on the router, wait, let's check.
-    # Ah, `/api/analyses` doesn't have a CurrentUserDep in its signature!
-    # @router.post("", response_model=ApiResponse[AnalysisResultSchema])
-    # async def analyze_snap_project(service: AnalysisServiceDep, project_url: str = None, file: UploadFile = None)
-
     files = {"file": ("sample.xml", sample_xml_bytes, "application/xml")}
 
     res = await async_client.post("/api/analyses", files=files)
@@ -35,7 +30,6 @@ async def test_analyze_snap_project_file(async_client: AsyncClient, sample_xml_b
 
 
 async def test_analyze_snap_project_anonymous(async_client: AsyncClient, sample_xml_bytes: bytes):
-    # First, we need to create a session and get an anonymous token
     token = await _get_auth_token(async_client)
     headers = {"Authorization": f"Bearer {token}"}
 
@@ -71,7 +65,6 @@ async def test_analyze_batch_snap_project(async_client: AsyncClient, sample_xml_
     token = await _get_auth_token(async_client)
     headers = {"Authorization": f"Bearer {token}"}
 
-    # Create session
     res_session = await async_client.post(
         "/api/sessions",
         json={
