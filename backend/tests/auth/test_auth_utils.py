@@ -7,47 +7,47 @@ from app.auth.utils import generate_jwt, hash_password, verify_jwt, verify_passw
 
 class TestAuthUtils:
     def test_hash_is_not_plain_text(self):
-        plain = "secretpassword"
-        hashed = hash_password(plain)
-        assert hashed != plain
+        password = "test_password"
+        hashed = hash_password(password)
+        assert hashed != password
 
     def test_hash_is_string(self):
-        hashed = hash_password("mypassword")
+        hashed = hash_password("test_password")
         assert isinstance(hashed, str)
 
     def test_different_calls_produce_different_hashes(self):
-        h1 = hash_password("samepassword")
-        h2 = hash_password("samepassword")
+        h1 = hash_password("test_password_same")
+        h2 = hash_password("test_password_same")
         assert h1 != h2
 
     def test_correct_password_returns_true(self):
-        plain = "correctpassword"
-        hashed = hash_password(plain)
-        assert verify_password(plain, hashed) is True
+        password = "test_password_correct"
+        hashed = hash_password(password)
+        assert verify_password(password, hashed) is True
 
     def test_wrong_password_returns_false(self):
-        hashed = hash_password("correctpassword")
-        assert verify_password("wrongpassword", hashed) is False
+        hashed = hash_password("test_password_correct")
+        assert verify_password("test_password_wrong", hashed) is False
 
     def test_empty_password_against_hash_returns_false(self):
-        hashed = hash_password("nonempty")
+        hashed = hash_password("test_password")
         assert verify_password("", hashed) is False
 
     def test_jwt_returns_string(self):
-        payload = {"sub": "testuser", "exp": datetime.now(timezone.utc) + timedelta(minutes=30)}
+        payload = {"sub": "test_user", "exp": datetime.now(timezone.utc) + timedelta(minutes=30)}
         token = generate_jwt(payload)
         assert isinstance(token, str)
 
     def test_jwt_has_three_parts(self):
-        payload = {"sub": "user", "exp": datetime.now(timezone.utc) + timedelta(minutes=10)}
+        payload = {"sub": "test_user", "exp": datetime.now(timezone.utc) + timedelta(minutes=10)}
         token = generate_jwt(payload)
         assert len(token.split(".")) == 3
 
     def test_jwt_encode_decode_roundtrip(self):
-        payload = {"sub": "alice", "exp": datetime.now(timezone.utc) + timedelta(minutes=60)}
+        payload = {"sub": "test_user", "exp": datetime.now(timezone.utc) + timedelta(minutes=60)}
         token = generate_jwt(payload)
         decoded = verify_jwt(token)
-        assert decoded["sub"] == "alice"
+        assert decoded["sub"] == "test_user"
 
     def test_jwt_anonymous_token_payload(self):
         payload = {
@@ -66,12 +66,14 @@ class TestAuthUtils:
 
     def test_expired_token_raises_exception(self):
         import jwt
-        payload = {"sub": "user", "exp": datetime.now(timezone.utc) - timedelta(seconds=1)}
+
+        payload = {"sub": "test_user", "exp": datetime.now(timezone.utc) - timedelta(seconds=1)}
         token = generate_jwt(payload)
         with pytest.raises(jwt.ExpiredSignatureError):
             verify_jwt(token)
 
     def test_invalid_token_raises_exception(self):
         import jwt
+
         with pytest.raises(jwt.PyJWTError):
             verify_jwt("not.a.valid.token")
