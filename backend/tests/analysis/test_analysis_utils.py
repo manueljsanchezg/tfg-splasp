@@ -36,13 +36,13 @@ def _make_zip_upload(files):
 
 class TestAnalysisUtils:
     async def test_valid_xml_returns_element(self):
-        root = await get_root_from_xml_content(b"<project><scenes/></project>")
+        root = get_root_from_xml_content(b"<project><scenes/></project>")
         assert isinstance(root, ET.Element)
         assert root.tag == "project"
 
     async def test_malformed_xml_raises_400(self):
         with pytest.raises(HTTPException) as exc_info:
-            await get_root_from_xml_content(b"<project><unclosed>")
+            get_root_from_xml_content(b"<project><unclosed>")
         assert exc_info.value.status_code == 400
         assert (
             "corrupted" in exc_info.value.detail.lower()
@@ -51,11 +51,11 @@ class TestAnalysisUtils:
 
     async def test_empty_bytes_raises_400(self):
         with pytest.raises(HTTPException) as exc_info:
-            await get_root_from_xml_content(b"")
+            get_root_from_xml_content(b"")
         assert exc_info.value.status_code == 400
 
     async def test_xml_with_nested_elements(self):
-        root = await get_root_from_xml_content(b"<root><child attr='val'>text</child></root>")
+        root = get_root_from_xml_content(b"<root><child attr='val'>text</child></root>")
         assert root.tag == "root"
         child = root.find("child")
         assert child is not None
@@ -111,7 +111,7 @@ class TestAnalysisUtils:
         assert exc_info.value.status_code == 400
 
     async def test_sample_xml_parsing(self, sample_xml_bytes):
-        root = await get_root_from_xml_content(sample_xml_bytes)
+        root = get_root_from_xml_content(sample_xml_bytes)
         assert isinstance(root, ET.Element)
         assert root.tag in ("project", "snapdata")
 
@@ -120,7 +120,7 @@ class TestAnalysisUtils:
         filename, content = await get_content_from_project_url(first_url)
         assert len(filename) > 0
         assert len(content) > 0
-        root = await get_root_from_xml_content(content)
+        root = get_root_from_xml_content(content)
         assert root.tag in ("project", "snapdata")
 
     async def test_get_roots_from_projects_urls_multiple(self, sample_urls):

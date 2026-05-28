@@ -1,3 +1,4 @@
+import asyncio
 from typing import List
 
 from fastapi import APIRouter, Form, HTTPException, Query, UploadFile
@@ -30,7 +31,7 @@ async def analyze_snap_project(
         else await get_content_from_xml(file)
     )
 
-    root = await get_root_from_xml_content(project_xml)
+    root = await asyncio.to_thread(get_root_from_xml_content, project_xml)
 
     analysis = await service.analyze_and_persist(filename, root)
 
@@ -56,7 +57,7 @@ async def analyze_snap_project_anonymous(
         else await get_content_from_xml(file)
     )
 
-    root = await get_root_from_xml_content(project_xml)
+    root = await asyncio.to_thread(get_root_from_xml_content, project_xml)
 
     analysis = await service.analyze_and_persist_anonymous(
         filename, anonymous_user.project_id, root
@@ -95,7 +96,7 @@ async def analyze_batch_snap_project(
 
 @router.get("", response_model=ApiResponse[List[SavedAnalysisResultSchema]])
 async def get_project_analysis_by_versions_ids(
-    # user: CurrentUserDep,
+    user: CurrentUserDep,
     service: AnalysisResultServiceDep,
     versions_ids: List[int] = Query(...),
 ):

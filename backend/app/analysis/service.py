@@ -1,3 +1,4 @@
+import asyncio
 import csv
 from io import StringIO
 from typing import List, Optional, Tuple
@@ -24,7 +25,7 @@ class AnalysisService:
 
     async def analyze_and_persist(self, filename: str, root: Element) -> dict:
         new_project = Project(title=filename)
-        result = analyze_project(root)
+        result = await asyncio.to_thread(analyze_project, root)
 
         new_project_with_analysis = await self._build_analysis_project(
             new_project, filename, result
@@ -41,7 +42,7 @@ class AnalysisService:
         if not existing_project:
             return None
 
-        result = analyze_project(root)
+        result = await asyncio.to_thread(analyze_project, root)
 
         existing_project = await self._build_analysis_project(existing_project, filename, result)
 
@@ -52,7 +53,7 @@ class AnalysisService:
     async def analyze_batch(self, session_id: int, projects_roots_list: List[Tuple[str, Element]]):
         projects_list = []
         for project_root in projects_roots_list:
-            result = analyze_project(project_root[1])
+            result = await asyncio.to_thread(analyze_project, project_root[1])
             new_project = Project(title=project_root[0], session_id=session_id)
 
             new_project_with_analysis = await self._build_analysis_project(
@@ -78,6 +79,9 @@ class AnalysisService:
 
         analysis_results = await self.analysis_repo.find_by_versions_ids(version_ids)
 
+        return await asyncio.to_thread(self._build_csv_content, analysis_results)
+
+    def _build_csv_content(self, analysis_results) -> str:
         projects_csv = StringIO()
         writer = csv.writer(projects_csv)
         writer.writerow(
