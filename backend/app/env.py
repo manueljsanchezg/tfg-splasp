@@ -13,4 +13,4 @@ CORS_ORIGINS = [
     for origin in os.getenv("CORS_ORIGINS", "http://localhost:5173").split(",")
     if origin.strip()
 ]
-UVICORN_WORKERS = int(os.getenv("UVICORN_WORKERS", "4"))
+UVICORN_WORKERS = int(os.getenv("UVICORN_WORKERS", "1"))

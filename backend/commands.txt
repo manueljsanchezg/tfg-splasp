@@ -13,3 +13,4 @@ Format  -> uv run ruff format app/
 tests
 tests -> uv run pytest tests -v
 coverage -> uv run pytest tests -v --cov=app --cov-report=term-missing
+load -> uv run locust -f tests/load/locustfile.py --host=http://localhost:8000
