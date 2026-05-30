@@ -1,12 +1,23 @@
 import asyncio
+from typing import Optional
 import xml.etree.ElementTree as ET
 import zipfile
 from io import BytesIO
 
 import httpx
-from bs4 import BeautifulSoup
+from selectolax.parser import HTMLParser
 from fastapi import HTTPException, UploadFile
 
+
+_http_client: httpx.AsyncClient = None
+
+def _get_http_client() -> httpx.AsyncClient:
+    global _http_client
+    if _http_client is None:
+        _http_client = httpx.AsyncClient(
+            headers={"user-agent": "Mozilla/5.0"}
+        )
+    return _http_client
 
 def get_root_from_xml_content(content_xml: bytes):
     try:
@@ -15,38 +26,33 @@ def get_root_from_xml_content(content_xml: bytes):
         raise HTTPException(status_code=400, detail="The content is corrupted or malformed")
     return root
 
-
 async def get_content_from_xml(file: UploadFile):
     if not file.filename or not file.filename.lower().endswith(".xml"):
         raise HTTPException(status_code=400, detail="The file is not xml")
     return file.filename, await file.read()
 
-
 async def get_content_from_project_url(project_url: str):
-    async with httpx.AsyncClient() as client:
-        project_page = await client.get(project_url, headers={"user-agent": "Mozilla/5.0"})
+    client = _get_http_client()
+    project_page = await client.get(project_url)
+    
+    download_url = _extract_link_from_html(project_page.content)
+    
+    if not download_url:
+        raise HTTPException(status_code=400, detail="Failed to find the project")
         
-        download_url = await asyncio.to_thread(_extract_link_from_html, project_page.content)
-        
-        if not download_url:
-            raise HTTPException(status_code=400, detail="Failed to find the project")
-            
-        filename = download_url.split("/")[-1]
+    filename = download_url.split("/")[-1]
 
-        response = await client.get("https://snap.berkeley.edu" + download_url)
+    response = await client.get("https://snap.berkeley.edu" + download_url)
 
     return filename, response.content
 
-def _extract_link_from_html(content: bytes) -> str:
-    s = BeautifulSoup(content, "html.parser")
-    download_link = s.find(
-        "a", class_="btn btn-outline-primary download", attrs={"download": True}
-    )
-        
-    if download_link and download_link.get("href"):
-        return download_link.get("href")
+def _extract_link_from_html(content: bytes) -> Optional[str]:
+    tree = HTMLParser(content)
+    node = tree.css_first('a.btn.btn-outline-primary.download[download]')
+    
+    if node:
+        return node.attributes.get('href')
     return None
-
 
 def _extract_and_parse_zip(content: bytes):
     roots_list = []
@@ -61,13 +67,13 @@ async def get_roots_from_zip(zip_file: UploadFile):
     content = await zip_file.read()
     return await asyncio.to_thread(_extract_and_parse_zip, content)
 
+async def _process_single_url(project_url: str):
+    filename, project_xml = await get_content_from_project_url(project_url.strip())
+    root = await asyncio.to_thread(get_root_from_xml_content, project_xml)
+    return filename, root
 
 async def get_roots_from_projects_urls(projects_urls: str):
-    roots_list = []
-    # urls = projects_urls.split(",")
     urls = ["https://" + url.strip() for url in projects_urls.split("https://") if url.strip()]
-    for project_url in urls:
-        filename, project_xml = await get_content_from_project_url(project_url.strip())
-        root =await asyncio.to_thread(get_root_from_xml_content, project_xml)
-        roots_list.append((filename, root))
-    return roots_list
+    tasks = [_process_single_url(url) for url in urls]
+    roots_list = await asyncio.gather(*tasks)
+    return list(roots_list)
