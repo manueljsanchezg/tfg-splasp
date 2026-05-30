@@ -11,5 +11,5 @@ Imports -> uv run ruff check --select I app/
 Format  -> uv run ruff format app/
 
 tests
-uv run pytest tests -v
-
+tests -> uv run pytest tests -v
+coverage -> uv run pytest tests -v --cov=app --cov-report=term-missing
