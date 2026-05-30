@@ -1,3 +1,6 @@
+server command
+uvicorn app.app:app --port 8000 --workers 4
+
 Alembic
 Create migration -> alembic revision --autogenerate -m "tu_mensaje_aqui"
 Apply migrations -> alembic upgrade head
@@ -6,3 +9,7 @@ ruff
 Linting -> uv run ruff check app/
 Imports -> uv run ruff check --select I app/
 Format  -> uv run ruff format app/
+
+tests
+uv run pytest tests -v
+
