@@ -8,7 +8,6 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
 
-# Importaciones de tu proyecto
 from app.db import Base
 from app.project import models as project_models
 from app.session import models as session_models
