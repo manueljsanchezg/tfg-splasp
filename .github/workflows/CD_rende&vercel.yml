@@ -1,7 +1,10 @@
 name: Deploy to Render and Vercel
 
 on:
-  push:
+  workflow_run:
+    workflows: ["Tests"]
+    types:
+      - completed
     branches:
       - main
 
@@ -9,6 +12,7 @@ jobs:
   deploy_render:
     name: Deploy to Render
     runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       - name: deploy
         env:
@@ -18,6 +22,7 @@ jobs:
   deploy_vercel:
     name: Deploy to Vercel
     runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       - name: deploy
         env:

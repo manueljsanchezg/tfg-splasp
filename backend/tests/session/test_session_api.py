@@ -154,3 +154,10 @@ class TestSessionAPI:
         res = await async_client.get(f"/api/sessions/{session_id}/projects", headers=headers)
         assert res.status_code == 200
         assert isinstance(res.json()["data"], list)
+
+        res_unauthorized = await async_client.get(f"/api/sessions/{session_id}/projects")
+        assert res_unauthorized.status_code == 401
+
+    async def test_get_sessions_analysis_stats_unauthorized(self, async_client: AsyncClient):
+        res = await async_client.get("/api/sessions/stats?sessions_ids=1")
+        assert res.status_code == 401

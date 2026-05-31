@@ -3,6 +3,7 @@ import xml.etree.ElementTree as ET
 import zipfile
 from io import BytesIO
 from typing import Optional
+from urllib.parse import urlparse
 
 import httpx
 from fastapi import HTTPException, UploadFile
@@ -33,6 +34,10 @@ async def get_content_from_xml(file: UploadFile):
 
 
 async def get_content_from_project_url(project_url: str):
+    parsed = urlparse(project_url)
+    if parsed.netloc not in ("snap.berkeley.edu", "www.snap.berkeley.edu"):
+        raise HTTPException(status_code=400, detail="Invalid project source URL")
+
     client = _get_http_client()
     project_page = await client.get(project_url)
 
@@ -60,10 +65,17 @@ def _extract_link_from_html(content: bytes) -> Optional[str]:
 def _extract_and_parse_zip(content: bytes):
     roots_list = []
     with zipfile.ZipFile(BytesIO(content)) as zip_file:
-        for project in zip_file.namelist():
-            xml = zip_file.read(project)
+        for file_path in zip_file.namelist():
+            if (
+                file_path.endswith("/")
+                or not file_path.lower().endswith(".xml")
+                or "__MACOSX" in file_path
+            ):
+                continue
+            xml = zip_file.read(file_path)
             root = get_root_from_xml_content(xml)
-            roots_list.append((project.split("/")[1], root))
+            filename = file_path.split("/")[-1]
+            roots_list.append((filename, root))
     return roots_list
 
 

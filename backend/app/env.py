@@ -7,7 +7,7 @@ load_dotenv()
 DATABASE_URL = os.getenv(
     "DATABASE_URL", "postgresql+asyncpg://postgres:postgres@localhost:5432/splasp_db"
 )
-SECRET_KEY = os.getenv("SECRET_KEY", "change-this-secret-in-production")
+SECRET_KEY = os.getenv("JWT_SECRET_KEY", "super-secret-key")
 CORS_ORIGINS = [
     origin.strip()
     for origin in os.getenv("CORS_ORIGINS", "http://localhost:5173").split(",")

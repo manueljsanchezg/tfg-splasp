@@ -104,6 +104,27 @@ class TestAnalysisUtils:
         assert len(roots) == 3
         assert {fname for fname, _ in roots} == {"proj_a.xml", "proj_b.xml", "proj_c.xml"}
 
+    async def test_zip_flat_structure(self):
+        upload = _make_zip_upload({"project1.xml": b"<project><scenes/></project>"})
+        roots = await get_roots_from_zip(upload)
+        assert len(roots) == 1
+        filename, root = roots[0]
+        assert filename == "project1.xml"
+        assert isinstance(root, ET.Element)
+
+    async def test_zip_with_directories_and_metadata(self):
+        upload = _make_zip_upload({
+            "session/": b"",
+            "session/__MACOSX/proj.xml": b"<project/>",
+            "session/project.xml": b"<project><scenes/></project>",
+            "session/readme.txt": b"some description",
+        })
+        roots = await get_roots_from_zip(upload)
+        assert len(roots) == 1
+        filename, root = roots[0]
+        assert filename == "project.xml"
+        assert isinstance(root, ET.Element)
+
     async def test_zip_with_malformed_xml_raises_400(self):
         upload = _make_zip_upload({"session/bad.xml": b"<not closed>"})
         with pytest.raises(HTTPException) as exc_info:
@@ -129,3 +150,9 @@ class TestAnalysisUtils:
         for filename, root in roots:
             assert isinstance(root, ET.Element)
             assert root.tag in ("project", "snapdata")
+
+    async def test_get_content_from_invalid_url_raises_400(self):
+        with pytest.raises(HTTPException) as exc_info:
+            await get_content_from_project_url("https://malicious-domain.com/project")
+        assert exc_info.value.status_code == 400
+        assert "invalid project source url" in exc_info.value.detail.lower()

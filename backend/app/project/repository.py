@@ -53,6 +53,7 @@ class ProjectRepository(BaseRepository[Project]):
     async def save_batch(self, projects_list: List[Project]) -> List[Project]:
         self.session.add_all(projects_list)
         await self.session.commit()
+        return projects_list
 
 
 class ProjectVersionRepository(BaseRepository[ProjectVersion]):

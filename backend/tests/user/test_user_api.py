@@ -82,6 +82,13 @@ class TestUserAPI:
         assert res_update.status_code == 200
         assert res_update.json()["data"]["username"] == "test_user_updated"
 
+        res_conflict = await async_client.put(
+            f"/api/users/{user_id}",
+            json={"username": "test_user", "password": "test_password_updated"},
+            headers=headers,
+        )
+        assert res_conflict.status_code == 400
+
         res_not_found = await async_client.put(
             "/api/users/9999",
             json={"username": "test_user_updated", "password": "test_password_updated"},

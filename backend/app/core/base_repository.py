@@ -28,9 +28,9 @@ class BaseRepository(Generic[T]):
         return entity
 
     async def delete(self, entity: T) -> int:
-        result = await self.session.delete(entity)
+        await self.session.delete(entity)
         await self.session.commit()
-        return result.rowcount
+        return 1
 
     async def delete_by_id(self, id: int):
         stmt = delete(self.model).where(self.model.id == id)

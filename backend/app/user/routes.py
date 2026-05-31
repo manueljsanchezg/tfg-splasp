@@ -49,9 +49,12 @@ async def update_user(
     user_id: int, user: CreateOrUpdateUser, service: UserServiceDep, current_user: CurrentUserDep
 ):
     existing_user = await service.get_by_id(user_id)
-
     if not existing_user:
         raise HTTPException(status_code=404, detail="User not found")
+
+    existing_username = await service.get_by_username(user.username)
+    if existing_username and existing_username.id != user_id:
+        raise HTTPException(status_code=400, detail="Username already exists")
 
     existing_user.username = user.username
 
