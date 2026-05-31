@@ -7,13 +7,16 @@ from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 from sqlalchemy.pool import NullPool
 
 from app.app import app
+from app.limiter import limiter
 from app.db import Base, get_session
+
+limiter.enabled = False
 
 FIXTURES_DIR = os.path.join(os.path.dirname(__file__), "fixtures")
 
 
 @pytest.fixture
-def sample_xml_bytes():
+def sample_xml():
     xml_path = os.path.join(FIXTURES_DIR, "sample.xml")
     with open(xml_path, "rb") as f:
         return f.read()

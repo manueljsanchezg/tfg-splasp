@@ -19,8 +19,8 @@ async def _get_auth_token(async_client: AsyncClient, username="test_user") -> st
 
 
 class TestAnalysisAPI:
-    async def test_analyze_snap_project_file(self, async_client: AsyncClient, sample_xml_bytes: bytes):
-        files = {"file": ("sample.xml", sample_xml_bytes, "application/xml")}
+    async def test_analyze_snap_project_file(self, async_client: AsyncClient, sample_xml: bytes):
+        files = {"file": ("sample.xml", sample_xml, "application/xml")}
 
         res = await async_client.post("/api/analyses", files=files)
 
@@ -31,7 +31,7 @@ class TestAnalysisAPI:
         assert data["totalScripts"] > 0
 
 
-    async def test_analyze_snap_project_anonymous(self, async_client: AsyncClient, sample_xml_bytes: bytes):
+    async def test_analyze_snap_project_anonymous(self, async_client: AsyncClient, sample_xml: bytes):
         token = await _get_auth_token(async_client)
         headers = {"Authorization": f"Bearer {token}"}
 
@@ -52,7 +52,7 @@ class TestAnalysisAPI:
         anon_token = res_join.json()["data"]["accessToken"]
         anon_headers = {"Authorization": f"Bearer {anon_token}"}
 
-        files = {"file": ("sample.xml", sample_xml_bytes, "application/xml")}
+        files = {"file": ("sample.xml", sample_xml, "application/xml")}
         res_analyze = await async_client.post(
             "/api/analyses/anonymous", files=files, headers=anon_headers
         )
@@ -63,7 +63,7 @@ class TestAnalysisAPI:
         assert data["totalScripts"] > 0
 
 
-    async def test_analyze_batch_snap_project(self, async_client: AsyncClient, sample_xml_bytes: bytes):
+    async def test_analyze_batch_snap_project(self, async_client: AsyncClient, sample_xml: bytes):
         token = await _get_auth_token(async_client)
         headers = {"Authorization": f"Bearer {token}"}
 

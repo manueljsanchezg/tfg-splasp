@@ -110,8 +110,8 @@ class TestAnalysisUtils:
             await get_roots_from_zip(upload)
         assert exc_info.value.status_code == 400
 
-    async def test_sample_xml_parsing(self, sample_xml_bytes):
-        root = get_root_from_xml_content(sample_xml_bytes)
+    async def test_sample_xml_parsing(self, sample_xml):
+        root = get_root_from_xml_content(sample_xml)
         assert isinstance(root, ET.Element)
         assert root.tag in ("project", "snapdata")
 

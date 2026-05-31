@@ -14,3 +14,5 @@ CORS_ORIGINS = [
     if origin.strip()
 ]
 UVICORN_WORKERS = int(os.getenv("UVICORN_WORKERS", "1"))
+RATE_LIMIT_ENABLED = os.getenv("RATE_LIMIT_ENABLED", "True") == "True"
+RATE_LIMIT_REQUESTS_PER_MINUTE = os.getenv("RATE_LIMIT_REQUESTS_PER_MINUTE", "60")
