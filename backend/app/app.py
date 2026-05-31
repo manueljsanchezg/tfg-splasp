@@ -7,8 +7,8 @@ from slowapi.middleware import SlowAPIMiddleware
 from app.analysis.routes import router as analysis_routes
 from app.auth.routes import router as auth_routes
 from app.core.api_response import ApiResponse
-from app.limiter import limiter
 from app.env import CORS_ORIGINS
+from app.limiter import limiter
 from app.project.routes import router as project_routes
 from app.session.routes import router as session_routes
 from app.user.routes import router as user_routes
@@ -32,9 +32,9 @@ async def rate_limit_exceeded_handler(request: Request, exc: RateLimitExceeded):
     return JSONResponse(
         status_code=429,
         content=ApiResponse(
-            success=False, 
-            error="You have made too many requests. Please wait a few minutes before trying again."
-        ).model_dump()
+            success=False,
+            error="You have made too many requests. Please wait a few minutes before trying again.",
+        ).model_dump(),
     )
 
 
@@ -49,7 +49,7 @@ async def http_exception_handler(request: Request, ex: HTTPException):
 async def unhandled_exception_handler(request: Request, ex: Exception):
     return JSONResponse(
         status_code=500,
-        content=ApiResponse(success=False, error="Internal server error").model_dump()
+        content=ApiResponse(success=False, error="Internal server error").model_dump(),
     )
 
 
