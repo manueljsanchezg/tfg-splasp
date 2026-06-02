@@ -9,6 +9,10 @@ import httpx
 from fastapi import HTTPException, UploadFile
 from selectolax.parser import HTMLParser
 
+
+MAX_XML_BYTES = 1 * 1024 * 1024
+MAX_ZIP_BYTES = 20 * 1024 * 1024
+
 _http_client: httpx.AsyncClient = None
 
 
@@ -30,7 +34,13 @@ def get_root_from_xml_content(content_xml: bytes):
 async def get_content_from_xml(file: UploadFile):
     if not file.filename or not file.filename.lower().endswith(".xml"):
         raise HTTPException(status_code=400, detail="The file is not xml")
-    return file.filename, await file.read()
+    
+    content = await file.read(MAX_XML_BYTES + 1)
+
+    if len(content) > MAX_XML_BYTES:
+        raise HTTPException(status_code=413, detail="XML file too large")
+    
+    return file.filename, content
 
 
 async def get_content_from_project_url(project_url: str):
@@ -50,7 +60,13 @@ async def get_content_from_project_url(project_url: str):
 
     response = await client.get("https://snap.berkeley.edu" + download_url)
 
-    return filename, response.content
+    lower_fname = filename.lower() if filename else ""
+    content = response.content
+    if lower_fname.endswith(".xml"):
+        if len(content) > MAX_XML_BYTES:
+            raise HTTPException(status_code=413, detail="XML file too large")
+
+    return filename, content
 
 
 def _extract_link_from_html(content: bytes) -> Optional[str]:
@@ -73,6 +89,9 @@ def _extract_and_parse_zip(content: bytes):
             ):
                 continue
             xml = zip_file.read(file_path)
+            # protect against very large xml files inside the archive
+            if len(xml) > MAX_XML_BYTES:
+                raise HTTPException(status_code=413, detail=f"XML inside archive too large: {file_path}")
             root = get_root_from_xml_content(xml)
             filename = file_path.split("/")[-1]
             roots_list.append((filename, root))
@@ -80,7 +99,10 @@ def _extract_and_parse_zip(content: bytes):
 
 
 async def get_roots_from_zip(zip_file: UploadFile):
-    content = await zip_file.read()
+    # Read at most MAX_ZIP_BYTES + 1 to detect oversize
+    content = await zip_file.read(MAX_ZIP_BYTES + 1)
+    if len(content) > MAX_ZIP_BYTES:
+        raise HTTPException(status_code=413, detail="Archive file too large")
     return await asyncio.to_thread(_extract_and_parse_zip, content)
 
 

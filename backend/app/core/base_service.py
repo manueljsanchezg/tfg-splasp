@@ -8,8 +8,8 @@ class BaseService(Generic[T, R]):
     def __init__(self, repository: R):
         self.repository = repository
 
-    async def get_all(self) -> List[T]:
-        return await self.repository.get_all()
+    async def get_all(self, limit: Optional[int] = None, offset: Optional[int] = None) -> List[T]:
+        return await self.repository.get_all(limit=limit, offset=offset)
 
     async def get_by_id(self, id: int) -> Optional[T]:
         entity = await self.repository.get_by_id(id)

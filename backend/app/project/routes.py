@@ -33,3 +33,5 @@ async def get_my_anonymous_project(
 async def get_project_versions(project_id: int, version_service: ProjectVersionServiceDep):
     versions = await version_service.get_versions_by_project(project_id)
     return ApiResponse(success=True, data=versions)
+    versions = await version_service.get_versions_by_project(project_id)
+    return ApiResponse(success=True, data=versions)

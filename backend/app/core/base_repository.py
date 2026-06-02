@@ -11,8 +11,12 @@ class BaseRepository(Generic[T]):
         self.session = session
         self.model = model
 
-    async def get_all(self) -> List[T]:
+    async def get_all(self, limit: Optional[int] = None, offset: Optional[int] = None) -> List[T]:
         stmt = select(self.model)
+        if limit is not None:
+            stmt = stmt.limit(limit)
+        if offset is not None:
+            stmt = stmt.offset(offset)
         res = await self.session.execute(stmt)
         return res.scalars().all()
 
