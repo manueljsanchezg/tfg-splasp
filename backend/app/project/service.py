@@ -28,8 +28,8 @@ class ProjectService(BaseService[Project, ProjectRepository]):
     async def find_project_by_id_with_versions(self, project_id: int) -> Optional[Project]:
         return await self.repository.find_by_id_with_versions(project_id)
 
-    async def find_projects_with_versions(self) -> List[Project]:
-        projects = await self.repository.find_with_versions()
+    async def find_projects_with_versions(self, limit: Optional[int] = None, offset: Optional[int] = None) -> List[Project]:
+        projects = await self.repository.find_with_versions(limit=limit, offset=offset)
 
         for project in projects:
             if project.project_versions:

@@ -13,12 +13,15 @@ import type {
 } from "../../types/session";
 import ComparisonModal from "../../components/admin/ComparisonModal";
 import { sessionStatsToChartEntry } from "../../utils/analysisAdapter";
+import InfiniteScroll from "react-infinite-scroll-component";
 
 function SessionPage() {
 	const navigate = useNavigate();
 	const [sessions, setSessions] = useState<SessionResponse[] | null>(null);
 	const [error, setError] = useState<string | null>(null);
 	const [isLoading, setIsLoading] = useState<boolean>(true);
+	const [page, setPage] = useState(0);
+	const [hasMore, setHasMore] = useState(true);
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [sessionToDeactivate, setSessionToDeactivate] = useState<number | null>(
 		null,
@@ -36,10 +39,19 @@ function SessionPage() {
 		);
 	};
 
-	const getSessions = async () => {
+	const getSessions = async (currentPage = 0, reset = false) => {
 		try {
-			const sessions = await getAllSessions();
-			setSessions(sessions);
+			const limit = 10;
+			const offset = currentPage * limit;
+			const newSessions = await getAllSessions(limit, offset);
+			
+			if (reset) {
+				setSessions(newSessions);
+			} else {
+				setSessions((prev) => (prev ? [...prev, ...newSessions] : newSessions));
+			}
+
+			setHasMore(newSessions.length === limit);
 		} catch (error) {
 			setError(
 				error instanceof Error ? error.message : "Error retrieving sessions",
@@ -58,7 +70,8 @@ function SessionPage() {
 
 		try {
 			await closeSession(sessionToDeactivate);
-			await getSessions();
+			setPage(0);
+			await getSessions(0, true);
 		} catch (error) {
 			setError(
 				error instanceof Error ? error.message : "Failed to deactivate session",
@@ -74,7 +87,7 @@ function SessionPage() {
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: pass
 	useEffect(() => {
-		getSessions();
+		getSessions(0, true);
 	}, []);
 
 	const handleLoadSelectedAnalyses = async () => {
@@ -135,7 +148,8 @@ function SessionPage() {
 				onClose={() => setIsModalOpen(false)}
 				onSuccess={() => {
 					setIsModalOpen(false);
-					getSessions();
+					setPage(0);
+					getSessions(0, true);
 				}}
 			/>
 
@@ -160,9 +174,19 @@ function SessionPage() {
 			)}
 
 			{!isLoading && sessions && sessions?.length > 0 && (
-				<div className="w-4/5 bg-base-100 rounded-xl shadow-lg border border-base-300 overflow-hidden mx-auto">
-					<div className="overflow-x-auto">
-						<table className="table table-lg w-full">
+				<InfiniteScroll
+					dataLength={sessions.length}
+					next={() => {
+						const nextPg = page + 1;
+						setPage(nextPg);
+						getSessions(nextPg);
+					}}
+					hasMore={hasMore}
+					loader={<div className="text-center py-4 text-xl">Loading more...</div>}
+				>
+					<div className="w-4/5 bg-base-100 rounded-xl shadow-lg border border-base-300 overflow-hidden mx-auto mb-4">
+						<div className="overflow-x-auto">
+							<table className="table table-lg w-full">
 							<thead className="bg-base-300 text-2xl uppercase">
 								<tr>
 									<th className="px-4 py-4 font-bold text-center">
@@ -246,6 +270,7 @@ function SessionPage() {
 						</table>
 					</div>
 				</div>
+				</InfiniteScroll>
 			)}
 
 			{!isLoading && sessions && sessions.length === 0 && (

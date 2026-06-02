@@ -2,8 +2,10 @@ import type { ProjectResponse, ProjectVersionResponse } from "../types/project";
 import type { ApiResponse } from "../types/request";
 import { api } from "./api";
 
-export const getProjects = async (): Promise<ProjectResponse[]> => {
-	const response = await api.get<ApiResponse<ProjectResponse[]>>("/projects");
+export const getProjects = async (limit = 10, offset = 0): Promise<ProjectResponse[]> => {
+	const response = await api.get<ApiResponse<ProjectResponse[]>>("/projects", {
+		params: { limit, offset }
+	});
 	console.log(response.data);
 	if (!response.data.data) {
 		throw new Error("Error fetching projects");

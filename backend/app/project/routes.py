@@ -1,6 +1,6 @@
 from typing import List
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 
 from app.auth.dependencies import CurrentAnonymousDep
 from app.core.api_response import ApiResponse
@@ -13,8 +13,10 @@ router = APIRouter(prefix="/api/projects", tags=["projects"])
 @router.get("", response_model=ApiResponse[List[ProjectWithLatestVersion]])
 async def get_projects_with_versions(
     service: ProjectServiceDep,
+    limit: int = Query(10, ge=1, le=100),
+    offset: int = Query(0, ge=0),
 ):
-    projects = await service.find_projects_with_versions()
+    projects = await service.find_projects_with_versions(limit=limit, offset=offset)
     return ApiResponse(success=True, data=projects)
 
 

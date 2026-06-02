@@ -32,14 +32,18 @@ class ProjectRepository(BaseRepository[Project]):
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none()
 
-    async def find_with_versions(self) -> List[Project]:
+    async def find_with_versions(self, limit: Optional[int] = None, offset: Optional[int] = None) -> List[Project]:
         stmt = (
             select(Project)
             .where(Project.project_versions.any())
             .options(selectinload(Project.project_versions))
         )
+        if limit is not None:
+            stmt = stmt.limit(limit)
+        if offset is not None:
+            stmt = stmt.offset(offset)
         result = await self.session.execute(stmt)
-        return result.scalars().unique().all()
+        return list(result.scalars().unique().all())
 
     async def find_by_session(self, session_id: int) -> List[Project]:
         stmt = (

@@ -18,8 +18,13 @@ router = APIRouter(prefix="/api/sessions", tags=["sessions"])
 
 
 @router.get("", response_model=ApiResponse[List[ReadSession]])
-async def get_all_sessions(service: SessionServiceDep, user: CurrentUserDep):
-    sessions = await service.get_all()
+async def get_all_sessions(
+    service: SessionServiceDep,
+    user: CurrentUserDep,
+    limit: int = Query(10, ge=1, le=100),
+    offset: int = Query(0, ge=0),
+):
+    sessions = await service.get_all(limit=limit, offset=offset)
     return ApiResponse(success=True, data=sessions)
 
 

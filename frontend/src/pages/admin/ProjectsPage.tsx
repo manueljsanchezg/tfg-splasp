@@ -13,10 +13,13 @@ import ProjectRow from "../../components/admin/ProjectRow";
 import ProjectAnalysisModal from "../../components/admin/ProjectAnalysisModal";
 import ComparisonModal from "../../components/admin/ComparisonModal";
 import { savedAnalysisToChartEntry } from "../../utils/analysisAdapter";
+import InfiniteScroll from "react-infinite-scroll-component";
 
 function ProjectsPage() {
 	const [projects, setProjects] = useState<ProjectResponse[]>([]);
 	const [isLoadingProjects, setIsLoadingProjects] = useState(true);
+	const [page, setPage] = useState(0);
+	const [hasMore, setHasMore] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 	const [isAnalysisModalOpen, setIsAnalysisModalOpen] = useState(false);
 	const [activeVersionName, setActiveVersionName] = useState("");
@@ -38,13 +41,20 @@ function ProjectsPage() {
 		);
 	};
 
-	const fetchProjects = async () => {
-		setIsLoadingProjects(true);
+	const fetchProjects = async (currentPage = 0, reset = false) => {
+		if (reset) setIsLoadingProjects(true);
 		setError(null);
 		try {
-			const data = await getProjects();
-			console.log(data);
-			setProjects(data);
+			const limit = 10;
+			const offset = currentPage * limit;
+			const newProjects = await getProjects(limit, offset);
+			
+			if (reset) {
+				setProjects(newProjects);
+			} else {
+				setProjects((prev) => [...prev, ...newProjects]);
+			}
+			setHasMore(newProjects.length === limit);
 		} catch (error) {
 			setError(
 				error instanceof Error ? error.message : "Error loading projects",
@@ -56,7 +66,7 @@ function ProjectsPage() {
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: pass
 	useEffect(() => {
-		fetchProjects();
+		fetchProjects(0, true);
 	}, []);
 
 	const handleOpenAnaylisisModal = async (
@@ -126,8 +136,18 @@ function ProjectsPage() {
 				</div>
 			</div>
 
-			<div className="bg-base-100 rounded-xl shadow-lg border border-base-300 overflow-hidden">
-				<table className="table table-lg w-full">
+			<InfiniteScroll
+				dataLength={projects.length}
+				next={() => {
+					const nextPg = page + 1;
+					setPage(nextPg);
+					fetchProjects(nextPg);
+				}}
+				hasMore={hasMore}
+				loader={<div className="text-center py-4 text-xl">Loading more...</div>}
+			>
+				<div className="bg-base-100 rounded-xl shadow-lg border border-base-300 overflow-hidden mb-4">
+					<table className="table table-lg w-full">
 					<thead className="bg-base-300 text-2xl uppercase">
 						<tr>
 							<th className="pl-8 py-6">Project Name</th>
@@ -161,6 +181,7 @@ function ProjectsPage() {
 					</tbody>
 				</table>
 			</div>
+			</InfiniteScroll>
 
 			<ProjectAnalysisModal
 				isOpen={isAnalysisModalOpen}
