@@ -34,6 +34,12 @@ def _make_analysis_result(
     duplicate_scripts: int = 2,
     total_combinations: int = 4,
     max_tangling: int = 3,
+    avg_tangling: float = 0.0,
+    avg_scattering: float = 0.0,
+    total_modified_blocks: int = 0,
+    total_definition_changes: int = 0,
+    total_feature_guarded_changes: int = 0,
+    total_ast_pipeline_changes: int = 0,
     blocks_analysis=None,
     detected_features=None,
 ) -> MagicMock:
@@ -43,6 +49,12 @@ def _make_analysis_result(
     ar.duplicate_scripts = duplicate_scripts
     ar.total_combinations = total_combinations
     ar.max_tangling = max_tangling
+    ar.avg_tangling = avg_tangling
+    ar.avg_scattering = avg_scattering
+    ar.total_modified_blocks = total_modified_blocks
+    ar.total_definition_changes = total_definition_changes
+    ar.total_feature_guarded_changes = total_feature_guarded_changes
+    ar.total_ast_pipeline_changes = total_ast_pipeline_changes
     ar.blocks_analysis = blocks_analysis or []
     ar.detected_features = detected_features or []
     return ar
@@ -154,8 +166,8 @@ class TestAnalysisService:
         csv_str = await self.analysis_service.generate_csv_by_session(session_id=1)
         lines = csv_str.strip().splitlines()
         row_values = lines[1].split(",")
-        assert row_values[5].strip() == "3"
-        assert row_values[6].strip() == "2"
+        assert row_values[11].strip() == "3"
+        assert row_values[12].strip() == "2"
 
     async def test_no_versions_returns_none(self):
         project = MagicMock(spec=Project)
