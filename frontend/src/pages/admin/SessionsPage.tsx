@@ -124,22 +124,24 @@ function SessionPage() {
 					<button
 						type="button"
 						onClick={() => setIsModalOpen(true)}
-						className="btn btn-primary btn-lg text-2xl px-8 m-10"
+						className="btn btn-primary btn-lg text-xl px-8 m-10"
 					>
 						Create Session
 					</button>
 
 					<button
 						type="button"
-						className="btn btn-lg btn-primary"
+						className="btn btn-lg text-xl btn-primary"
 						onClick={handleOpenComparisonModal}
 						disabled={selectedSessionsIds.length === 0}
 					>
-						Compare selected
+						Compare
+						{selectedSessionsIds.length > 0 && (
+							<div className="badge badge-neutral badge-lg ml-1 font-bold">
+								{selectedSessionsIds.length}
+							</div>
+						)}
 					</button>
-					<span className="text-base text-base-content/70">
-						{selectedSessionsIds.length} selected
-					</span>
 				</div>
 			</div>
 
@@ -189,6 +191,9 @@ function SessionPage() {
 							<table className="table table-lg w-full">
 							<thead className="bg-base-300 text-2xl uppercase">
 								<tr>
+									<th className="px-4 py-4 w-16 text-center">
+										{/* Checkbox column */}
+									</th>
 									<th className="px-4 py-4 font-bold text-center">
 										Session Name
 									</th>
@@ -203,11 +208,23 @@ function SessionPage() {
 							</thead>
 
 							<tbody className="bg-base-100">
-								{sessions.map((session) => (
+								{sessions.map((session) => {
+									const isSelected = selectedSessionsIds.includes(session.id);
+									return (
 									<tr
 										key={session.id}
-										className="hover:bg-base-200 border-b border-base-200 last:border-b-0"
+										className={`border-b transition-colors last:border-b-0 hover:bg-base-200 ${
+											isSelected ? "bg-primary/10 border-primary" : "border-base-200"
+										}`}
 									>
+										<td className="px-4 py-4 text-center align-middle w-16">
+											<input
+												className="checkbox checkbox-primary checkbox-lg"
+												type="checkbox"
+												checked={isSelected}
+												onChange={() => addId(session.id)}
+											/>
+										</td>
 										<td className="px-4 py-4 text-center">
 											<span className="font-bold text-2xl text-base-content">
 												{session.name}
@@ -244,12 +261,6 @@ function SessionPage() {
 												>
 													View
 												</button>
-												<input
-													className="checkbox"
-													type="checkbox"
-													checked={selectedSessionsIds.includes(session.id)}
-													onChange={() => addId(session.id)}
-												/>
 												{session.isActive && (
 													<button
 														type="button"
@@ -265,7 +276,8 @@ function SessionPage() {
 											</div>
 										</td>
 									</tr>
-								))}
+									);
+								})}
 							</tbody>
 						</table>
 					</div>

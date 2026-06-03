@@ -17,13 +17,7 @@ export interface AnalysisFeedback {
 	improvements: string[];
 	hints: string[];
 	alerts: string[];
-	metrics: AnalysisFeedbackMetrics;
-}
 
-export interface AnalysisFeedbackMetrics {
-	avgTangling: number;
-	avgScattering: number;
-}
 
 interface AnalysisResultBase {
 	feedback: AnalysisFeedback;
@@ -34,6 +28,12 @@ interface AnalysisResultBase {
 	totalCombinations: number;
 	blocksAnalysis: BlockAnalysis[];
 	maxTangling: number;
+	avgTangling: number;
+	avgScattering: number;
+	totalModifiedBlocks: number;
+	totalDefinitionChanges: number;
+	totalFeatureGuardedChanges: number;
+	totalAstPipelineChanges: number;
 	detectedFeatures: DetectedFeature[];
 }
 

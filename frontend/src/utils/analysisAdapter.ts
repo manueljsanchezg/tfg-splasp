@@ -11,6 +11,12 @@ export const savedAnalysisToChartEntry = (
 	duplicationRatio: analysis.duplicationRatio,
 	totalCombinations: analysis.totalCombinations,
 	maxTangling: analysis.maxTangling,
+	avgTangling: analysis.avgTangling,
+	avgScattering: analysis.avgScattering,
+	totalModifiedBlocks: analysis.totalModifiedBlocks,
+	totalDefinitionChanges: analysis.totalDefinitionChanges,
+	totalFeatureGuardedChanges: analysis.totalFeatureGuardedChanges,
+	totalAstPipelineChanges: analysis.totalAstPipelineChanges,
 	isAveraged: false,
 });
 
@@ -22,5 +28,11 @@ export const sessionStatsToChartEntry = (
 	duplicationRatio: session.avgDuplicateScripts / session.avgTotalScripts,
 	totalCombinations: session.avgTotalCombinations,
 	maxTangling: session.avgMaxTangling,
+	avgTangling: session.avgAvgTangling,
+	avgScattering: session.avgAvgScattering,
+	totalModifiedBlocks: session.avgTotalModifiedBlocks,
+	totalDefinitionChanges: session.avgTotalDefinitionChanges,
+	totalFeatureGuardedChanges: session.avgTotalFeatureGuardedChanges,
+	totalAstPipelineChanges: session.avgTotalAstPipelineChanges,
 	isAveraged: true,
 });

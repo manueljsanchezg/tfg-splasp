@@ -128,11 +128,13 @@ function ProjectsPage() {
 						onClick={handleOpenComparisonModal}
 						disabled={selectedVersionIds.length === 0}
 					>
-						Compare selected
+						Compare
+						{selectedVersionIds.length > 0 && (
+							<div className="badge badge-neutral badge-lg ml-1 font-bold">
+								{selectedVersionIds.length}
+							</div>
+						)}
 					</button>
-					<span className="text-base text-base-content/70">
-						{selectedVersionIds.length} selected
-					</span>
 				</div>
 			</div>
 

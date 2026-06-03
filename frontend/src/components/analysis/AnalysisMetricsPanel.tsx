@@ -11,13 +11,18 @@ function AnalysisMetricsPanel({
 	showDetectedFeatures = false,
 }: AnalysisMetricsPanelProps) {
 	const projectLevel = analysis.projectLevel;
-	const duplicateScripts = analysis.duplicateScripts;
 	const duplicationRatio = analysis.duplicationRatio;
 	const totalCombinations = analysis.totalCombinations;
 	const blocks = analysis.blocksAnalysis;
 	const detectedFeatures = analysis.detectedFeatures;
 
 	const maxTangling = analysis.maxTangling;
+	const avgTangling = analysis.avgTangling;
+	const avgScattering = analysis.avgScattering;
+	const totalModifiedBlocks = analysis.totalModifiedBlocks;
+	const totalDefinitionChanges = analysis.totalDefinitionChanges;
+	const totalFeatureGuardedChanges = analysis.totalFeatureGuardedChanges;
+	const totalAstPipelineChanges = analysis.totalAstPipelineChanges;
 	const featuresUsedCount = detectedFeatures.filter((f) => !f.isDead).length;
 	const deadFeaturesCount = detectedFeatures.filter((f) => f.isDead).length;
 	const maxScattering =
@@ -29,7 +34,6 @@ function AnalysisMetricsPanel({
 		<div className="flex w-full flex-col gap-8">
 			<div className="grid w-full grid-cols-4 gap-4">
 				<MetricCard value={projectLevel} label="Project Level" />
-				<MetricCard value={duplicateScripts} label="Duplicate Scripts" />
 				<MetricCard
 					value={`${duplicationRatio.toFixed(1)}%`}
 					label="Duplication Ratio"
@@ -40,8 +44,17 @@ function AnalysisMetricsPanel({
 				{typeof maxTangling === "number" && (
 					<MetricCard value={maxTangling} label="Max Tangling" />
 				)}
+				{typeof avgTangling === "number" && (
+					<MetricCard value={avgTangling.toFixed(2)} label="Avg Tangling" />
+				)}
+				{typeof avgScattering === "number" && (
+					<MetricCard value={avgScattering.toFixed(2)} label="Avg Scattering" />
+				)}
 
-				<MetricCard value={blocks.length} label="Modified Blocks" />
+				<MetricCard value={totalModifiedBlocks} label="Modified Blocks" />
+				<MetricCard value={totalDefinitionChanges} label="Definition Changes" />
+				<MetricCard value={totalFeatureGuardedChanges} label="Cond. Changes" />
+				<MetricCard value={totalAstPipelineChanges} label="AST Pipe Changes" />
 				<MetricCard value={featuresUsedCount} label="Used Features" />
 				<MetricCard value={deadFeaturesCount} label="Dead Features" />
 				<MetricCard value={maxScattering} label="Max Scattering" />

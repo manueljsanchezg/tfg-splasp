@@ -16,13 +16,25 @@ type MetricKey =
 	| "projectLevel"
 	| "duplicationRatio"
 	| "totalCombinations"
-	| "maxTangling";
+	| "maxTangling"
+	| "avgTangling"
+	| "avgScattering"
+	| "totalModifiedBlocks"
+	| "totalDefinitionChanges"
+	| "totalFeatureGuardedChanges"
+	| "totalAstPipelineChanges";
 
 const metricOptions: Array<{ key: MetricKey; label: string }> = [
 	{ key: "projectLevel", label: "Project level" },
 	{ key: "duplicationRatio", label: "Duplication ratio" },
 	{ key: "totalCombinations", label: "Total combinations" },
 	{ key: "maxTangling", label: "Max tangling" },
+	{ key: "avgTangling", label: "Avg tangling" },
+	{ key: "avgScattering", label: "Avg scattering" },
+	{ key: "totalModifiedBlocks", label: "Modified blocks" },
+	{ key: "totalDefinitionChanges", label: "Definition changes" },
+	{ key: "totalFeatureGuardedChanges", label: "Feature guarded changes" },
+	{ key: "totalAstPipelineChanges", label: "AST pipeline changes" },
 ];
 
 interface ComparisonModalProps {
@@ -89,12 +101,12 @@ function ComparisonModal({
 						</div>
 					) : (
 						<div className="flex flex-col gap-6">
-							<div className="join w-fit">
+							<div className="flex flex-wrap justify-center gap-2">
 								{metricOptions.map(({ key, label }) => (
 									<button
 										type="button"
 										key={key}
-										className={`btn join-item ${activeMetric === key ? "btn-primary" : "btn-outline"}`}
+										className={`btn btn-sm ${activeMetric === key ? "btn-primary" : "btn-outline"}`}
 										onClick={() => setActiveMetric(key)}
 									>
 										{useAvgLabels ? `Avg ${label}` : label}

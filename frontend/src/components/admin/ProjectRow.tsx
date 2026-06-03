@@ -72,10 +72,15 @@ function ProjectRow({
 							<p className="text-xl text-base-content/60">No versions found.</p>
 						) : (
 							<div className="flex flex-wrap gap-4">
-								{versions.map((version) => (
+								{versions.map((version) => {
+									const isSelected = selectedVersionIds.includes(version.id);
+									return (
 									<div
 										key={version.id}
-										className="card bg-base-100 shadow-sm border border-base-300 w-72"
+										className={`card shadow-sm border w-72 transition-colors cursor-pointer ${
+											isSelected ? "bg-primary/10 border-primary shadow-md" : "bg-base-100 border-base-300"
+										}`}
+										onClick={() => onAddVersionId(version.id)}
 									>
 										<div className="card-body p-6">
 											<div className="flex flex-row items-center justify-between">
@@ -83,10 +88,10 @@ function ProjectRow({
 													Version {version.versionNumber}
 												</h5>
 												<input
-													className="checkbox"
+													className="checkbox checkbox-primary checkbox-lg"
 													type="checkbox"
-													checked={selectedVersionIds.includes(version.id)}
-													onChange={() => onAddVersionId(version.id)}
+													checked={isSelected}
+													onChange={() => {}}
 												/>
 											</div>
 											<p className="text-lg text-base-content/60 mb-4">
@@ -94,14 +99,18 @@ function ProjectRow({
 											</p>
 											<button
 												type="button"
-												className="btn btn-primary text-lg"
-												onClick={() => onViewAnalysis(version, project.title)}
+												className={`btn text-lg ${isSelected ? "btn-primary" : "btn-outline"}`}
+												onClick={(e) => {
+													e.stopPropagation();
+													onViewAnalysis(version, project.title);
+												}}
 											>
 												View Results
 											</button>
 										</div>
 									</div>
-								))}
+									);
+								})}
 							</div>
 						)}
 					</td>

@@ -119,20 +119,22 @@ function SessionInfoPage() {
 				<div className="flex items-center gap-3">
 					<button
 						type="button"
-						className="btn btn-lg btn-primary"
+						className="btn btn-lg text-xl btn-primary"
 						onClick={handleOpenComparisonModal}
 						disabled={selectedVersionIds.length === 0}
 					>
-						Compare selected
+						Compare
+						{selectedVersionIds.length > 0 && (
+							<div className="badge badge-neutral badge-lg ml-1 font-bold">
+								{selectedVersionIds.length}
+							</div>
+						)}
 					</button>
-					<span className="text-base text-base-content/70">
-						{selectedVersionIds.length} selected
-					</span>
 				</div>
 
 				<button
 					type="button"
-					className="btn btn-lg btn-primary"
+					className="btn btn-lg text-xl btn-primary"
 					onClick={() => setIsZipModalOpen(true)}
 				>
 					Upload projects
@@ -140,7 +142,7 @@ function SessionInfoPage() {
 
 				<button
 					type="button"
-					className="btn btn-lg btn-primary"
+					className="btn btn-lg text-xl btn-primary"
 					onClick={async () => {
 						if (!sessionId) return;
 						await downloadProjectsCSVBySession(Number(sessionId));
