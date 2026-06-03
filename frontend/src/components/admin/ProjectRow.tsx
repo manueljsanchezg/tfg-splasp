@@ -75,40 +75,40 @@ function ProjectRow({
 								{versions.map((version) => {
 									const isSelected = selectedVersionIds.includes(version.id);
 									return (
-									<div
-										key={version.id}
-										className={`card shadow-sm border w-72 transition-colors cursor-pointer ${
-											isSelected ? "bg-primary/10 border-primary shadow-md" : "bg-base-100 border-base-300"
-										}`}
-										onClick={() => onAddVersionId(version.id)}
-									>
-										<div className="card-body p-6">
-											<div className="flex flex-row items-center justify-between">
-												<h5 className="font-bold text-2xl mb-1">
-													Version {version.versionNumber}
-												</h5>
-												<input
-													className="checkbox checkbox-primary checkbox-lg"
-													type="checkbox"
-													checked={isSelected}
-													onChange={() => {}}
-												/>
-											</div>
-											<p className="text-lg text-base-content/60 mb-4">
-												{formatDate(version.uploadedAt)}
-											</p>
+										<div key={version.id} className="flex w-72 flex-col gap-3">
+											<button
+												type="button"
+												className={`card shadow-sm border w-full text-left transition-colors cursor-pointer ${
+													isSelected
+														? "bg-primary/10 border-primary shadow-md"
+														: "bg-base-100 border-base-300"
+												}`}
+												onClick={() => onAddVersionId(version.id)}
+											>
+												<div className="card-body p-6">
+													<div className="flex flex-row items-center justify-between gap-4">
+														<h5 className="font-bold text-2xl mb-1">
+															Version {version.versionNumber}
+														</h5>
+														<span
+															className={`badge badge-lg ${isSelected ? "badge-primary" : "badge-outline"}`}
+														>
+															{isSelected ? "Selected" : "Select"}
+														</span>
+													</div>
+													<p className="text-lg text-base-content/60 mb-4">
+														{formatDate(version.uploadedAt)}
+													</p>
+												</div>
+											</button>
 											<button
 												type="button"
 												className={`btn text-lg ${isSelected ? "btn-primary" : "btn-outline"}`}
-												onClick={(e) => {
-													e.stopPropagation();
-													onViewAnalysis(version, project.title);
-												}}
+												onClick={() => onViewAnalysis(version, project.title)}
 											>
 												View Results
 											</button>
 										</div>
-									</div>
 									);
 								})}
 							</div>

@@ -48,7 +48,7 @@ function ProjectsPage() {
 			const limit = 10;
 			const offset = currentPage * limit;
 			const newProjects = await getProjects(limit, offset);
-			
+
 			if (reset) {
 				setProjects(newProjects);
 			} else {
@@ -150,39 +150,39 @@ function ProjectsPage() {
 			>
 				<div className="bg-base-100 rounded-xl shadow-lg border border-base-300 overflow-hidden mb-4">
 					<table className="table table-lg w-full">
-					<thead className="bg-base-300 text-2xl uppercase">
-						<tr>
-							<th className="pl-8 py-6">Project Name</th>
-							<th className="text-center pr-8 w-64 py-6">Created At</th>
-						</tr>
-					</thead>
-					<tbody>
-						{isLoadingProjects ? (
+						<thead className="bg-base-300 text-2xl uppercase">
 							<tr>
-								<td colSpan={2} className="text-center py-12 text-2xl">
-									Loading...
-								</td>
+								<th className="pl-8 py-6">Project Name</th>
+								<th className="text-center pr-8 w-64 py-6">Created At</th>
 							</tr>
-						) : projects.length === 0 ? (
-							<tr>
-								<td colSpan={2} className="text-center py-12 text-2xl">
-									No projects found.
-								</td>
-							</tr>
-						) : (
-							projects.map((project) => (
-								<ProjectRow
-									key={project.id}
-									project={project}
-									onViewAnalysis={handleOpenAnaylisisModal}
-									onAddVersionId={addVersionId}
-									selectedVersionIds={selectedVersionIds}
-								/>
-							))
-						)}
-					</tbody>
-				</table>
-			</div>
+						</thead>
+						<tbody>
+							{isLoadingProjects ? (
+								<tr>
+									<td colSpan={2} className="text-center py-12 text-2xl">
+										Loading...
+									</td>
+								</tr>
+							) : projects.length === 0 ? (
+								<tr>
+									<td colSpan={2} className="text-center py-12 text-2xl">
+										No projects found.
+									</td>
+								</tr>
+							) : (
+								projects.map((project) => (
+									<ProjectRow
+										key={project.id}
+										project={project}
+										onViewAnalysis={handleOpenAnaylisisModal}
+										onAddVersionId={addVersionId}
+										selectedVersionIds={selectedVersionIds}
+									/>
+								))
+							)}
+						</tbody>
+					</table>
+				</div>
 			</InfiniteScroll>
 
 			<ProjectAnalysisModal

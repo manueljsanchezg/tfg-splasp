@@ -44,7 +44,7 @@ function SessionPage() {
 			const limit = 10;
 			const offset = currentPage * limit;
 			const newSessions = await getAllSessions(limit, offset);
-			
+
 			if (reset) {
 				setSessions(newSessions);
 			} else {
@@ -184,104 +184,116 @@ function SessionPage() {
 						getSessions(nextPg);
 					}}
 					hasMore={hasMore}
-					loader={<div className="text-center py-4 text-xl">Loading more...</div>}
+					loader={
+						<div className="text-center py-4 text-xl">Loading more...</div>
+					}
 				>
 					<div className="w-4/5 bg-base-100 rounded-xl shadow-lg border border-base-300 overflow-hidden mx-auto mb-4">
 						<div className="overflow-x-auto">
 							<table className="table table-lg w-full">
-							<thead className="bg-base-300 text-2xl uppercase">
-								<tr>
-									<th className="px-4 py-4 w-16 text-center">
-										{/* Checkbox column */}
-									</th>
-									<th className="px-4 py-4 font-bold text-center">
-										Session Name
-									</th>
-									<th className="px-4 py-4 font-bold text-center">Code</th>
-									<th className="px-4 py-4 font-bold text-center">
-										Start Date
-									</th>
-									<th className="px-4 py-4 font-bold text-center">End Date</th>
-									<th className="px-4 py-4 font-bold text-center">Status</th>
-									<th className="px-4 py-4 font-bold text-center">Actions</th>
-								</tr>
-							</thead>
-
-							<tbody className="bg-base-100">
-								{sessions.map((session) => {
-									const isSelected = selectedSessionsIds.includes(session.id);
-									return (
-									<tr
-										key={session.id}
-										className={`border-b transition-colors last:border-b-0 hover:bg-base-200 ${
-											isSelected ? "bg-primary/10 border-primary" : "border-base-200"
-										}`}
-									>
-										<td className="px-4 py-4 text-center align-middle w-16">
-											<input
-												className="checkbox checkbox-primary checkbox-lg"
-												type="checkbox"
-												checked={isSelected}
-												onChange={() => addId(session.id)}
-											/>
-										</td>
-										<td className="px-4 py-4 text-center">
-											<span className="font-bold text-2xl text-base-content">
-												{session.name}
-											</span>
-										</td>
-										<td className="px-4 py-4 text-center">
-											<code className="bg-base-300/50 px-3 py-1 rounded-lg text-xl font-semibold text-base-content">
-												{session.code}
-											</code>
-										</td>
-										<td className="px-4 py-4 text-center text-base-content font-medium text-xl">
-											{new Date(session.startDate).toLocaleDateString("es-ES")}
-										</td>
-										<td className="px-4 py-4 text-center text-base-content font-medium text-xl">
-											{new Date(session.endDate).toLocaleDateString("es-ES")}
-										</td>
-										<td className="px-4 py-4 text-center">
-											{session.isActive ? (
-												<span className="badge badge-success badge-xl text-xl font-bold w-30 justify-center">
-													Active
-												</span>
-											) : (
-												<span className="badge badge-neutral badge-xl text-xl font-bold w-30 justify-center">
-													Inactive
-												</span>
-											)}
-										</td>
-										<td className="px-4 py-4 text-center text-xl">
-											<div className="flex flex-col gap-2 items-center justify-center">
-												<button
-													type="button"
-													className="btn btn-info text-xl w-full"
-													onClick={() => navigate(`/sessions/${session.id}`)}
-												>
-													View
-												</button>
-												{session.isActive && (
-													<button
-														type="button"
-														className="btn btn-warning text-xl w-full"
-														onClick={() => handleDeactivate(session.id)}
-													>
-														Deactivate
-													</button>
-												)}
-												{!session.isActive && (
-													<span className="text-base-content/50">—</span>
-												)}
-											</div>
-										</td>
+								<thead className="bg-base-300 text-2xl uppercase">
+									<tr>
+										<th className="px-4 py-4 w-16 text-center">
+											{/* Checkbox column */}
+										</th>
+										<th className="px-4 py-4 font-bold text-center">
+											Session Name
+										</th>
+										<th className="px-4 py-4 font-bold text-center">Code</th>
+										<th className="px-4 py-4 font-bold text-center">
+											Start Date
+										</th>
+										<th className="px-4 py-4 font-bold text-center">
+											End Date
+										</th>
+										<th className="px-4 py-4 font-bold text-center">Status</th>
+										<th className="px-4 py-4 font-bold text-center">Actions</th>
 									</tr>
-									);
-								})}
-							</tbody>
-						</table>
+								</thead>
+
+								<tbody className="bg-base-100">
+									{sessions.map((session) => {
+										const isSelected = selectedSessionsIds.includes(session.id);
+										return (
+											<tr
+												key={session.id}
+												className={`border-b transition-colors last:border-b-0 hover:bg-base-200 ${
+													isSelected
+														? "bg-primary/10 border-primary"
+														: "border-base-200"
+												}`}
+											>
+												<td className="px-4 py-4 text-center align-middle w-16">
+													<input
+														className="checkbox checkbox-primary checkbox-lg"
+														type="checkbox"
+														checked={isSelected}
+														onChange={() => addId(session.id)}
+													/>
+												</td>
+												<td className="px-4 py-4 text-center">
+													<span className="font-bold text-2xl text-base-content">
+														{session.name}
+													</span>
+												</td>
+												<td className="px-4 py-4 text-center">
+													<code className="bg-base-300/50 px-3 py-1 rounded-lg text-xl font-semibold text-base-content">
+														{session.code}
+													</code>
+												</td>
+												<td className="px-4 py-4 text-center text-base-content font-medium text-xl">
+													{new Date(session.startDate).toLocaleDateString(
+														"es-ES",
+													)}
+												</td>
+												<td className="px-4 py-4 text-center text-base-content font-medium text-xl">
+													{new Date(session.endDate).toLocaleDateString(
+														"es-ES",
+													)}
+												</td>
+												<td className="px-4 py-4 text-center">
+													{session.isActive ? (
+														<span className="badge badge-success badge-xl text-xl font-bold w-30 justify-center">
+															Active
+														</span>
+													) : (
+														<span className="badge badge-neutral badge-xl text-xl font-bold w-30 justify-center">
+															Inactive
+														</span>
+													)}
+												</td>
+												<td className="px-4 py-4 text-center text-xl">
+													<div className="flex flex-col gap-2 items-center justify-center">
+														<button
+															type="button"
+															className="btn btn-info text-xl w-full"
+															onClick={() =>
+																navigate(`/sessions/${session.id}`)
+															}
+														>
+															View
+														</button>
+														{session.isActive && (
+															<button
+																type="button"
+																className="btn btn-warning text-xl w-full"
+																onClick={() => handleDeactivate(session.id)}
+															>
+																Deactivate
+															</button>
+														)}
+														{!session.isActive && (
+															<span className="text-base-content/50">—</span>
+														)}
+													</div>
+												</td>
+											</tr>
+										);
+									})}
+								</tbody>
+							</table>
+						</div>
 					</div>
-				</div>
 				</InfiniteScroll>
 			)}
 

@@ -22,8 +22,6 @@ class DetectedFeatureRead(BaseModelCamel):
     scattering_count: int
 
 
-
-
 class AnalysisFeedback(BaseModelCamel):
     label: str
     summary: str

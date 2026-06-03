@@ -10,9 +10,12 @@ import type {
 } from "../types/session";
 import { api } from "./api";
 
-export const getAllSessions = async (limit = 10, offset = 0): Promise<SessionResponse[]> => {
+export const getAllSessions = async (
+	limit = 10,
+	offset = 0,
+): Promise<SessionResponse[]> => {
 	const response = await api.get<ApiResponse<SessionResponse[]>>("/sessions", {
-		params: { limit, offset }
+		params: { limit, offset },
 	});
 	if (!response.data.data) {
 		throw new Error("Invalid sessions response");

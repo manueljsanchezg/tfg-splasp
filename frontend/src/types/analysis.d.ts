@@ -17,7 +17,7 @@ export interface AnalysisFeedback {
 	improvements: string[];
 	hints: string[];
 	alerts: string[];
-
+}
 
 interface AnalysisResultBase {
 	feedback: AnalysisFeedback;

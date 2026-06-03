@@ -145,10 +145,16 @@ class AnalysisService:
             "avg_max_tangling": sum(a.max_tangling for a in analyses) / len(analyses),
             "avg_avg_tangling": sum(a.avg_tangling for a in analyses) / len(analyses),
             "avg_avg_scattering": sum(a.avg_scattering for a in analyses) / len(analyses),
-            "avg_total_modified_blocks": sum(a.total_modified_blocks for a in analyses) / len(analyses),
-            "avg_total_definition_changes": sum(a.total_definition_changes for a in analyses) / len(analyses),
-            "avg_total_feature_guarded_changes": sum(a.total_feature_guarded_changes for a in analyses) / len(analyses),
-            "avg_total_ast_pipeline_changes": sum(a.total_ast_pipeline_changes for a in analyses) / len(analyses),
+            "avg_total_modified_blocks": sum(a.total_modified_blocks for a in analyses)
+            / len(analyses),
+            "avg_total_definition_changes": sum(a.total_definition_changes for a in analyses)
+            / len(analyses),
+            "avg_total_feature_guarded_changes": sum(
+                a.total_feature_guarded_changes for a in analyses
+            )
+            / len(analyses),
+            "avg_total_ast_pipeline_changes": sum(a.total_ast_pipeline_changes for a in analyses)
+            / len(analyses),
         }
 
     async def _build_analysis_project(

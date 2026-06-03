@@ -32,7 +32,9 @@ class ProjectRepository(BaseRepository[Project]):
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none()
 
-    async def find_with_versions(self, limit: Optional[int] = None, offset: Optional[int] = None) -> List[Project]:
+    async def find_with_versions(
+        self, limit: Optional[int] = None, offset: Optional[int] = None
+    ) -> List[Project]:
         stmt = (
             select(Project)
             .where(Project.project_versions.any())

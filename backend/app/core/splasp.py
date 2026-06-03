@@ -911,8 +911,12 @@ class ProjectAnalyzer:
             avg_scattering=avg_scattering,
             total_modified_blocks=len(self.blocks),
             total_definition_changes=sum(st.definition_changes for st in self.blocks.values()),
-            total_feature_guarded_changes=sum(st.feature_guarded_definition_changes for st in self.blocks.values()),
-            total_ast_pipeline_changes=sum(st.ast_pipeline_definition_changes for st in self.blocks.values()),
+            total_feature_guarded_changes=sum(
+                st.feature_guarded_definition_changes for st in self.blocks.values()
+            ),
+            total_ast_pipeline_changes=sum(
+                st.ast_pipeline_definition_changes for st in self.blocks.values()
+            ),
         )
 
 
