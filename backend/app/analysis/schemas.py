@@ -22,10 +22,6 @@ class DetectedFeatureRead(BaseModelCamel):
     scattering_count: int
 
 
-class AnalysisFeedbackMetrics(BaseModelCamel):
-    avg_tangling: float
-    avg_scattering: float
-    max_tangling: Optional[int] = None
 
 
 class AnalysisFeedback(BaseModelCamel):
@@ -35,7 +31,6 @@ class AnalysisFeedback(BaseModelCamel):
     improvements: List[str]
     hints: List[str]
     alerts: List[str]
-    metrics: AnalysisFeedbackMetrics
 
 
 class AnalysisResultBase(BaseModelCamel):
@@ -47,6 +42,12 @@ class AnalysisResultBase(BaseModelCamel):
     duplication_ratio: float
     total_combinations: int
     max_tangling: int
+    avg_tangling: float
+    avg_scattering: float
+    total_modified_blocks: int
+    total_definition_changes: int
+    total_feature_guarded_changes: int
+    total_ast_pipeline_changes: int
     detected_features: List[DetectedFeatureRead]
 
 

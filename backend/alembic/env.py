@@ -12,6 +12,7 @@ from app.db import Base
 from app.project import models as project_models
 from app.session import models as session_models
 from app.user import models as user_models
+from app.analysis import models as analysis_models
 
 load_dotenv()
 

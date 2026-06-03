@@ -18,6 +18,12 @@ class AnalysisResult(Base):
     duplicate_scripts: Mapped[int] = mapped_column()
     total_combinations: Mapped[int] = mapped_column()
     max_tangling: Mapped[int] = mapped_column()
+    avg_tangling: Mapped[float] = mapped_column(server_default="0.0")
+    avg_scattering: Mapped[float] = mapped_column(server_default="0.0")
+    total_modified_blocks: Mapped[int] = mapped_column(server_default="0")
+    total_definition_changes: Mapped[int] = mapped_column(server_default="0")
+    total_feature_guarded_changes: Mapped[int] = mapped_column(server_default="0")
+    total_ast_pipeline_changes: Mapped[int] = mapped_column(server_default="0")
 
     project_versions_id: Mapped[int] = mapped_column(ForeignKey("project_versions.id"), unique=True)
     project_version: Mapped["ProjectVersion"] = relationship(

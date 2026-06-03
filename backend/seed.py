@@ -1,13 +1,17 @@
 import asyncio
+import copy
 from datetime import datetime, timedelta, timezone
+import random
 
 from sqlalchemy import select
 
 from app.db import async_session
-from app.project.models import (
+from app.analysis.models import (
     AnalysisResult,
     BlockAnalysis,
     DetectedFeature,
+)
+from app.project.models import (
     Project,
     ProjectVersion,
 )
@@ -182,6 +186,12 @@ async def seed_project(db_session, db_project_session, project_data: dict):
             duplicate_scripts=version_data["duplicate_scripts"],
             total_combinations=version_data["total_combinations"],
             max_tangling=max(version_data["tangling_dict"].values()) if version_data["tangling_dict"] else 0,
+            avg_tangling=version_data.get("avg_tangling", 1.5),
+            avg_scattering=version_data.get("avg_scattering", 2.0),
+            total_modified_blocks=version_data.get("total_modified_blocks", len(new_blocks)),
+            total_definition_changes=version_data.get("total_definition_changes", sum(b.definition_changes for b in new_blocks)),
+            total_feature_guarded_changes=version_data.get("total_feature_guarded_changes", sum(b.feature_guarded_definition_changes for b in new_blocks)),
+            total_ast_pipeline_changes=version_data.get("total_ast_pipeline_changes", sum(b.ast_pipeline_definition_changes for b in new_blocks)),
             blocks_analysis=new_blocks,
             detected_features=new_features,
         )
@@ -221,6 +231,26 @@ async def seed():
 
         for project_data in projects:
             await seed_project(db_session, seeded_session, project_data)
+
+        base_saludar = next(p for p in projects if p["title"] == "saludar")
+        for i in range(1, 21):
+            varied_project = copy.deepcopy(base_saludar)
+            varied_project["title"] = f"saludar_student_{i}"
+            varied_project["device_id"] = f"device-student-{i}"
+            
+            for version in varied_project["versions"]:
+                version["project_level"] = random.choice([1, 2, 3])
+                version["total_scripts"] = random.randint(15, 30)
+                version["duplicate_scripts"] = random.randint(2, 10)
+                version["total_combinations"] = random.randint(4, 20)
+                version["avg_tangling"] = round(random.uniform(1.0, 3.5), 2)
+                version["avg_scattering"] = round(random.uniform(1.0, 4.0), 2)
+                version["total_modified_blocks"] = random.randint(1, 6)
+                version["total_definition_changes"] = random.randint(0, 5)
+                version["total_feature_guarded_changes"] = random.randint(0, 4)
+                version["total_ast_pipeline_changes"] = random.randint(0, 2)
+                
+            await seed_project(db_session, seeded_session, varied_project)
 
         await db_session.commit()
 

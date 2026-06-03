@@ -91,6 +91,12 @@ class AnalysisService:
                 "duplicate_scripts",
                 "total_combinations",
                 "max_tangling",
+                "avg_tangling",
+                "avg_scattering",
+                "total_modified_blocks",
+                "total_definition_changes",
+                "total_feature_guarded_changes",
+                "total_ast_pipeline_changes",
                 "detected_features",
                 "dead_features",
             ]
@@ -104,6 +110,12 @@ class AnalysisService:
                     analysis.duplicate_scripts,
                     analysis.total_combinations,
                     analysis.max_tangling,
+                    analysis.avg_tangling,
+                    analysis.avg_scattering,
+                    analysis.total_modified_blocks,
+                    analysis.total_definition_changes,
+                    analysis.total_feature_guarded_changes,
+                    analysis.total_ast_pipeline_changes,
                     len(analysis.detected_features),
                     sum(1 for f in analysis.detected_features if f.is_dead),
                 ]
@@ -131,6 +143,12 @@ class AnalysisService:
             "avg_duplicate_scripts": sum(a.duplicate_scripts for a in analyses) / len(analyses),
             "avg_total_combinations": sum(a.total_combinations for a in analyses) / len(analyses),
             "avg_max_tangling": sum(a.max_tangling for a in analyses) / len(analyses),
+            "avg_avg_tangling": sum(a.avg_tangling for a in analyses) / len(analyses),
+            "avg_avg_scattering": sum(a.avg_scattering for a in analyses) / len(analyses),
+            "avg_total_modified_blocks": sum(a.total_modified_blocks for a in analyses) / len(analyses),
+            "avg_total_definition_changes": sum(a.total_definition_changes for a in analyses) / len(analyses),
+            "avg_total_feature_guarded_changes": sum(a.total_feature_guarded_changes for a in analyses) / len(analyses),
+            "avg_total_ast_pipeline_changes": sum(a.total_ast_pipeline_changes for a in analyses) / len(analyses),
         }
 
     async def _build_analysis_project(
@@ -165,6 +183,12 @@ class AnalysisService:
             duplicate_scripts=result.duplicate_scripts,
             total_combinations=result.total_combinations,
             max_tangling=max(result.tangling_dict.values()) if result.tangling_dict else 0,
+            avg_tangling=result.avg_tangling,
+            avg_scattering=result.avg_scattering,
+            total_modified_blocks=result.total_modified_blocks,
+            total_definition_changes=result.total_definition_changes,
+            total_feature_guarded_changes=result.total_feature_guarded_changes,
+            total_ast_pipeline_changes=result.total_ast_pipeline_changes,
             blocks_analysis=new_blocks,
             detected_features=new_features,
         )
@@ -250,12 +274,14 @@ class AnalysisResultService(BaseService[AnalysisResult, AnalysisResultRepository
             tangling_dict={},
             scattering_dict=scattering_dict,
             dead_features=dead_features,
+            avg_tangling=analysis.avg_tangling,
+            avg_scattering=analysis.avg_scattering,
+            total_modified_blocks=analysis.total_modified_blocks,
+            total_definition_changes=analysis.total_definition_changes,
+            total_feature_guarded_changes=analysis.total_feature_guarded_changes,
+            total_ast_pipeline_changes=analysis.total_ast_pipeline_changes,
         )
         feedback = splasp_result.to_json_dict()["feedback"]
-
-        metrics = feedback.get("metrics", {})
-        metrics["max_tangling"] = analysis.max_tangling
-        feedback["metrics"] = metrics
 
         return feedback
 

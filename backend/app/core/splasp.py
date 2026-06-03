@@ -78,6 +78,12 @@ class AnalysisResult:
     tangling_dict: Dict[int, int] = field(default_factory=dict)
     scattering_dict: Dict[str, Set[int]] = field(default_factory=dict)
     dead_features: Set[str] = field(default_factory=set)
+    avg_tangling: float = 0.0
+    avg_scattering: float = 0.0
+    total_modified_blocks: int = 0
+    total_definition_changes: int = 0
+    total_feature_guarded_changes: int = 0
+    total_ast_pipeline_changes: int = 0
 
     def to_json_dict(self) -> dict:
         feedback = _build_feedback(self)
@@ -116,6 +122,12 @@ class AnalysisResult:
             "scattering_dict": self.scattering_dict,
             "dead_features": self.dead_features,
             "max_tangling": max_tangling,
+            "avg_tangling": self.avg_tangling,
+            "avg_scattering": self.avg_scattering,
+            "total_modified_blocks": self.total_modified_blocks,
+            "total_definition_changes": self.total_definition_changes,
+            "total_feature_guarded_changes": self.total_feature_guarded_changes,
+            "total_ast_pipeline_changes": self.total_ast_pipeline_changes,
             "detected_features": detected_features,
         }
 
@@ -880,6 +892,10 @@ class ProjectAnalyzer:
 
         dead_features = self.configured_vars - set(scattering_dict.keys())
 
+        avg_tangling = round(_safe_mean(list(tangling_dict.values())), 2)
+        scattering_sizes = [len(s) for s in scattering_dict.values()]
+        avg_scattering = round(_safe_mean(scattering_sizes), 2)
+
         return AnalysisResult(
             project_level=max_level,
             blocks=self.blocks,
@@ -891,6 +907,12 @@ class ProjectAnalyzer:
             tangling_dict=tangling_dict,
             scattering_dict=scattering_dict,
             dead_features=dead_features,
+            avg_tangling=avg_tangling,
+            avg_scattering=avg_scattering,
+            total_modified_blocks=len(self.blocks),
+            total_definition_changes=sum(st.definition_changes for st in self.blocks.values()),
+            total_feature_guarded_changes=sum(st.feature_guarded_definition_changes for st in self.blocks.values()),
+            total_ast_pipeline_changes=sum(st.ast_pipeline_definition_changes for st in self.blocks.values()),
         )
 
 
@@ -1153,11 +1175,6 @@ def _build_feedback(result: AnalysisResult) -> dict:
             "Think carefully about whether you need that many options or if you can simplify the user settings",
         )
 
-    metrics = {
-        "avg_tangling": round(avg_tangling, 2),
-        "avg_scattering": round(avg_scattering, 2),
-    }
-
     return {
         "label": base.get("label", "Unknown Level"),
         "summary": base.get("summary", "No summary available."),
@@ -1165,7 +1182,6 @@ def _build_feedback(result: AnalysisResult) -> dict:
         "improvements": improvements,
         "hints": hints,
         "alerts": alerts,
-        "metrics": metrics,
     }
 
 
