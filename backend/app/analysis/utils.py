@@ -71,7 +71,6 @@ async def get_content_from_project_url(project_url: str):
 def _extract_link_from_html(content: bytes) -> Optional[str]:
     tree = HTMLParser(content)
     node = tree.css_first("a.btn.btn-outline-primary.download[download]")
-
     if node:
         return node.attributes.get("href")
     return None
@@ -84,7 +83,6 @@ def _extract_and_parse_zip(content: bytes):
             if (
                 file_path.endswith("/")
                 or not file_path.lower().endswith(".xml")
-                or "__MACOSX" in file_path
             ):
                 continue
             xml = zip_file.read(file_path)
@@ -99,7 +97,6 @@ def _extract_and_parse_zip(content: bytes):
 
 
 async def get_roots_from_zip(zip_file: UploadFile):
-    # Read at most MAX_ZIP_BYTES + 1 to detect oversize
     content = await zip_file.read(MAX_ZIP_BYTES + 1)
     if len(content) > MAX_ZIP_BYTES:
         raise HTTPException(status_code=413, detail="Archive file too large")
