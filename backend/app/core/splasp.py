@@ -236,6 +236,17 @@ def parse_snap_xml(path: str | Path) -> ET.Element:
     return root
 
 
+def clean_snap_root(root: ET.Element) -> ET.Element:
+    """Clean an already-parsed Snap! project XML root.
+
+    Clears large subtrees (thumbnail/media/costumes/sounds) to reduce memory usage.
+    """
+    for elem in root.iter():
+        if elem.tag in HEAVY_TAGS:
+            elem.clear()
+    return root
+
+
 # ---------------------------------------------------------------------------
 # Snap! XML utilities
 # ---------------------------------------------------------------------------
@@ -1198,6 +1209,7 @@ def _build_feedback(result: AnalysisResult) -> dict:
 
 def analyze_project(root: ET.Element, config: Optional[AnalysisConfig] = None) -> AnalysisResult:
     """Analyze a Snap! project XML tree."""
+    clean_snap_root(root)
     analyzer = ProjectAnalyzer(root, config)
     return analyzer.analyze()
 
