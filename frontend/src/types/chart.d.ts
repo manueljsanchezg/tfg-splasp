@@ -4,6 +4,7 @@ export interface ChartEntry {
 	duplicationRatio: number;
 	totalCombinations: number;
 	maxTangling: number;
+	maxScattering: number;
 	avgTangling: number;
 	avgScattering: number;
 	totalModifiedBlocks: number;

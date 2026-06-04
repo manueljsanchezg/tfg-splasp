@@ -28,6 +28,7 @@ interface AnalysisResultBase {
 	totalCombinations: number;
 	blocksAnalysis: BlockAnalysis[];
 	maxTangling: number;
+	maxScattering: number;
 	avgTangling: number;
 	avgScattering: number;
 	totalModifiedBlocks: number;

@@ -16,7 +16,6 @@ type MetricKey =
 	| "projectLevel"
 	| "duplicationRatio"
 	| "totalCombinations"
-	| "maxTangling"
 	| "avgTangling"
 	| "avgScattering"
 	| "totalModifiedBlocks"
@@ -28,7 +27,6 @@ const metricOptions: Array<{ key: MetricKey; label: string }> = [
 	{ key: "projectLevel", label: "Project level" },
 	{ key: "duplicationRatio", label: "Duplication ratio" },
 	{ key: "totalCombinations", label: "Total combinations" },
-	{ key: "maxTangling", label: "Max tangling" },
 	{ key: "avgTangling", label: "Avg tangling" },
 	{ key: "avgScattering", label: "Avg scattering" },
 	{ key: "totalModifiedBlocks", label: "Modified blocks" },

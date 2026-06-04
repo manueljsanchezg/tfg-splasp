@@ -18,6 +18,7 @@ class AnalysisResult(Base):
     duplicate_scripts: Mapped[int] = mapped_column()
     total_combinations: Mapped[int] = mapped_column()
     max_tangling: Mapped[int] = mapped_column()
+    max_scattering: Mapped[int] = mapped_column(server_default="0")
     avg_tangling: Mapped[float] = mapped_column(server_default="0.0")
     avg_scattering: Mapped[float] = mapped_column(server_default="0.0")
     total_modified_blocks: Mapped[int] = mapped_column(server_default="0")

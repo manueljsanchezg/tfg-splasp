@@ -37,3 +37,4 @@ class SessionAnalysisStats(BaseModelCamel):
     avg_duplicate_scripts: float
     avg_total_combinations: float
     avg_max_tangling: float
+    avg_max_scattering: float

@@ -36,6 +36,7 @@ export interface SessionAnalysisStats {
 	avgDuplicateScripts: float;
 	avgTotalCombinations: float;
 	avgMaxTangling: float;
+	avgMaxScattering: float;
 	avgAvgTangling: float;
 	avgAvgScattering: float;
 	avgTotalModifiedBlocks: float;

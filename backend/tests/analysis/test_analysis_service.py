@@ -34,6 +34,7 @@ def _make_analysis_result(
     duplicate_scripts: int = 2,
     total_combinations: int = 4,
     max_tangling: int = 3,
+    max_scattering: int = 2,
     avg_tangling: float = 0.0,
     avg_scattering: float = 0.0,
     total_modified_blocks: int = 0,
@@ -49,6 +50,7 @@ def _make_analysis_result(
     ar.duplicate_scripts = duplicate_scripts
     ar.total_combinations = total_combinations
     ar.max_tangling = max_tangling
+    ar.max_scattering = max_scattering
     ar.avg_tangling = avg_tangling
     ar.avg_scattering = avg_scattering
     ar.total_modified_blocks = total_modified_blocks
@@ -166,8 +168,8 @@ class TestAnalysisService:
         csv_str = await self.analysis_service.generate_csv_by_session(session_id=1)
         lines = csv_str.strip().splitlines()
         row_values = lines[1].split(",")
-        assert row_values[11].strip() == "3"
-        assert row_values[12].strip() == "2"
+        assert row_values[12].strip() == "3"
+        assert row_values[13].strip() == "2"
 
     async def test_no_versions_returns_none(self):
         project = MagicMock(spec=Project)

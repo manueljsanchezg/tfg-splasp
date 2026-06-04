@@ -186,6 +186,7 @@ async def seed_project(db_session, db_project_session, project_data: dict):
             duplicate_scripts=version_data["duplicate_scripts"],
             total_combinations=version_data["total_combinations"],
             max_tangling=max(version_data["tangling_dict"].values()) if version_data["tangling_dict"] else 0,
+            max_scattering=max(version_data["features"].values()) if version_data["features"] else 0,
             avg_tangling=version_data.get("avg_tangling", 1.5),
             avg_scattering=version_data.get("avg_scattering", 2.0),
             total_modified_blocks=version_data.get("total_modified_blocks", len(new_blocks)),

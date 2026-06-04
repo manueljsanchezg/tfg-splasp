@@ -40,6 +40,7 @@ class AnalysisResultBase(BaseModelCamel):
     duplication_ratio: float
     total_combinations: int
     max_tangling: int
+    max_scattering: int
     avg_tangling: float
     avg_scattering: float
     total_modified_blocks: int

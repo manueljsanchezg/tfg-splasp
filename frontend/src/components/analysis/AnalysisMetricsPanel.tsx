@@ -25,10 +25,7 @@ function AnalysisMetricsPanel({
 	const totalAstPipelineChanges = analysis.totalAstPipelineChanges;
 	const featuresUsedCount = detectedFeatures.filter((f) => !f.isDead).length;
 	const deadFeaturesCount = detectedFeatures.filter((f) => f.isDead).length;
-	const maxScattering =
-		detectedFeatures.length > 0
-			? Math.max(...detectedFeatures.map((f) => f.scatteringCount))
-			: 0;
+	const maxScattering = analysis.maxScattering;
 
 	return (
 		<div className="flex w-full flex-col gap-8">

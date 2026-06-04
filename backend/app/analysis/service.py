@@ -91,6 +91,7 @@ class AnalysisService:
                 "duplicate_scripts",
                 "total_combinations",
                 "max_tangling",
+                "max_scattering",
                 "avg_tangling",
                 "avg_scattering",
                 "total_modified_blocks",
@@ -110,6 +111,7 @@ class AnalysisService:
                     analysis.duplicate_scripts,
                     analysis.total_combinations,
                     analysis.max_tangling,
+                    analysis.max_scattering,
                     analysis.avg_tangling,
                     analysis.avg_scattering,
                     analysis.total_modified_blocks,
@@ -143,6 +145,7 @@ class AnalysisService:
             "avg_duplicate_scripts": sum(a.duplicate_scripts for a in analyses) / len(analyses),
             "avg_total_combinations": sum(a.total_combinations for a in analyses) / len(analyses),
             "avg_max_tangling": sum(a.max_tangling for a in analyses) / len(analyses),
+            "avg_max_scattering": sum(a.max_scattering for a in analyses) / len(analyses),
             "avg_avg_tangling": sum(a.avg_tangling for a in analyses) / len(analyses),
             "avg_avg_scattering": sum(a.avg_scattering for a in analyses) / len(analyses),
             "avg_total_modified_blocks": sum(a.total_modified_blocks for a in analyses)
@@ -189,6 +192,9 @@ class AnalysisService:
             duplicate_scripts=result.duplicate_scripts,
             total_combinations=result.total_combinations,
             max_tangling=max(result.tangling_dict.values()) if result.tangling_dict else 0,
+            max_scattering=max(len(s) for s in result.scattering_dict.values())
+            if result.scattering_dict
+            else 0,
             avg_tangling=result.avg_tangling,
             avg_scattering=result.avg_scattering,
             total_modified_blocks=result.total_modified_blocks,
