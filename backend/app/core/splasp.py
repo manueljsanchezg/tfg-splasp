@@ -70,7 +70,6 @@ class AnalysisResult:
     project_level: int
     blocks: Dict[BlockKey, BlockStats]
     unknown_events: List[UnknownEvent] = field(default_factory=list)
-
     total_scripts: int = 0
     duplicate_scripts: int = 0
     duplication_ratio: float = 0
