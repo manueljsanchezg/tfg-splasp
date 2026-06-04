@@ -88,7 +88,6 @@ def _extract_and_parse_zip(content: bytes):
             ):
                 continue
             xml = zip_file.read(file_path)
-            # protect against very large xml files inside the archive
             if len(xml) > MAX_XML_BYTES:
                 raise HTTPException(
                     status_code=413, detail=f"XML inside archive too large: {file_path}"
