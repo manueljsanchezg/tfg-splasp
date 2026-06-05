@@ -1,5 +1,5 @@
 // ComparisonModal.tsx
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import {
 	Bar,
 	BarChart,
@@ -56,15 +56,10 @@ function ComparisonModal({
 
 	const useAvgLabels = metrics.some((e) => e.isAveraged);
 
-	const activeLabel = useMemo(() => {
-		const base = metricOptions.find((o) => o.key === activeMetric)?.label ?? "";
-		return useAvgLabels ? `Avg ${base}` : base;
-	}, [activeMetric, useAvgLabels]);
+	const base = metricOptions.find((o) => o.key === activeMetric)?.label ?? "";
+	const activeLabel = useAvgLabels ? `Avg ${base}` : base;
 
-	const chartData = useMemo(
-		() => metrics.map((e) => ({ name: e.name, value: e[activeMetric] })),
-		[metrics, activeMetric],
-	);
+	const chartData = metrics.map((e) => ({ name: e.name, value: e[activeMetric] }));
 
 	return (
 		<dialog className={`modal ${isOpen ? "modal-open" : ""}`}>

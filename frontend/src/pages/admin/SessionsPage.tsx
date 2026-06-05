@@ -194,7 +194,6 @@ function SessionPage() {
 								<thead className="bg-base-300 text-2xl uppercase">
 									<tr>
 										<th className="px-4 py-4 w-16 text-center">
-											{/* Checkbox column */}
 										</th>
 										<th className="px-4 py-4 font-bold text-center">
 											Session Name
