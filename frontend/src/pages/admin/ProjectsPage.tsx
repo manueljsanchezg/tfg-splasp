@@ -146,7 +146,9 @@ function ProjectsPage() {
 					fetchProjects(nextPg);
 				}}
 				hasMore={hasMore}
-				loader={<div className="text-center py-4 text-base">Loading more...</div>}
+				loader={
+					<div className="text-center py-4 text-base">Loading more...</div>
+				}
 			>
 				<div className="bg-base-100 rounded-xl shadow-lg border border-base-300 overflow-hidden mb-4">
 					<table className="table table-lg text-lg w-full">

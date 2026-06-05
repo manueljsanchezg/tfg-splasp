@@ -59,7 +59,10 @@ function ComparisonModal({
 	const base = metricOptions.find((o) => o.key === activeMetric)?.label ?? "";
 	const activeLabel = useAvgLabels ? `Avg ${base}` : base;
 
-	const chartData = metrics.map((e) => ({ name: e.name, value: e[activeMetric] }));
+	const chartData = metrics.map((e) => ({
+		name: e.name,
+		value: e[activeMetric],
+	}));
 
 	return (
 		<dialog className={`modal ${isOpen ? "modal-open" : ""}`}>

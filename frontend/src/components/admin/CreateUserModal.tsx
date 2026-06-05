@@ -65,9 +65,7 @@ function CreateUserModal({ isOpen, onClose, onSuccess }: CreateUserModalProps) {
 				<form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
 					<div className="form-control w-full">
 						<div className="label">
-							<span className="label-text font-bold">
-								Nombre de usuario
-							</span>
+							<span className="label-text font-bold">Nombre de usuario</span>
 						</div>
 						<input
 							type="text"

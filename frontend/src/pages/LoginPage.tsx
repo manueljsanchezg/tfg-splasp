@@ -41,7 +41,10 @@ export default function LoginPage() {
 				</p>
 			</div>
 
-			<form className="flex flex-col gap-4 w-full max-w-sm" onSubmit={handleSubmit(onSubmit)}>
+			<form
+				className="flex flex-col gap-4 w-full max-w-sm"
+				onSubmit={handleSubmit(onSubmit)}
+			>
 				<div className="form-control w-full">
 					<div className="label">
 						<span className="label-text">Username</span>

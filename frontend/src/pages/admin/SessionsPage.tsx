@@ -193,8 +193,7 @@ function SessionPage() {
 							<table className="table table-lg text-lg w-full">
 								<thead className="bg-base-300 uppercase text-lg">
 									<tr>
-										<th className="px-4 py-4 w-16 text-center">
-										</th>
+										<th className="px-4 py-4 w-16 text-center"></th>
 										<th className="px-4 py-4 font-bold text-center">
 											Session Name
 										</th>

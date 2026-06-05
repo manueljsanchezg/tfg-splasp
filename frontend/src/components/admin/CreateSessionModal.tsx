@@ -140,11 +140,7 @@ function CreateSessionModal({
 					</div>
 
 					<div className="modal-action gap-4 mt-8">
-						<button
-							type="button"
-							onClick={onClose}
-							className="btn btn-ghost"
-						>
+						<button type="button" onClick={onClose} className="btn btn-ghost">
 							Cancel
 						</button>
 						<button

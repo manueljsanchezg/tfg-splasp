@@ -50,10 +50,7 @@ function ProjectRow({
 
 	return (
 		<>
-			<tr
-				className="hover:bg-base-200 cursor-pointer"
-				onClick={handleToggle}
-			>
+			<tr className="hover:bg-base-200 cursor-pointer" onClick={handleToggle}>
 				<td className="font-bold pl-8 py-6">{project.title}</td>
 				<td className="text-center pr-8 py-6">
 					{formatDate(project.createdAt)}

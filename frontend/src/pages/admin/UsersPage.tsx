@@ -98,7 +98,7 @@ function UsersPage() {
 			)}
 
 			{!isLoading && users && users.length > 0 && (
-					<div className="w-4/5 bg-base-100 rounded-xl shadow-lg border border-base-300 overflow-hidden mx-auto">
+				<div className="w-4/5 bg-base-100 rounded-xl shadow-lg border border-base-300 overflow-hidden mx-auto">
 					<div className="overflow-x-auto">
 						<table className="table table-lg text-lg w-full">
 							<thead className="bg-base-300 uppercase text-lg">
