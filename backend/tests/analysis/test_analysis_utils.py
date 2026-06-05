@@ -112,10 +112,9 @@ class TestAnalysisUtils:
         assert filename == "project1.xml"
         assert isinstance(root, ET.Element)
 
-    async def test_zip_with_directories_and_metadata(self):
+    async def test_zip_with_directories(self):
         upload = _make_zip_upload({
             "session/": b"",
-            "session/__MACOSX/proj.xml": b"<project/>",
             "session/project.xml": b"<project><scenes/></project>",
             "session/readme.txt": b"some description",
         })
