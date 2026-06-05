@@ -50,7 +50,7 @@ class BlockAnalysis(Base):
     feature_guarded_definition_changes: Mapped[int] = mapped_column()
     ast_pipeline_definition_changes: Mapped[int] = mapped_column()
 
-    analysis_result_id: Mapped[int] = mapped_column(ForeignKey("analysis_results.id"))
+    analysis_result_id: Mapped[int] = mapped_column(ForeignKey("analysis_results.id"), index=True)
     analysis_result: Mapped["AnalysisResult"] = relationship(back_populates="blocks_analysis")
 
 
@@ -62,5 +62,5 @@ class DetectedFeature(Base):
     is_dead: Mapped[bool] = mapped_column()
     scattering_count: Mapped[int] = mapped_column()
 
-    analysis_result_id: Mapped[int] = mapped_column(ForeignKey("analysis_results.id"))
+    analysis_result_id: Mapped[int] = mapped_column(ForeignKey("analysis_results.id"), index=True)
     analysis_result: Mapped["AnalysisResult"] = relationship(back_populates="detected_features")

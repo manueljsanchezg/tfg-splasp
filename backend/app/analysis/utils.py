@@ -80,10 +80,7 @@ def _extract_and_parse_zip(content: bytes):
     roots_list = []
     with zipfile.ZipFile(BytesIO(content)) as zip_file:
         for file_path in zip_file.namelist():
-            if (
-                file_path.endswith("/")
-                or not file_path.lower().endswith(".xml")
-            ):
+            if file_path.endswith("/") or not file_path.lower().endswith(".xml"):
                 continue
             xml = zip_file.read(file_path)
             if len(xml) > MAX_XML_BYTES:
