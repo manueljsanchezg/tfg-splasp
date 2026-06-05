@@ -54,7 +54,7 @@ function CreateSessionModal({
 	return (
 		<dialog ref={modalRef} className="modal" onClose={onClose}>
 			<div className="modal-box w-11/12 max-w-2xl">
-				<h3 className="font-bold text-2xl mb-6 text-base-content">
+				<h3 className="font-bold text-xl mb-6 text-base-content">
 					Create New Session
 				</h3>
 
@@ -67,12 +67,12 @@ function CreateSessionModal({
 				<form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
 					<div className="form-control w-full">
 						<div className="label">
-							<span className="label-text font-bold text-lg">Session Name</span>
+							<span className="label-text font-bold">Session Name</span>
 						</div>
 						<input
 							type="text"
 							placeholder="e.g., Advanced Programming"
-							className={`input input-bordered input-lg w-full text-lg ${
+							className={`input input-bordered w-full ${
 								errors.name ? "input-error" : ""
 							}`}
 							{...register("name", {
@@ -81,7 +81,7 @@ function CreateSessionModal({
 						/>
 						{errors.name && (
 							<div className="label">
-								<span className="label-text-alt text-error text-base">
+								<span className="label-text-alt text-error">
 									{errors.name.message}
 								</span>
 							</div>
@@ -91,11 +91,11 @@ function CreateSessionModal({
 					<div className="grid grid-cols-2 gap-6">
 						<div className="form-control w-full">
 							<div className="label">
-								<span className="label-text font-bold text-lg">Start Date</span>
+								<span className="label-text font-bold">Start Date</span>
 							</div>
 							<input
 								type="datetime-local"
-								className={`input input-bordered input-lg w-full text-lg ${
+								className={`input input-bordered w-full ${
 									errors.startDate ? "input-error" : ""
 								}`}
 								{...register("startDate", {
@@ -104,7 +104,7 @@ function CreateSessionModal({
 							/>
 							{errors.startDate && (
 								<div className="label">
-									<span className="label-text-alt text-error text-base">
+									<span className="label-text-alt text-error">
 										{errors.startDate.message}
 									</span>
 								</div>
@@ -113,11 +113,11 @@ function CreateSessionModal({
 
 						<div className="form-control w-full">
 							<div className="label">
-								<span className="label-text font-bold text-lg">End Date</span>
+								<span className="label-text font-bold">End Date</span>
 							</div>
 							<input
 								type="datetime-local"
-								className={`input input-bordered input-lg w-full text-lg ${
+								className={`input input-bordered w-full ${
 									errors.startDate ? "input-error" : ""
 								}`}
 								{...register("endDate", {
@@ -131,7 +131,7 @@ function CreateSessionModal({
 							/>
 							{errors.endDate && (
 								<div className="label">
-									<span className="label-text-alt text-error text-base">
+									<span className="label-text-alt text-error">
 										{errors.endDate.message}
 									</span>
 								</div>
@@ -143,14 +143,14 @@ function CreateSessionModal({
 						<button
 							type="button"
 							onClick={onClose}
-							className="btn btn-ghost btn-lg text-lg"
+							className="btn btn-ghost"
 						>
 							Cancel
 						</button>
 						<button
 							type="submit"
 							disabled={isLoading}
-							className="btn btn-primary btn-lg text-lg"
+							className="btn btn-primary"
 						>
 							{isLoading ? (
 								<>

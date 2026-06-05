@@ -51,7 +51,7 @@ function ProjectRow({
 	return (
 		<>
 			<tr
-				className="hover:bg-base-200 cursor-pointer text-2xl"
+				className="hover:bg-base-200 cursor-pointer"
 				onClick={handleToggle}
 			>
 				<td className="font-bold pl-8 py-6">{project.title}</td>
@@ -63,13 +63,13 @@ function ProjectRow({
 			{isExpanded && (
 				<tr className="bg-base-200/40">
 					<td colSpan={2} className="p-8 border-b border-base-300">
-						<h4 className="font-bold mb-6 text-2xl border-b pb-2">Versions</h4>
-						{error && <p className="text-error text-lg mb-4">{error}</p>}
+						<h4 className="font-bold mb-6 text-xl border-b pb-2">Versions</h4>
+						{error && <p className="text-error mb-4">{error}</p>}
 
 						{isLoading ? (
-							<span className="loading loading-spinner loading-lg text-primary"></span>
+							<span className="loading loading-spinner text-primary"></span>
 						) : !versions || versions.length === 0 ? (
-							<p className="text-xl text-base-content/60">No versions found.</p>
+							<p className="text-base-content/60">No versions found.</p>
 						) : (
 							<div className="flex flex-wrap gap-4">
 								{versions.map((version) => {
@@ -87,23 +87,24 @@ function ProjectRow({
 											>
 												<div className="card-body p-6">
 													<div className="flex flex-row items-center justify-between gap-4">
-														<h5 className="font-bold text-2xl mb-1">
+														<h5 className="font-bold text-xl mb-1">
 															Version {version.versionNumber}
 														</h5>
-														<span
-															className={`badge badge-lg ${isSelected ? "badge-primary" : "badge-outline"}`}
-														>
-															{isSelected ? "Selected" : "Select"}
-														</span>
+														<input
+															type="checkbox"
+															className="checkbox checkbox-primary"
+															checked={isSelected}
+															readOnly
+														/>
 													</div>
-													<p className="text-lg text-base-content/60 mb-4">
+													<p className="text-base-content/60 mb-4">
 														{formatDate(version.uploadedAt)}
 													</p>
 												</div>
 											</button>
 											<button
 												type="button"
-												className={`btn text-lg ${isSelected ? "btn-primary" : "btn-outline"}`}
+												className={`btn ${isSelected ? "btn-primary" : "btn-outline"}`}
 												onClick={() => onViewAnalysis(version, project.title)}
 											>
 												View Results

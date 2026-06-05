@@ -56,13 +56,13 @@ function UsersPage() {
 	return (
 		<div className="flex flex-col gap-4 w-full px-4 py-4">
 			<div className="flex flex-col justify-between items-center gap-4">
-				<h1 className="text-5xl font-black text-base-content">
+				<h1 className="text-3xl font-black text-base-content">
 					User Management
 				</h1>
 				<button
 					type="button"
 					onClick={() => setIsModalOpen(true)}
-					className="btn btn-primary btn-lg text-2xl px-8 m-10"
+					className="btn btn-primary px-8 m-10"
 				>
 					Create User
 				</button>
@@ -98,10 +98,10 @@ function UsersPage() {
 			)}
 
 			{!isLoading && users && users.length > 0 && (
-				<div className="w-4/5 bg-base-100 rounded-xl shadow-lg border border-base-300 overflow-hidden mx-auto">
+					<div className="w-4/5 bg-base-100 rounded-xl shadow-lg border border-base-300 overflow-hidden mx-auto">
 					<div className="overflow-x-auto">
-						<table className="table table-lg w-full">
-							<thead className="bg-base-300 text-2xl uppercase">
+						<table className="table table-lg text-lg w-full">
+							<thead className="bg-base-300 uppercase text-lg">
 								<tr>
 									<th className="px-4 py-4 font-bold text-center">Username</th>
 									<th className="px-4 py-4 font-bold text-center">Actions</th>
@@ -115,14 +115,14 @@ function UsersPage() {
 										className="hover:bg-base-200 border-b border-base-200 last:border-b-0"
 									>
 										<td className="px-4 py-4 text-center">
-											<span className="font-bold text-2xl text-base-content">
+											<span className="font-bold text-base-content">
 												{user.username}
 											</span>
 										</td>
-										<td className="px-4 py-4 text-center text-xl flex flex-col gap-3 items-center">
+										<td className="px-4 py-4 text-center flex flex-col gap-3 items-center">
 											<button
 												type="button"
-												className="btn btn-error text-xl"
+												className="btn btn-error btn-sm"
 												onClick={() => handleDeleteUser(user.id)}
 											>
 												Delete
@@ -138,7 +138,7 @@ function UsersPage() {
 
 			{!isLoading && users && users.length === 0 && (
 				<div className="flex flex-col items-center justify-center h-64 gap-4">
-					<p className="text-xl font-semibold text-base-content/60">
+					<p className="text-base font-semibold text-base-content/60">
 						No users registered yet
 					</p>
 					<p className="text-base text-base-content/50">

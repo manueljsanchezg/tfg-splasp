@@ -114,18 +114,18 @@ function SessionInfoPage() {
 	return (
 		<div className="flex flex-col gap-6 w-full px-8 py-6 max-w-7xl ">
 			<div className="flex items-center justify-between mb-4">
-				<h1 className="text-5xl font-black">Session: {sessionId}</h1>
+				<h1 className="text-3xl font-black">Session: {sessionId}</h1>
 
 				<div className="flex items-center gap-3">
 					<button
 						type="button"
-						className="btn btn-lg text-xl btn-primary"
+						className="btn btn-primary"
 						onClick={handleOpenComparisonModal}
 						disabled={selectedVersionIds.length === 0}
 					>
 						Compare
 						{selectedVersionIds.length > 0 && (
-							<div className="badge badge-neutral badge-lg ml-1 font-bold">
+							<div className="badge badge-neutral ml-1 font-bold">
 								{selectedVersionIds.length}
 							</div>
 						)}
@@ -134,7 +134,7 @@ function SessionInfoPage() {
 
 				<button
 					type="button"
-					className="btn btn-lg text-xl btn-primary"
+					className="btn btn-primary"
 					onClick={() => setIsZipModalOpen(true)}
 				>
 					Upload projects
@@ -142,7 +142,7 @@ function SessionInfoPage() {
 
 				<button
 					type="button"
-					className="btn btn-lg text-xl btn-primary"
+					className="btn btn-primary"
 					onClick={async () => {
 						if (!sessionId) return;
 						await downloadProjectsCSVBySession(Number(sessionId));
@@ -153,7 +153,7 @@ function SessionInfoPage() {
 
 				<button
 					type="button"
-					className="btn btn-outline btn-lg text-xl"
+					className="btn btn-outline"
 					onClick={() => navigate("/sessions")}
 				>
 					Back to Sessions
@@ -167,8 +167,8 @@ function SessionInfoPage() {
 			)}
 
 			<div className="bg-base-100 rounded-xl shadow-lg border border-base-300 overflow-hidden">
-				<table className="table table-lg w-full">
-					<thead className="bg-base-300 text-2xl uppercase">
+				<table className="table table-lg text-lg w-full">
+					<thead className="bg-base-300 uppercase text-lg">
 						<tr>
 							<th className="pl-8 py-6">Project Name</th>
 							<th className="text-center pr-8 w-64 py-6">Created At</th>
@@ -177,13 +177,13 @@ function SessionInfoPage() {
 					<tbody>
 						{isLoadingProjects ? (
 							<tr>
-								<td colSpan={2} className="text-center py-12 text-2xl">
+								<td colSpan={2} className="text-center py-12 text-lg">
 									Loading...
 								</td>
 							</tr>
 						) : projects.length === 0 ? (
 							<tr>
-								<td colSpan={2} className="text-center py-12 text-2xl">
+								<td colSpan={2} className="text-center py-12 text-base">
 									No projects found.
 								</td>
 							</tr>

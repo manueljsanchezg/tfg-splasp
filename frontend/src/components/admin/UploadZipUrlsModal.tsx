@@ -50,27 +50,27 @@ function UploadZipModal({
 					<input
 						type="file"
 						onChange={handleFile}
-						className="file-input file-input-bordered file-input-lg w-full"
+						className="file-input file-input-bordered w-full"
 					/>
 					<textarea
 						onChange={(e) => {
 							setProjectsUrls(e.target.value);
 							setZipFile(null);
 						}}
-						className="textarea textarea-xl w-full"
+						className="textarea textarea-bordered w-full"
 					/>
 					<button
 						type="button"
 						onClick={handleUpload}
-						className="btn btn-primary btn-lg px-10 text-xl shadow-md w-full"
+						className="btn btn-primary px-10 shadow-md w-full"
 					>
 						{isLoadingZip ? (
-							<span className="loading loading-spinner loading-lg"></span>
+							<span className="loading loading-spinner"></span>
 						) : (
 							"Upload"
 						)}
 					</button>
-					{error && <h3 className="text-center text-xl text-error">{error}</h3>}
+					{error && <h3 className="text-center text-error">{error}</h3>}
 				</div>
 			</div>
 

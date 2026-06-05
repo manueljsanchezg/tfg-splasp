@@ -33,50 +33,51 @@ export default function LoginPage() {
 	};
 
 	return (
-		<div className="w-full max-w-lg space-y-8">
-			<div>
-				<h2 className="mt-6 text-center text-5xl font-black tracking-tight text-base-content">
-					Sign In
-				</h2>
+		<div className="flex flex-col items-center justify-center min-h-[60vh] gap-8 w-full">
+			<div className="flex flex-col items-center gap-2">
+				<h1 className="text-3xl font-bold">Sign In</h1>
+				<p className="text-base-content/60">
+					Use your teacher credentials to sign in
+				</p>
 			</div>
 
-			<form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
-				<div className="form-control w-full gap-2">
-					<div className="label pb-0">
-						<span className="label-text text-xl font-bold">Username</span>
+			<form className="flex flex-col gap-4 w-full max-w-sm" onSubmit={handleSubmit(onSubmit)}>
+				<div className="form-control w-full">
+					<div className="label">
+						<span className="label-text">Username</span>
 					</div>
 					<input
 						type="text"
 						placeholder="Your username"
-						className={`input input-lg w-full text-lg ${errors.username ? "input-error" : ""}`}
+						className={`input input-bordered w-full ${errors.username ? "input-error" : ""}`}
 						{...register("username", {
 							required: "Username is required",
 						})}
 					/>
 					{errors.username && (
-						<div className="label pt-0">
-							<span className="label-text-alt text-error text-base font-medium">
+						<div className="label">
+							<span className="label-text-alt text-error">
 								{errors.username.message}
 							</span>
 						</div>
 					)}
 				</div>
 
-				<div className="form-control w-full gap-2">
-					<div className="label pb-0">
-						<span className="label-text text-xl font-bold">Password</span>
+				<div className="form-control w-full">
+					<div className="label">
+						<span className="label-text">Password</span>
 					</div>
 					<input
 						type="password"
 						placeholder="Your password"
-						className={`input input-bordered input-lg w-full text-lg ${errors.password ? "input-error" : ""}`}
+						className={`input input-bordered w-full ${errors.password ? "input-error" : ""}`}
 						{...register("password", {
 							required: "Password is required",
 						})}
 					/>
 					{errors.password && (
-						<div className="label pt-0">
-							<span className="label-text-alt text-error text-base font-medium">
+						<div className="label">
+							<span className="label-text-alt text-error">
 								{errors.password.message}
 							</span>
 						</div>
@@ -84,31 +85,22 @@ export default function LoginPage() {
 				</div>
 
 				{error && (
-					<div className="rounded-xl bg-error/20 p-5 text-lg text-error text-center font-medium">
-						{error}
+					<div className="alert alert-error">
+						<span>{error}</span>
 					</div>
 				)}
 
 				<button
 					type="submit"
 					disabled={isLoading}
-					className="btn btn-primary btn-lg w-full text-2xl mt-4"
+					className="btn btn-primary mt-2"
 				>
 					{isLoading ? (
-						<>
-							<span className="loading loading-spinner loading-md"></span>
-							Signing in...
-						</>
+						<span className="loading loading-spinner"></span>
 					) : (
 						"Sign In"
 					)}
 				</button>
-
-				<div className="text-center text-lg mt-6">
-					<p className="text-base-content/70 font-medium">
-						Use your teacher credentials to sign in.
-					</p>
-				</div>
 			</form>
 		</div>
 	);

@@ -52,7 +52,7 @@ function CreateUserModal({ isOpen, onClose, onSuccess }: CreateUserModalProps) {
 	return (
 		<dialog ref={modalRef} className="modal" onClose={handleClose}>
 			<div className="modal-box w-11/12 max-w-2xl">
-				<h3 className="font-bold text-2xl mb-6 text-base-content">
+				<h3 className="font-bold text-xl mb-6 text-base-content">
 					Crear usuario
 				</h3>
 
@@ -65,21 +65,21 @@ function CreateUserModal({ isOpen, onClose, onSuccess }: CreateUserModalProps) {
 				<form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
 					<div className="form-control w-full">
 						<div className="label">
-							<span className="label-text font-bold text-lg">
+							<span className="label-text font-bold">
 								Nombre de usuario
 							</span>
 						</div>
 						<input
 							type="text"
 							placeholder="Nombre de usuario único"
-							className={`input input-bordered input-lg w-full text-lg ${
+							className={`input input-bordered w-full ${
 								errors.username ? "input-error" : ""
 							}`}
 							{...register("username", { required: "Username is required" })}
 						/>
 						{errors.username && (
 							<div className="label">
-								<span className="label-text-alt text-error text-base">
+								<span className="label-text-alt text-error">
 									{errors.username.message}
 								</span>
 							</div>
@@ -88,12 +88,12 @@ function CreateUserModal({ isOpen, onClose, onSuccess }: CreateUserModalProps) {
 
 					<div className="form-control w-full">
 						<div className="label">
-							<span className="label-text font-bold text-lg">Contraseña</span>
+							<span className="label-text font-bold">Contraseña</span>
 						</div>
 						<input
 							type="password"
 							placeholder="Mínimo 6 caracteres"
-							className={`input input-bordered input-lg w-full text-lg ${
+							className={`input input-bordered w-full ${
 								errors.password ? "input-error" : ""
 							}`}
 							{...register("password", {
@@ -106,7 +106,7 @@ function CreateUserModal({ isOpen, onClose, onSuccess }: CreateUserModalProps) {
 						/>
 						{errors.password && (
 							<div className="label">
-								<span className="label-text-alt text-error text-base">
+								<span className="label-text-alt text-error">
 									{errors.password.message}
 								</span>
 							</div>
@@ -117,14 +117,14 @@ function CreateUserModal({ isOpen, onClose, onSuccess }: CreateUserModalProps) {
 						<button
 							type="button"
 							onClick={handleClose}
-							className="btn btn-ghost btn-lg text-lg"
+							className="btn btn-ghost"
 						>
 							Cancelar
 						</button>
 						<button
 							type="submit"
 							disabled={isLoading}
-							className="btn btn-primary btn-lg text-lg"
+							className="btn btn-primary"
 						>
 							{isLoading ? (
 								<>

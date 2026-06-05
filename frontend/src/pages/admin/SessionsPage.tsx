@@ -116,7 +116,7 @@ function SessionPage() {
 	return (
 		<div className="flex flex-col gap-4 w-full px-4 py-4">
 			<div className="flex flex-col justify-between items-center gap-4">
-				<h1 className="text-5xl font-black text-base-content">
+				<h1 className="text-3xl font-black text-base-content">
 					Sessions Management
 				</h1>
 
@@ -124,20 +124,20 @@ function SessionPage() {
 					<button
 						type="button"
 						onClick={() => setIsModalOpen(true)}
-						className="btn btn-primary btn-lg text-xl px-8 m-10"
+						className="btn btn-primary px-8 m-10"
 					>
 						Create Session
 					</button>
 
 					<button
 						type="button"
-						className="btn btn-lg text-xl btn-primary"
+						className="btn btn-primary"
 						onClick={handleOpenComparisonModal}
 						disabled={selectedSessionsIds.length === 0}
 					>
 						Compare
 						{selectedSessionsIds.length > 0 && (
-							<div className="badge badge-neutral badge-lg ml-1 font-bold">
+							<div className="badge badge-neutral ml-1 font-bold">
 								{selectedSessionsIds.length}
 							</div>
 						)}
@@ -185,13 +185,13 @@ function SessionPage() {
 					}}
 					hasMore={hasMore}
 					loader={
-						<div className="text-center py-4 text-xl">Loading more...</div>
+						<div className="text-center py-4 text-base">Loading more...</div>
 					}
 				>
 					<div className="w-4/5 bg-base-100 rounded-xl shadow-lg border border-base-300 overflow-hidden mx-auto mb-4">
 						<div className="overflow-x-auto">
-							<table className="table table-lg w-full">
-								<thead className="bg-base-300 text-2xl uppercase">
+							<table className="table table-lg text-lg w-full">
+								<thead className="bg-base-300 uppercase text-lg">
 									<tr>
 										<th className="px-4 py-4 w-16 text-center">
 										</th>
@@ -224,48 +224,48 @@ function SessionPage() {
 											>
 												<td className="px-4 py-4 text-center align-middle w-16">
 													<input
-														className="checkbox checkbox-primary checkbox-lg"
+														className="checkbox checkbox-primary"
 														type="checkbox"
 														checked={isSelected}
 														onChange={() => addId(session.id)}
 													/>
 												</td>
 												<td className="px-4 py-4 text-center">
-													<span className="font-bold text-2xl text-base-content">
+													<span className="font-bold text-base-content">
 														{session.name}
 													</span>
 												</td>
 												<td className="px-4 py-4 text-center">
-													<code className="bg-base-300/50 px-3 py-1 rounded-lg text-xl font-semibold text-base-content">
+													<code className="bg-base-300/50 px-3 py-1 rounded-lg font-semibold text-base-content">
 														{session.code}
 													</code>
 												</td>
-												<td className="px-4 py-4 text-center text-base-content font-medium text-xl">
+												<td className="px-4 py-4 text-center text-base-content font-medium">
 													{new Date(session.startDate).toLocaleDateString(
 														"es-ES",
 													)}
 												</td>
-												<td className="px-4 py-4 text-center text-base-content font-medium text-xl">
+												<td className="px-4 py-4 text-center text-base-content font-medium">
 													{new Date(session.endDate).toLocaleDateString(
 														"es-ES",
 													)}
 												</td>
 												<td className="px-4 py-4 text-center">
 													{session.isActive ? (
-														<span className="badge badge-success badge-xl text-xl font-bold w-30 justify-center">
+														<span className="badge badge-success font-bold w-30 justify-center">
 															Active
 														</span>
 													) : (
-														<span className="badge badge-neutral badge-xl text-xl font-bold w-30 justify-center">
+														<span className="badge badge-neutral font-bold w-30 justify-center">
 															Inactive
 														</span>
 													)}
 												</td>
-												<td className="px-4 py-4 text-center text-xl">
+												<td className="px-4 py-4 text-center">
 													<div className="flex flex-col gap-2 items-center justify-center">
 														<button
 															type="button"
-															className="btn btn-info text-xl w-full"
+															className="btn btn-info btn-sm w-full"
 															onClick={() =>
 																navigate(`/sessions/${session.id}`)
 															}
@@ -275,7 +275,7 @@ function SessionPage() {
 														{session.isActive && (
 															<button
 																type="button"
-																className="btn btn-warning text-xl w-full"
+																className="btn btn-warning btn-sm w-full"
 																onClick={() => handleDeactivate(session.id)}
 															>
 																Deactivate
@@ -298,7 +298,7 @@ function SessionPage() {
 
 			{!isLoading && sessions && sessions.length === 0 && (
 				<div className="flex flex-col items-center justify-center h-64 gap-4">
-					<p className="text-xl font-semibold text-base-content/60">
+					<p className="text-base font-semibold text-base-content/60">
 						No sessions found
 					</p>
 					<p className="text-base text-base-content/50">

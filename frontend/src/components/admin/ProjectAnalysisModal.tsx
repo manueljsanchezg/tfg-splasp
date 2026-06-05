@@ -34,10 +34,10 @@ function ProjectAnalysisModal({
 		<dialog className={`modal ${isOpen ? "modal-open" : ""}`}>
 			<div className="modal-box flex h-[85vh] w-11/12 max-w-6xl flex-col p-0">
 				<div className="flex items-center justify-between border-b border-base-300 bg-base-200 p-4">
-					<h3 className="text-3xl font-bold">{activeVersionName}</h3>
+					<h3 className="text-xl font-bold">{activeVersionName}</h3>
 					<button
 						type="button"
-						className="btn btn-ghost btn-lg"
+						className="btn btn-ghost btn-sm"
 						onClick={onClose}
 					>
 						X
@@ -47,8 +47,8 @@ function ProjectAnalysisModal({
 				<div className="flex-1 overflow-y-auto bg-base-100 p-4">
 					{isLoadingAnalysis ? (
 						<div className="flex flex-col items-center justify-center h-full gap-4">
-							<span className="loading loading-spinner loading-lg text-primary"></span>
-							<span className="text-xl font-medium text-base-content/70">
+							<span className="loading loading-spinner text-primary"></span>
+							<span className="text-base font-medium text-base-content/70">
 								Loading analysis...
 							</span>
 						</div>
