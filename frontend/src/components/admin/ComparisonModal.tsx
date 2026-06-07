@@ -57,7 +57,7 @@ function ComparisonModal({
 	const useAvgLabels = metrics.some((e) => e.isAveraged);
 
 	const base = metricOptions.find((o) => o.key === activeMetric)?.label ?? "";
-	const activeLabel = useAvgLabels ? `Avg ${base}` : base;
+	const activeLabel = useAvgLabels && !base.toLowerCase().startsWith("avg") ? `Avg ${base}` : base;
 
 	const chartData = metrics.map((e) => ({
 		name: e.name,
@@ -105,7 +105,7 @@ function ComparisonModal({
 										className={`btn btn-sm ${activeMetric === key ? "btn-primary" : "btn-outline"}`}
 										onClick={() => setActiveMetric(key)}
 									>
-										{useAvgLabels ? `Avg ${label}` : label}
+										{useAvgLabels && !label.toLowerCase().startsWith("avg") ? `Avg ${label}` : label}
 									</button>
 								))}
 							</div>

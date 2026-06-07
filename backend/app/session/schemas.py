@@ -38,3 +38,9 @@ class SessionAnalysisStats(BaseModelCamel):
     avg_total_combinations: float
     avg_max_tangling: float
     avg_max_scattering: float
+    avg_avg_tangling: float
+    avg_avg_scattering: float
+    avg_total_modified_blocks: float
+    avg_total_definition_changes: float
+    avg_total_feature_guarded_changes: float
+    avg_total_ast_pipeline_changes: float

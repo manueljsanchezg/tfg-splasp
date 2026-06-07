@@ -57,6 +57,12 @@ projects = [
                 "duplicate_scripts": 10,
                 "total_combinations": 2,
                 "tangling_dict": {"flow": 1},
+                "avg_tangling": 1.0,
+                "avg_scattering": 1.0,
+                "total_modified_blocks": 2,
+                "total_definition_changes": 4,
+                "total_feature_guarded_changes": 4,
+                "total_ast_pipeline_changes": 0,
             },
         ],
     },
@@ -98,6 +104,12 @@ projects = [
                 "duplicate_scripts": 8,
                 "total_combinations": 8,
                 "tangling_dict": {"saludar": 3},
+                "avg_tangling": 3.0,
+                "avg_scattering": 1.0,
+                "total_modified_blocks": 2,
+                "total_definition_changes": 2,
+                "total_feature_guarded_changes": 2,
+                "total_ast_pipeline_changes": 1,
             },
             {
                 "blocks": [
@@ -134,6 +146,12 @@ projects = [
                 "duplicate_scripts": 8,
                 "total_combinations": 16,
                 "tangling_dict": {"saludar": 3},
+                "avg_tangling": 3.0,
+                "avg_scattering": 0.75,
+                "total_modified_blocks": 2,
+                "total_definition_changes": 2,
+                "total_feature_guarded_changes": 2,
+                "total_ast_pipeline_changes": 1,
             },
         ],
     },
@@ -215,43 +233,49 @@ async def seed():
             db_session.add(user)
             await db_session.flush()
 
-        seeded_session = await db_session.scalar(
-            select(Session).where(Session.code == "session1")
-        )
-        if seeded_session is None:
-            now = datetime.now(timezone.utc)
-            seeded_session = Session(
-                name="Session 1",
-                code="session1",
-                start_date=now,
-                end_date=now + timedelta(days=100),
-                is_active=True,
+        sessions_to_seed = [
+            {"name": "Session 1", "code": "session1"},
+            {"name": "Session 2", "code": "session2"},
+        ]
+        
+        for session_data in sessions_to_seed:
+            seeded_session = await db_session.scalar(
+                select(Session).where(Session.code == session_data["code"])
             )
-            db_session.add(seeded_session)
-            await db_session.flush()
+            if seeded_session is None:
+                now = datetime.now(timezone.utc)
+                seeded_session = Session(
+                    name=session_data["name"],
+                    code=session_data["code"],
+                    start_date=now,
+                    end_date=now + timedelta(days=100),
+                    is_active=True,
+                )
+                db_session.add(seeded_session)
+                await db_session.flush()
 
-        for project_data in projects:
-            await seed_project(db_session, seeded_session, project_data)
+            for project_data in projects:
+                await seed_project(db_session, seeded_session, project_data)
 
-        base_saludar = next(p for p in projects if p["title"] == "saludar")
-        for i in range(1, 21):
-            varied_project = copy.deepcopy(base_saludar)
-            varied_project["title"] = f"saludar_student_{i}"
-            varied_project["device_id"] = f"device-student-{i}"
-            
-            for version in varied_project["versions"]:
-                version["project_level"] = random.choice([1, 2, 3])
-                version["total_scripts"] = random.randint(15, 30)
-                version["duplicate_scripts"] = random.randint(2, 10)
-                version["total_combinations"] = random.randint(4, 20)
-                version["avg_tangling"] = round(random.uniform(1.0, 3.5), 2)
-                version["avg_scattering"] = round(random.uniform(1.0, 4.0), 2)
-                version["total_modified_blocks"] = random.randint(1, 6)
-                version["total_definition_changes"] = random.randint(0, 5)
-                version["total_feature_guarded_changes"] = random.randint(0, 4)
-                version["total_ast_pipeline_changes"] = random.randint(0, 2)
+            base_saludar = next(p for p in projects if p["title"] == "saludar")
+            for i in range(1, 21):
+                varied_project = copy.deepcopy(base_saludar)
+                varied_project["title"] = f"saludar_student_{i}"
+                varied_project["device_id"] = f"device-student-{i}"
                 
-            await seed_project(db_session, seeded_session, varied_project)
+                for version in varied_project["versions"]:
+                    version["project_level"] = random.choice([1, 2, 3])
+                    version["total_scripts"] = random.randint(15, 30)
+                    version["duplicate_scripts"] = random.randint(2, 10)
+                    version["total_combinations"] = random.randint(4, 20)
+                    version["avg_tangling"] = round(random.uniform(1.0, 3.5), 2)
+                    version["avg_scattering"] = round(random.uniform(1.0, 4.0), 2)
+                    version["total_modified_blocks"] = random.randint(1, 6)
+                    version["total_definition_changes"] = random.randint(0, 5)
+                    version["total_feature_guarded_changes"] = random.randint(0, 4)
+                    version["total_ast_pipeline_changes"] = random.randint(0, 2)
+                    
+                await seed_project(db_session, seeded_session, varied_project)
 
         await db_session.commit()
 

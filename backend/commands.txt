@@ -1,5 +1,8 @@
-server command
-uvicorn app.app:app --port 8000 --workers 4
+server command (development)
+uv run fastapi dev --port 8000
+
+server command (production)
+uv run fastapi run --port 8000 --workers 4
 
 Alembic
 Create migration -> alembic revision --autogenerate -m "tu_mensaje_aqui"
@@ -15,7 +18,7 @@ tests -> uv run pytest tests -v
 coverage -> uv run pytest tests -v --cov=app --cov-report=term-missing
 
 windows cmd
-load -> set RATE_LIMIT_ENABLED=False && uv run main.py || uv run locust -f tests/load/locustfile.py --host=http://localhost:8000
+load -> set RATE_LIMIT_ENABLED=False && uv run fastapi run --port 8000 --workers 4 || uv run locust -f tests/load/locustfile.py --host=http://localhost:8000
 
 linux
-load -> RATE_LIMIT_ENABLED=False uv run main.py || uv run locust -f tests/load/locustfile.py --host=http://localhost:8000
+load -> RATE_LIMIT_ENABLED=False uv run fastapi run --port 8000 --workers 4|| uv run locust -f tests/load/locustfile.py --host=http://localhost:8000
