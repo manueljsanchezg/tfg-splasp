@@ -52,6 +52,24 @@ async def join_session_anonymous(data: JoinAnonymousSession, service: SessionSer
     )
 
 
+@router.get("/stats", response_model=ApiResponse[List[SessionAnalysisStats]])
+async def get_sessions_analysis_stats(
+    service: SessionServiceDep,
+    user: CurrentUserDep,
+    sessions_ids: List[int] = Query(...),
+):
+    stats = await service.get_analyses_stats_by_sessions_ids(sessions_ids)
+    return ApiResponse(success=True, data=stats)
+
+
+@router.get("/{session_id}", response_model=ApiResponse[ReadSession])
+async def get_session_by_id(session_id: int, service: SessionServiceDep):
+    session = await service.repository.get_by_id(session_id)
+    if not session:
+        raise HTTPException(status_code=404, detail="Session not found")
+    return ApiResponse(success=True, data=session)
+
+
 @router.patch("/{session_id}", response_model=ApiResponse[dict[str, str]])
 async def close_session(session_id: int, service: SessionServiceDep, user: CurrentUserDep):
     closed = await service.close(session_id)
@@ -84,14 +102,3 @@ async def get_projects_analysis_csv_by_session_id(
         media_type="text/csv",
         headers={"Content-Disposition": "attachment; filename=projects.csv"},
     )
-
-
-@router.get("/stats", response_model=ApiResponse[List[SessionAnalysisStats]])
-async def get_sessions_analysis_stats(
-    service: SessionServiceDep,
-    user: CurrentUserDep,
-    sessions_ids: List[int] = Query(...),
-):
-    print(sessions_ids)
-    stats = await service.get_analyses_stats_by_sessions_ids(sessions_ids)
-    return ApiResponse(success=True, data=stats)
