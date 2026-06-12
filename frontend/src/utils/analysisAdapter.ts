@@ -21,20 +21,25 @@ export const savedAnalysisToChartEntry = (
 	isAveraged: false,
 });
 
+const r2 = (n: number) => Number(n.toFixed(2));
+
 export const sessionStatsToChartEntry = (
 	session: SessionAnalysisStats,
 ): ChartEntry => ({
 	name: session.sessionName,
-	projectLevel: session.avgProjectLevel,
-	duplicationRatio: session.avgDuplicateScripts / session.avgTotalScripts,
-	totalCombinations: session.avgTotalCombinations,
-	maxTangling: session.avgMaxTangling,
-	maxScattering: session.avgMaxScattering,
-	avgTangling: session.avgAvgTangling,
-	avgScattering: session.avgAvgScattering,
-	totalModifiedBlocks: session.avgTotalModifiedBlocks,
-	totalDefinitionChanges: session.avgTotalDefinitionChanges,
-	totalFeatureGuardedChanges: session.avgTotalFeatureGuardedChanges,
-	totalAstPipelineChanges: session.avgTotalAstPipelineChanges,
+	projectLevel: r2(session.avgProjectLevel),
+	duplicationRatio:
+		session.avgTotalScripts > 0
+			? r2((session.avgDuplicateScripts / session.avgTotalScripts) * 100)
+			: 0,
+	totalCombinations: r2(session.avgTotalCombinations),
+	maxTangling: r2(session.avgMaxTangling),
+	maxScattering: r2(session.avgMaxScattering),
+	avgTangling: r2(session.avgAvgTangling),
+	avgScattering: r2(session.avgAvgScattering),
+	totalModifiedBlocks: r2(session.avgTotalModifiedBlocks),
+	totalDefinitionChanges: r2(session.avgTotalDefinitionChanges),
+	totalFeatureGuardedChanges: r2(session.avgTotalFeatureGuardedChanges),
+	totalAstPipelineChanges: r2(session.avgTotalAstPipelineChanges),
 	isAveraged: true,
 });

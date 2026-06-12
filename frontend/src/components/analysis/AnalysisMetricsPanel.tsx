@@ -8,7 +8,7 @@ interface AnalysisMetricsPanelProps {
 
 function AnalysisMetricsPanel({
 	analysis,
-	showDetectedFeatures = false,
+	showDetectedFeatures = true,
 }: AnalysisMetricsPanelProps) {
 	const projectLevel = analysis.projectLevel;
 	const duplicationRatio = analysis.duplicationRatio;
@@ -24,37 +24,80 @@ function AnalysisMetricsPanel({
 	const totalFeatureGuardedChanges = analysis.totalFeatureGuardedChanges;
 	const totalAstPipelineChanges = analysis.totalAstPipelineChanges;
 	const featuresUsedCount = detectedFeatures.filter((f) => !f.isDead).length;
-	const deadFeaturesCount = detectedFeatures.filter((f) => f.isDead).length;
 	const maxScattering = analysis.maxScattering;
 
 	return (
 		<div className="flex w-full flex-col gap-8">
 			<div className="grid w-full grid-cols-4 gap-4">
-				<MetricCard value={projectLevel} label="Project Level" />
+				<MetricCard
+					value={projectLevel}
+					label="Project level"
+					tooltip="Level of complexity based on the use of metaprogramming."
+				/>
 				<MetricCard
 					value={`${duplicationRatio.toFixed(1)}%`}
-					label="Duplication Ratio"
+					label="Duplication ratio"
+					tooltip="Percentage of duplicate blocks found in the project."
 				/>
 				{typeof totalCombinations === "number" && (
-					<MetricCard value={totalCombinations} label="Total Combinations" />
+					<MetricCard
+						value={totalCombinations}
+						label="Total combinations"
+						tooltip="Number of possible combinations based on features."
+					/>
 				)}
 				{typeof maxTangling === "number" && (
-					<MetricCard value={maxTangling} label="Max Tangling" />
+					<MetricCard
+						value={maxTangling}
+						label="Max tangling"
+						tooltip="Maximum number of features that are in a block."
+					/>
 				)}
+				<MetricCard
+					value={maxScattering}
+					label="Max scattering"
+					tooltip="Maximum number of blocks in which a feature is found."
+				/>
 				{typeof avgTangling === "number" && (
-					<MetricCard value={avgTangling.toFixed(2)} label="Avg Tangling" />
+					<MetricCard
+						value={avgTangling.toFixed(2)}
+						label="Average tangling"
+						tooltip="Average tangling across all modified blocks."
+					/>
 				)}
 				{typeof avgScattering === "number" && (
-					<MetricCard value={avgScattering.toFixed(2)} label="Avg Scattering" />
+					<MetricCard
+						value={avgScattering.toFixed(2)}
+						label="Average scattering"
+						tooltip="Average scattering across all features."
+					/>
 				)}
 
-				<MetricCard value={totalModifiedBlocks} label="Modified Blocks" />
-				<MetricCard value={totalDefinitionChanges} label="Definition Changes" />
-				<MetricCard value={totalFeatureGuardedChanges} label="Cond. Changes" />
-				<MetricCard value={totalAstPipelineChanges} label="AST Pipe Changes" />
-				<MetricCard value={featuresUsedCount} label="Used Features" />
-				<MetricCard value={deadFeaturesCount} label="Dead Features" />
-				<MetricCard value={maxScattering} label="Max Scattering" />
+				<MetricCard
+					value={totalModifiedBlocks}
+					label="Modified blocks"
+					tooltip="Number of blocks that have been modified due to variability."
+				/>
+				<MetricCard
+					value={totalDefinitionChanges}
+					label="Definition changes"
+					tooltip="Number of times the behavior of a block has changed."
+				/>
+				<MetricCard
+					value={totalFeatureGuardedChanges}
+					label="Conditional changes"
+					tooltip="Number of definition changes that depend on a feature."
+				/>
+				<MetricCard
+					value={totalAstPipelineChanges}
+					label="AST pipeline changes"
+					tooltip="Number of times the behavior of a block has changed through AST manipulation"
+				/>
+				<MetricCard
+					value={featuresUsedCount}
+					label="Used features"
+					tooltip="Number of active features modifying the project."
+				/>
 			</div>
 
 			<div className="w-full">
@@ -66,11 +109,11 @@ function AnalysisMetricsPanel({
 								<tr>
 									<th>Block / Owner</th>
 									<th className="text-center">Level</th>
-									<th className="text-center">Struct. Changes</th>
-									<th className="text-center">Def. Changes</th>
-									<th className="text-center">Def. Level</th>
-									<th className="text-center">Feature Guarded</th>
-									<th className="text-center">AST Pipeline</th>
+									<th className="text-center">Structural changes</th>
+									<th className="text-center">Deinition changes</th>
+									<th className="text-center">Definition level</th>
+									<th className="text-center">Feature guarded</th>
+									<th className="text-center">AST pipeline</th>
 								</tr>
 							</thead>
 							<tbody className="bg-base-100">

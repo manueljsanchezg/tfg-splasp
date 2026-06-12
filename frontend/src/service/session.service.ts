@@ -10,6 +10,18 @@ import type {
 } from "../types/session";
 import { api } from "./api";
 
+export const getSessionById = async (
+	sessionId: number,
+): Promise<SessionResponse> => {
+	const response = await api.get<ApiResponse<SessionResponse>>(
+		`/sessions/${sessionId}`,
+	);
+	if (!response.data.data) {
+		throw new Error("Invalid session response");
+	}
+	return response.data.data;
+};
+
 export const getAllSessions = async (
 	limit = 10,
 	offset = 0,

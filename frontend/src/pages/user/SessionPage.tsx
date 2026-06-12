@@ -2,12 +2,15 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import AnalysisResult from "../../components/user/AnalysisResult";
 import { getMyAnonymousProject } from "../../service/project.service";
+import { getSessionById } from "../../service/session.service";
 import type { ProjectResponse } from "../../types/project";
+import type { SessionResponse } from "../../types/session";
 
 function SessionPage() {
 	const { sessionId } = useParams<{ sessionId: string }>();
 	const navigate = useNavigate();
 	const [project, setProject] = useState<ProjectResponse | null>(null);
+	const [session, setSession] = useState<SessionResponse | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 
@@ -21,8 +24,12 @@ function SessionPage() {
 
 		const verifyAccess = async () => {
 			try {
-				const myProject = await getMyAnonymousProject();
+				const [myProject, mySession] = await Promise.all([
+					getMyAnonymousProject(),
+					getSessionById(numericSessionId),
+				]);
 				setProject(myProject);
+				setSession(mySession);
 			} catch (error) {
 				setError(
 					error instanceof Error
@@ -62,17 +69,25 @@ function SessionPage() {
 		);
 	}
 
+	const sessionName = session?.name ?? `Sesión ${numericSessionId}`;
+	const isNotUploaded = project.title === "dump";
+
 	return (
-		<div className="flex flex-col items-center gap-8 w-full py-8">
-			<div className="flex flex-col items-center gap-2">
-				<div className="badge badge-success badge-lg gap-2 py-4 px-6 text-base font-bold">
-					Active in Session
-				</div>
+		<div className="flex flex-col items-center gap-2 w-full py-8">
+			<div className="flex flex-col items-center gap-1">
 				<p className="text-base-content/60 text-lg">
-					Project:{" "}
-					<span className="font-semibold text-base-content">
-						{project.title === "dump" ? "Not yet uploaded" : project.title}
-					</span>
+					{isNotUploaded ? (
+						<span className="font-semibold text-base-content">
+							Upload your project to session {sessionName}
+						</span>
+					) : (
+						<>
+							Project:{" "}
+							<span className="font-semibold text-base-content">
+								{project.title}
+							</span>
+						</>
+					)}
 				</p>
 			</div>
 			<AnalysisResult />
