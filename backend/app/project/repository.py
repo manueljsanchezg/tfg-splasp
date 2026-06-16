@@ -44,9 +44,13 @@ class ProjectRepository(BaseRepository[Project]):
         return list(result.scalars().unique().all())
 
     async def find_by_session(self, session_id: int) -> List[Project]:
-        stmt = select(Project).where(Project.session_id == session_id)
+        stmt = (
+            select(Project)
+            .where(Project.session_id == session_id)
+            .options(selectinload(Project.project_versions))
+        )
         result = await self.session.execute(stmt)
-        return result.scalars().unique().all()
+        return list(result.scalars().unique().all())
 
     async def save_batch(self, projects_list: List[Project]) -> List[Project]:
         self.session.add_all(projects_list)
