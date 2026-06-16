@@ -35,11 +35,7 @@ class ProjectRepository(BaseRepository[Project]):
     async def find_paginated(
         self, limit: Optional[int] = None, offset: Optional[int] = None
     ) -> List[Project]:
-        stmt = (
-            select(Project)
-            .where(Project.project_versions.any())
-            .order_by(Project.id.desc())
-        )
+        stmt = select(Project).where(Project.project_versions.any()).order_by(Project.id.desc())
         if limit is not None:
             stmt = stmt.limit(limit)
         if offset is not None:
@@ -48,10 +44,7 @@ class ProjectRepository(BaseRepository[Project]):
         return list(result.scalars().unique().all())
 
     async def find_by_session(self, session_id: int) -> List[Project]:
-        stmt = (
-            select(Project)
-            .where(Project.session_id == session_id)
-        )
+        stmt = select(Project).where(Project.session_id == session_id)
         result = await self.session.execute(stmt)
         return result.scalars().unique().all()
 
