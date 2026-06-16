@@ -57,37 +57,10 @@ class TestProjectService:
         assert p.device_id == "device-test"
         assert p.session_id == 5
 
-    async def test_find_with_versions_no_versions_stays_empty(self):
+    async def test_find_projects_paginated_calls_repository(self):
         project = _make_project(project_id=1, versions=[])
-        self.repo.find_with_versions = AsyncMock(return_value=[project])
-        result = await self.service.find_projects_with_versions()
-        assert result[0].project_versions == []
-
-    async def test_find_with_versions_single_version_kept(self):
-        v1 = _make_version(version_number=1, vid=10)
-        project = _make_project(project_id=1, versions=[v1])
-        self.repo.find_with_versions = AsyncMock(return_value=[project])
-        result = await self.service.find_projects_with_versions()
-        assert len(result[0].project_versions) == 1
-        assert result[0].project_versions[0].version_number == 1
-
-    async def test_find_with_versions_keeps_latest(self):
-        v1 = _make_version(version_number=1, vid=1)
-        v2 = _make_version(version_number=2, vid=2)
-        v3 = _make_version(version_number=3, vid=3)
-        project = _make_project(project_id=1, versions=[v1, v2, v3])
-        self.repo.find_with_versions = AsyncMock(return_value=[project])
-        result = await self.service.find_projects_with_versions()
-        versions = result[0].project_versions
-        assert len(versions) == 1
-        assert versions[0].version_number == 3
-
-    async def test_find_with_versions_multiple_projects_each_keeps_latest(self):
-        p1 = _make_project(project_id=1, versions=[_make_version(1, 1), _make_version(2, 2)])
-        p2 = _make_project(
-            project_id=2, versions=[_make_version(1, 3), _make_version(3, 4), _make_version(2, 5)]
-        )
-        self.repo.find_with_versions = AsyncMock(return_value=[p1, p2])
-        result = await self.service.find_projects_with_versions()
-        assert result[0].project_versions[0].version_number == 2
-        assert result[1].project_versions[0].version_number == 3
+        self.repo.find_paginated = AsyncMock(return_value=[project])
+        result = await self.service.find_projects_paginated(limit=5, offset=10)
+        self.repo.find_paginated.assert_called_once_with(limit=5, offset=10)
+        assert len(result) == 1
+        assert result[0].id == 1

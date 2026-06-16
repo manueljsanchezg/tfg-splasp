@@ -35,7 +35,7 @@ export const analyzeProject = async (
 	let url = isAnonymous ? "/analyses/anonymous" : "/analyses";
 	const formData = new FormData();
 	if (projectUrl) {
-		url = url.concat(`?project_url=${projectUrl}`);
+		url = url.concat(`?project_url=${encodeURIComponent(projectUrl)}`);
 	} else if (project) {
 		formData.append("file", project);
 	}

@@ -112,7 +112,7 @@ function SessionInfoPage() {
 	};
 
 	return (
-		<div className="flex flex-col gap-6 w-full px-8 py-6 max-w-7xl ">
+		<div className="flex flex-col gap-6 w-full px-8 py-6 max-w-7xl mx-auto">
 			<div className="flex items-center justify-between mb-4">
 				<h1 className="text-3xl font-black">Session: {sessionId}</h1>
 
@@ -170,20 +170,21 @@ function SessionInfoPage() {
 				<table className="table table-lg text-lg w-full">
 					<thead className="bg-base-300 uppercase text-lg">
 						<tr>
-							<th className="pl-8 py-6">Project Name</th>
-							<th className="text-center pr-8 w-64 py-6">Created At</th>
+							<th className="pl-8 py-6 w-1/3">Project Name</th>
+							<th className="text-center px-4 py-6 w-1/3">URL</th>
+							<th className="text-center pr-8 py-6 w-1/3">Created At</th>
 						</tr>
 					</thead>
 					<tbody>
 						{isLoadingProjects ? (
 							<tr>
-								<td colSpan={2} className="text-center py-12 text-lg">
+								<td colSpan={3} className="text-center py-12 text-lg">
 									Loading...
 								</td>
 							</tr>
 						) : projects.length === 0 ? (
 							<tr>
-								<td colSpan={2} className="text-center py-12 text-base">
+								<td colSpan={3} className="text-center py-12 text-base">
 									No projects found.
 								</td>
 							</tr>

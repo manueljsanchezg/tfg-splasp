@@ -89,7 +89,7 @@ class TestAnalysisUtils:
         upload = _make_zip_upload({"session/project1.xml": b"<project><scenes/></project>"})
         roots = await get_roots_from_zip(upload)
         assert len(roots) == 1
-        filename, root = roots[0]
+        filename, root, _ = roots[0]
         assert filename == "project1.xml"
         assert isinstance(root, ET.Element)
 
@@ -102,13 +102,13 @@ class TestAnalysisUtils:
         upload = _make_zip_upload(files)
         roots = await get_roots_from_zip(upload)
         assert len(roots) == 3
-        assert {fname for fname, _ in roots} == {"proj_a.xml", "proj_b.xml", "proj_c.xml"}
+        assert {fname for fname, _, _ in roots} == {"proj_a.xml", "proj_b.xml", "proj_c.xml"}
 
     async def test_zip_flat_structure(self):
         upload = _make_zip_upload({"project1.xml": b"<project><scenes/></project>"})
         roots = await get_roots_from_zip(upload)
         assert len(roots) == 1
-        filename, root = roots[0]
+        filename, root, _ = roots[0]
         assert filename == "project1.xml"
         assert isinstance(root, ET.Element)
 
@@ -120,7 +120,7 @@ class TestAnalysisUtils:
         })
         roots = await get_roots_from_zip(upload)
         assert len(roots) == 1
-        filename, root = roots[0]
+        filename, root, _ = roots[0]
         assert filename == "project.xml"
         assert isinstance(root, ET.Element)
 
@@ -146,7 +146,7 @@ class TestAnalysisUtils:
     async def test_get_roots_from_projects_urls_multiple(self, sample_urls):
         roots = await get_roots_from_projects_urls(sample_urls)
         assert len(roots) == 3
-        for filename, root in roots:
+        for filename, root, _ in roots:
             assert isinstance(root, ET.Element)
             assert root.tag in ("project", "snapdata")
 

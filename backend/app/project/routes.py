@@ -5,18 +5,18 @@ from fastapi import APIRouter, HTTPException, Query
 from app.auth.dependencies import CurrentAnonymousDep
 from app.core.api_response import ApiResponse
 from app.project.dependencies import ProjectServiceDep, ProjectVersionServiceDep
-from app.project.schemas import ProjectRead, ProjectVersionRead, ProjectWithLatestVersion
+from app.project.schemas import ProjectRead, ProjectVersionRead
 
 router = APIRouter(prefix="/api/projects", tags=["projects"])
 
 
-@router.get("", response_model=ApiResponse[List[ProjectWithLatestVersion]])
-async def get_projects_with_versions(
+@router.get("", response_model=ApiResponse[List[ProjectRead]])
+async def get_projects(
     service: ProjectServiceDep,
     limit: int = Query(10, ge=1, le=100),
     offset: int = Query(0, ge=0),
 ):
-    projects = await service.find_projects_with_versions(limit=limit, offset=offset)
+    projects = await service.find_projects_paginated(limit=limit, offset=offset)
     return ApiResponse(success=True, data=projects)
 
 

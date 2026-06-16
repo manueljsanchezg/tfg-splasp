@@ -32,13 +32,13 @@ class ProjectRepository(BaseRepository[Project]):
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none()
 
-    async def find_with_versions(
+    async def find_paginated(
         self, limit: Optional[int] = None, offset: Optional[int] = None
     ) -> List[Project]:
         stmt = (
             select(Project)
             .where(Project.project_versions.any())
-            .options(selectinload(Project.project_versions))
+            .order_by(Project.id.desc())
         )
         if limit is not None:
             stmt = stmt.limit(limit)
@@ -51,7 +51,6 @@ class ProjectRepository(BaseRepository[Project]):
         stmt = (
             select(Project)
             .where(Project.session_id == session_id)
-            .options(selectinload(Project.project_versions))
         )
         result = await self.session.execute(stmt)
         return result.scalars().unique().all()

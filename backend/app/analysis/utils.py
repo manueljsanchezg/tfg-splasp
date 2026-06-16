@@ -89,7 +89,7 @@ def _extract_and_parse_zip(content: bytes):
                 )
             root = get_root_from_xml_content(xml)
             filename = file_path.split("/")[-1]
-            roots_list.append((filename, root))
+            roots_list.append((filename, root, None))
     return roots_list
 
 
@@ -103,7 +103,7 @@ async def get_roots_from_zip(zip_file: UploadFile):
 async def _process_single_url(project_url: str):
     filename, project_xml = await get_content_from_project_url(project_url.strip())
     root = await asyncio.to_thread(get_root_from_xml_content, project_xml)
-    return filename, root
+    return filename, root, project_url.strip()
 
 
 async def get_roots_from_projects_urls(projects_urls: str):

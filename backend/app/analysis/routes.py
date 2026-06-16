@@ -33,7 +33,7 @@ async def analyze_snap_project(
 
     root = await asyncio.to_thread(get_root_from_xml_content, project_xml)
 
-    analysis = await service.analyze_and_persist(filename, root)
+    analysis = await service.analyze_and_persist(filename, root, project_url)
 
     if analysis is None:
         raise HTTPException(status_code=400, detail="Failure saving the result of the analysis")
@@ -60,7 +60,7 @@ async def analyze_snap_project_anonymous(
     root = await asyncio.to_thread(get_root_from_xml_content, project_xml)
 
     analysis = await service.analyze_and_persist_anonymous(
-        filename, anonymous_user.project_id, root
+        filename, anonymous_user.project_id, root, project_url
     )
 
     if analysis is None:

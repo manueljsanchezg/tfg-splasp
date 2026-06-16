@@ -948,21 +948,21 @@ def _base_template_by_level(level: int, result) -> dict:
     n_blocks_level_3 = sum(1 for block_stat in result.blocks.values() if block_stat.level >= 3)
 
     if level == 0:
-        label = "Initial Level"
+        label = "Initial level"
         summary = (
             "Your project doesn't use any metaprogramming yet. "
             "As a next challenge, we suggest trying to change the visual structure of a block, "
             "by modifying attributes like its color or the category it belongs to."
         )
     elif level == 1:
-        label = "Basic Level"
+        label = "Basic level"
         summary = (
             f"You're on the right track! You've started applying basic variability to {n_blocks_total} block{'s' if n_blocks_total != 1 else ''}. "
             f"Right now your project changes the external structure of some blocks, like their color. "
             f"The next challenge is to make them change not just how they look, but also what they do."
         )
     elif level == 2:
-        label = "Intermediate Level"
+        label = "Intermediate level"
         summary = (
             f"Excellent work! You're no longer just changing how blocks look, but also rewriting their behavior. "
             f"You've applied intermediate variability to {n_blocks_level_2} block{'s' if n_blocks_level_2 != 1 else ''} "
@@ -970,7 +970,7 @@ def _base_template_by_level(level: int, result) -> dict:
             f"To reach the next level, try dismantling the blocks, modifying specific parts, and reassembling them."
         )
     elif level == 3:
-        label = "Advanced Level"
+        label = "Advanced level"
         summary = (
             f"Expert level reached! You are using advanced metaprogramming techniques in {n_blocks_level_3} block{'s' if n_blocks_level_3 != 1 else ''} "
             f"out of the {n_blocks_total} you've modified. "
@@ -1058,8 +1058,8 @@ def _build_feedback(result: AnalysisResult) -> dict:
         )
         _add_unique(
             improvements,
-            "The only improvement I can suggest is to keep expanding your project "
-            "by adding new blocks and using your metaprogramming skills",
+            "Keep up the great work! You can continue to grow your project "
+            "by adding new blocks and leveraging your metaprogramming skills.",
         )
 
     if result.total_scripts == 0:
@@ -1141,37 +1141,40 @@ def _build_feedback(result: AnalysisResult) -> dict:
         if avg_tangling >= 3:
             _add_unique(
                 alerts,
-                "Watch out for clutter! You have several global variables mixed in the same block. "
-                "Try to make each block handle only one thing.",
+                "Watch out for clutter! You have several configuration variables mixed in the same block. "
+                "Try to separate your features so each block handles only one configuration option.",
             )
 
         elif avg_tangling >= 2:
             _add_unique(
                 improvements,
-                "Your code is a bit cluttered. "
+                "Your features are a bit tangled. "
                 "Try not to mix global variables in the same blocks. ",
             )
 
         elif tangling_values:
-            _add_unique(strengths, "Your code is very well organized!")
+            _add_unique(
+                strengths,
+                "Your configuration variables are very well separated across your blocks.",
+            )
 
     if result.project_level > 1:
         if avg_scattering >= 5:
             _add_unique(
                 alerts,
-                "Your code is too scattered. "
-                "If you want to change something for a single variable, you'll have to search in too many places at once.",
+                "High scattering detected! The logic for a single configuration option is spread across too many places. "
+                "Updating a feature will require modifying many different scripts at once.",
             )
             _add_unique(
                 hints,
-                "Try creating a single custom block that groups everything that variable does "
-                "instead of putting loose conditionals all over the game.",
+                "Try creating a custom block that encapsulates all the behavior for that specific feature, "
+                "instead of scattering loose 'if' conditions throughout your entire project.",
             )
-        elif avg_scattering >= 3:
+        elif avg_scattering >= 2:
             _add_unique(
                 improvements,
                 "Your code is somewhat scattered. "
-                "It is recommended to group the logic of global variables to avoid modifying many blocks",
+                "It is recommended to group the behavior of your configuration variables into fewer blocks to make updates easier.",
             )
         elif scattering_sizes:
             _add_unique(

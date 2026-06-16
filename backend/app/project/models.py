@@ -21,6 +21,7 @@ class Project(Base):
     title: Mapped[str] = mapped_column()
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=func.now())
     device_id: Mapped[Optional[str]] = mapped_column(nullable=True)
+    url: Mapped[Optional[str]] = mapped_column(nullable=True)
 
     session_id: Mapped[Optional[int]] = mapped_column(
         ForeignKey("sessions.id"), nullable=True, index=True

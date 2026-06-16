@@ -11,6 +11,19 @@ export const formatDate = (dateString: string | undefined | null) => {
 	return Number.isNaN(date.getTime()) ? "N/A" : date.toLocaleDateString();
 };
 
+export const formatProjectUrl = (url: string) => {
+	try {
+		const urlObj = new URL(url);
+		const projectName = urlObj.searchParams.get("projectname");
+		if (projectName) {
+			return projectName;
+		}
+		return urlObj.pathname + urlObj.search;
+	} catch {
+		return url;
+	}
+};
+
 function ProjectRow({
 	project,
 	onViewAnalysis,
@@ -52,6 +65,22 @@ function ProjectRow({
 		<>
 			<tr className="hover:bg-base-200 cursor-pointer" onClick={handleToggle}>
 				<td className="font-bold pl-8 py-6">{project.title}</td>
+				<td className="text-center px-4 py-6 truncate max-w-[16rem]">
+					{project.url ? (
+						<a
+							href={project.url}
+							target="_blank"
+							rel="noreferrer"
+							className="link link-primary hover:text-primary-focus transition-colors"
+							onClick={(e) => e.stopPropagation()}
+							title={formatProjectUrl(project.url)}
+						>
+							{formatProjectUrl(project.url)}
+						</a>
+					) : (
+						<span className="text-base-content/50">-</span>
+					)}
+				</td>
 				<td className="text-center pr-8 py-6">
 					{formatDate(project.createdAt)}
 				</td>
@@ -59,7 +88,7 @@ function ProjectRow({
 
 			{isExpanded && (
 				<tr className="bg-base-200/40">
-					<td colSpan={2} className="p-8 border-b border-base-300">
+					<td colSpan={3} className="p-8 border-b border-base-300">
 						<h4 className="font-bold mb-6 text-xl border-b pb-2">Versions</h4>
 						{error && <p className="text-error mb-4">{error}</p>}
 
@@ -91,7 +120,8 @@ function ProjectRow({
 															type="checkbox"
 															className="checkbox checkbox-primary"
 															checked={isSelected}
-															readOnly
+															onChange={() => onAddVersionId(version.id)}
+															onClick={(e) => e.stopPropagation()}
 														/>
 													</div>
 													<p className="text-base-content/60 mb-4">

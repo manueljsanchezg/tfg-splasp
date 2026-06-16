@@ -114,7 +114,7 @@ function ProjectsPage() {
 	};
 
 	return (
-		<div className="flex flex-col gap-6 w-full px-8 py-6 max-w-7xl">
+		<div className="flex flex-col gap-6 w-full px-8 py-6 max-w-7xl mx-auto">
 			{error && (
 				<div className="alert alert-error shadow-lg">
 					<span>{error}</span>
@@ -154,20 +154,21 @@ function ProjectsPage() {
 					<table className="table table-lg text-lg w-full">
 						<thead className="bg-base-300 uppercase text-lg">
 							<tr>
-								<th className="pl-8 py-6">Project Name</th>
-								<th className="text-center pr-8 w-64 py-6">Created At</th>
+								<th className="pl-8 py-6 w-1/3">Project Name</th>
+								<th className="text-center px-4 py-6 w-1/3">URL</th>
+								<th className="text-center pr-8 py-6 w-1/3">Created At</th>
 							</tr>
 						</thead>
 						<tbody>
 							{isLoadingProjects ? (
 								<tr>
-									<td colSpan={2} className="text-center py-12 text-lg">
+									<td colSpan={3} className="text-center py-12 text-lg">
 										Loading...
 									</td>
 								</tr>
 							) : projects.length === 0 ? (
 								<tr>
-									<td colSpan={2} className="text-center py-12 text-base">
+									<td colSpan={3} className="text-center py-12 text-base">
 										No projects found.
 									</td>
 								</tr>

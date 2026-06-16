@@ -23,8 +23,10 @@ class AnalysisService:
         self.analysis_repo = analysis_repo
         self.project_service = project_service
 
-    async def analyze_and_persist(self, filename: str, root: Element) -> dict:
-        new_project = Project(title=filename)
+    async def analyze_and_persist(
+        self, filename: str, root: Element, project_url: Optional[str] = None
+    ) -> dict:
+        new_project = Project(title=filename, url=project_url)
         result = await asyncio.to_thread(analyze_project, root)
 
         new_project_with_analysis = await self._build_analysis_project(
@@ -35,12 +37,15 @@ class AnalysisService:
         return result.to_json_dict()
 
     async def analyze_and_persist_anonymous(
-        self, filename: str, project_id: int, root: Element
+        self, filename: str, project_id: int, root: Element, project_url: Optional[str] = None
     ) -> Optional[dict]:
         existing_project = await self.project_service.find_project_by_id_with_versions(project_id)
 
         if not existing_project:
             return None
+
+        if project_url:
+            existing_project.url = project_url
 
         result = await asyncio.to_thread(analyze_project, root)
 
@@ -50,11 +55,13 @@ class AnalysisService:
 
         return result.to_json_dict()
 
-    async def analyze_batch(self, session_id: int, projects_roots_list: List[Tuple[str, Element]]):
+    async def analyze_batch(
+        self, session_id: int, projects_roots_list: List[Tuple[str, Element, Optional[str]]]
+    ):
         projects_list = []
         for project_root in projects_roots_list:
             result = await asyncio.to_thread(analyze_project, project_root[1])
-            new_project = Project(title=project_root[0], session_id=session_id)
+            new_project = Project(title=project_root[0], session_id=session_id, url=project_root[2])
 
             new_project_with_analysis = await self._build_analysis_project(
                 new_project, project_root[0], result

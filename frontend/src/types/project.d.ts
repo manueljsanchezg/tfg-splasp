@@ -4,6 +4,7 @@ export interface ProjectResponse {
 	createdAt: string;
 	userId: number;
 	sessionId?: number | null;
+	url?: string | null;
 	projectVersions?: ProjectVersionResponse[];
 }
 

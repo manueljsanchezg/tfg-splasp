@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import "./App.css";
 import { Navigate, Route, Routes } from "react-router-dom";
 import AdminRoute from "./components/AdminRoute";
@@ -13,9 +14,16 @@ import UserSessionPage from "./pages/user/SessionPage";
 import ScrollToTop from "./components/ScrollToTop";
 import AnalysisPage from "./pages/user/AnalysisPage";
 import ProjectsPage from "./pages/admin/ProjectsPage";
+import { isTokenExpired } from "./utils/auth";
 
 export default function App() {
-	const { isUserAuthenticated } = useAuth();
+	const { isUserAuthenticated, token, logout } = useAuth();
+
+	useEffect(() => {
+		if (token && isTokenExpired(token)) {
+			logout();
+		}
+	}, [token, logout]);
 
 	let publicRoutes = <></>;
 	let privateRoutes = <></>;

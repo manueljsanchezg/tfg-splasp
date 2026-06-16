@@ -10,6 +10,7 @@ class ProjectRead(BaseModelCamel):
     created_at: datetime
     session_id: int | None = None
     device_id: str | None = None
+    url: str | None = None
 
 
 class ProjectVersionRead(BaseModelCamel):
