@@ -1,6 +1,6 @@
 services:
   pg_db:
-    image: postgres:18-alpine
+    image: postgres:17-alpine
     restart: always
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
